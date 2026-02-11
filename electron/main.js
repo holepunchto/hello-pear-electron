@@ -1,14 +1,14 @@
 const { app, BrowserWindow, ipcMain } = require('electron')
 const path = require('path')
 const PearRuntime = require('pear-runtime')
-const pearConfig = require('../pear.json')
+const { version, upgrade } = require('../package.json')
 
 const workers = new Map()
 let pear = null
 
 function getPear() {
   if (pear) return pear
-  pear = new PearRuntime({ app: getAppPath(), ...pearConfig })
+  pear = new PearRuntime({ app: getAppPath(), version, upgrade })
   return pear
 }
 
