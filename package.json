@@ -1,12 +1,13 @@
 {
   "name": "hello-pear-electron",
   "version": "1.0.0",
+  "upgrade": "pear://qxenz5wmspmryjc13m9yzsqj1conqotn8fb4ocbufwtz9mtbqq5o",
   "description": "",
   "license": "",
   "author": "",
-  "private": true,
   "type": "commonjs",
   "main": "electron/main.js",
+  "private": true,
   "scripts": {
     "lint": "prettier --check && lunte",
     "format": "prettier --write . && lunte --fix",
@@ -24,8 +25,7 @@
     }
   },
   "dependencies": {
-    "bare-sidecar": "^0.1.2",
-    "pear-runtime": "^0.1.0"
+    "pear-runtime": "^0.2.0"
   },
   "devDependencies": {
     "@electron-forge/cli": "^7.11.1",
