@@ -35,7 +35,7 @@ function getWorker(specifier) {
   function sendWorkerIPC(data) {
     sendToAll('worker:ipc:' + specifier, data)
   }
-  ipcMain.handle('pear:writeWorkerIPC:' + specifier, (evt, data) => {
+  ipcMain.handle('worker:writeIPC:' + specifier, (evt, data) => {
     return worker.write(Buffer.from(data))
   })
   workers.set(specifier, worker)
@@ -43,7 +43,7 @@ function getWorker(specifier) {
   worker.stdout.on('data', sendWorkerStdout)
   worker.stderr.on('data', sendWorkerStderr)
   worker.once('exit', (code) => {
-    ipcMain.removeHandler('pear:writeWorkerIPC:' + specifier)
+    ipcMain.removeHandler('worker:writeIPC:' + specifier)
     worker.removeListener('data', sendWorkerIPC)
     worker.stdout.removeListener('data', sendWorkerStdout)
     worker.stderr.removeListener('data', sendWorkerStderr)
