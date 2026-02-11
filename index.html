@@ -1,0 +1,52 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Hello World!</title>
+    <style>
+      body {
+        font-family:
+          -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+      }
+      h1 {
+        font-size: 48px;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+      }
+    </style>
+  </head>
+  <body>
+    <h1 id="h">VERSION 1</h1>
+    <script>
+      const path = require('path')
+      const PearRuntime = require('pear-runtime')
+      const app = new PearRuntime({ app: getApp(), ...require('./pear.json') })
+
+      app.on('updating', function () {
+        document.getElementById('h').innerText = 'VERSION 1: Updating...'
+      })
+
+      app.on('updated', function () {
+        app.applyUpdate()
+        document.getElementById('h').innerText = 'VERSION 1: Updated! Restart for latest'
+      })
+
+      const worker = app.run(require.resolve('./bare.js'))
+
+      worker.stdout.on('data', function(data) {
+        console.log('worker:', data.toString())
+      })
+
+      function getApp() {
+        if (process.cwd() !== '/') return null
+        return path.join(process.resourcesPath, '../..')
+      }
+    </script>
+  </body>
+</html>

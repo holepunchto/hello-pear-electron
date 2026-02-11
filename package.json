@@ -1,0 +1,40 @@
+{
+  "name": "hello-pear-electron",
+  "version": "1.0.0",
+  "description": "hello pear-electron",
+  "license": "ISC",
+  "author": "",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "test": "prettier . --check",
+    "start": "electron-forge start",
+    "package": "electron-forge package",
+    "make": "electron-forge make",
+    "make:linux": "electron-forge make --platform=linux",
+    "publish": "electron-forge publish"
+  },
+  "devDependencies": {
+    "@electron-forge/cli": "^7.11.1",
+    "@electron-forge/maker-deb": "^7.11.1",
+    "@electron-forge/maker-dmg": "^7.11.1",
+    "@electron-forge/maker-rpm": "^7.11.1",
+    "@electron-forge/maker-zip": "^7.11.1",
+    "electron": "^40.2.1",
+    "electron-forge-plugin-prune-prebuilds": "^1.0.0",
+    "electron-forge-plugin-universal-prebuilds": "^1.0.0",
+    "prettier": "^3.4.2",
+    "prettier-config-holepunch": "^2.0.0"
+  },
+  "build": {
+    "appId": "map.app.id",
+    "asar": false,
+    "mac": {
+      "category": "your.app.category.type"
+    }
+  },
+  "dependencies": {
+    "bare-sidecar": "^0.1.1",
+    "pear-runtime": "github:holepunchto/pear-runtime"
+  }
+}
