@@ -1,5 +1,6 @@
 {
   "name": "hello-pear-electron",
+  "productName": "HelloPear",
   "version": "1.0.0",
   "upgrade": "pear://qxenz5wmspmryjc13m9yzsqj1conqotn8fb4ocbufwtz9mtbqq5o",
   "description": "",
@@ -14,8 +15,7 @@
     "start": "electron-forge start",
     "package": "electron-forge package",
     "make": "electron-forge make",
-    "make:linux": "electron-forge make --platform=linux",
-    "publish": "electron-forge publish"
+    "make:linux": "electron-forge make --platform=linux"
   },
   "build": {
     "appId": "map.app.id",
@@ -33,6 +33,7 @@
     "@electron-forge/maker-dmg": "^7.11.1",
     "@electron-forge/maker-rpm": "^7.11.1",
     "@electron-forge/maker-zip": "^7.11.1",
+    "@forkprince/electron-forge-maker-appimage": "^1.0.11",
     "electron": "^40.2.1",
     "electron-forge-plugin-prune-prebuilds": "^1.0.0",
     "electron-forge-plugin-universal-prebuilds": "^1.0.0",

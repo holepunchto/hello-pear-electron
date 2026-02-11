@@ -1,11 +1,17 @@
 module.exports = {
-  packagerConfig: {},
+  packagerConfig: process.env.MAC_CODESIGN_IDENTITY
+    ? {
+        osxSign: {
+          identity: process.env.MAC_CODESIGN_IDENTITY
+        },
+        osxNotarize: {
+          appleId: process.env.APPLE_ID,
+          appleIdPassword: process.env.APPLE_PASSWORD
+        }
+      }
+    : {},
 
   makers: [
-    {
-      name: '@electron-forge/maker-zip',
-      platforms: ['darwin', 'win32', 'linux']
-    },
     {
       name: '@electron-forge/maker-dmg',
       platforms: ['darwin'],
