@@ -1,3 +1,4 @@
+import * as b4a from 'b4a'
 const bridge = window.bridge
 
 bridge.onPearEvent('updating', () => {
@@ -16,16 +17,15 @@ const workers = {
 bridge.startWorker(workers.main)
 
 const offWorkerStdout = bridge.onWorkerStdout(workers.main, (data) => {
-  console.log('worker stderr', '[', workers.main, ']:', data)
+  console.log('worker stderr', '[', workers.main, ']:', b4a.from(data).toString())
 })
 
 const offWorkerStderr = bridge.onWorkerStderr(workers.main, (data) => {
-  console.error('worker stderr', '[', workers.main, ']:', data)
+  console.error('worker stderr', '[', workers.main, ']:', b4a.from(data).toString())
 })
 
 const offWorkerIpc = bridge.onWorkerIPC(workers.main, (data) => {
-  console.log('worker ipc', '[', workers.main, ']:', data)
-
+  console.log('worker ipc', '[', workers.main, ']:', b4a.from(data).toString())
   bridge.writeWorkerIPC(workers.main, 'Hello from renderer')
 })
 

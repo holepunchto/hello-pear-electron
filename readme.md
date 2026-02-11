@@ -2,7 +2,6 @@
 
 > Hello World for Pear in Electron
 
-
 ## install
 
 ```
