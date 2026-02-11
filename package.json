@@ -25,7 +25,6 @@
     }
   },
   "dependencies": {
-    "bare-sidecar": "^0.2.0",
     "pear-runtime": "^0.2.0"
   },
   "devDependencies": {
