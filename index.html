@@ -39,7 +39,7 @@
 
       const worker = app.run(require.resolve('./bare.js'))
 
-      worker.stdout.on('data', function(data) {
+      worker.stdout.on('data', function (data) {
         console.log('worker:', data.toString())
       })
 

@@ -4,27 +4,27 @@ module.exports = {
   makers: [
     {
       name: '@electron-forge/maker-zip',
-      platforms: ['darwin', 'win32', 'linux'],
+      platforms: ['darwin', 'win32', 'linux']
     },
     {
       name: '@electron-forge/maker-dmg',
       platforms: ['darwin'],
-      config: {},
+      config: {}
     },
     {
-      name: "@forkprince/electron-forge-maker-appimage",
-      platforms: ["linux"]
+      name: '@forkprince/electron-forge-maker-appimage',
+      platforms: ['linux']
     }
   ],
 
   plugins: [
     {
       name: 'electron-forge-plugin-universal-prebuilds',
-      config: {},
+      config: {}
     },
     {
       name: 'electron-forge-plugin-prune-prebuilds',
-      config: {},
-    },
-  ],
+      config: {}
+    }
+  ]
 }
