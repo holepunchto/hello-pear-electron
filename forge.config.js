@@ -12,9 +12,8 @@ module.exports = {
       config: {},
     },
     {
-      name: '@electron-forge/maker-deb',
-      platforms: ['linux'],
-      config: {},
+      name: "@forkprince/electron-forge-maker-appimage",
+      platforms: ["linux"]
     }
   ],
 
