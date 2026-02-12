@@ -128,7 +128,7 @@ pear touch
 
 And set it in package.json `upgrade`.
 
-#### Verioning Link
+#### Versioning
 
 Use the `package.json` `version` field to version, using SemVer as normal.
 
@@ -156,17 +156,16 @@ npm run make
 
 #### Build
 
-Each make runs on a different OS and architecture.
+Each make runs on a different OS and architecture. Each must be moved to a single build machine, 
+this assumes that they've all been moved into the same project `./out` folder.
 
 Use [`pear-build`](https://npm.im/pear-build) to move all apps into a single `by-arch` folder,
 which should then be staged along with the rest of the application.
 
-The `out` files can be gathered rapidly by running `pear stage builds && pear seed builds` on each remote machine, then from project root on the build machine `pear dump <link>/out ./out`. This will populate the `out` folder on one machine with all OS & architcture builds using peer-to-peer connections.
-
-From project root run `pear-build` for each arch, for example Mac ARM64 + Linux x64 would be:
+From above the project root run `pear-build` for each arch, for example Mac ARM64 + Linux x64 would be:
 
 ```sh
-pear-build --package=./package.json --darwin-arm64-app ./out/HelloPear-darwin-arm64/HelloPear.app --linux-x64-app ./out/HelloPear-darwin-arm64/HelloPear.AppImage
+pear-build --package=./hello-pear-electron/package.json --darwin-arm64-app ./hello-pear-electron/out/HelloPear-darwin-arm64/HelloPear.app --linux-x64-app ./hello-pear-electron/out/HelloPear-darwin-arm64/HelloPear.AppImage --target built-app
 ```
 
 Once the `by-arch` folder is hydrated with builds for all required target architectures it's ready to move on to be staged, provisioned and multisigned.
