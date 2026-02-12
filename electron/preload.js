@@ -7,29 +7,28 @@ contextBridge.exposeInMainWorld('bridge', {
     ipcRenderer.on('pear:event:' + name, wrap)
     return () => ipcRenderer.removeListener('pear:event:' + name, wrap)
   },
-
   startWorker: (specifier) => ipcRenderer.invoke('pear:startWorker', specifier),
   onWorkerStdout: (specifier, listener) => {
     const wrap = (evt, data) => listener(Buffer.from(data))
-    ipcRenderer.on('worker:stdout:' + specifier, wrap)
-    return () => ipcRenderer.removeListener('worker:stdout:' + specifier, wrap)
+    ipcRenderer.on('pear:worker:stdout:' + specifier, wrap)
+    return () => ipcRenderer.removeListener('pear:worker:stdout:' + specifier, wrap)
   },
   onWorkerStderr: (specifier, listener) => {
     const wrap = (evt, data) => listener(Buffer.from(data))
-    ipcRenderer.on('worker:stderr:' + specifier, wrap)
-    return () => ipcRenderer.removeListener('worker:stderr:' + specifier, wrap)
+    ipcRenderer.on('pear:worker:stderr:' + specifier, wrap)
+    return () => ipcRenderer.removeListener('pear:worker:stderr:' + specifier, wrap)
   },
   onWorkerIPC: (specifier, listener) => {
     const wrap = (evt, data) => listener(Buffer.from(data))
-    ipcRenderer.on('worker:ipc:' + specifier, wrap)
-    return () => ipcRenderer.removeListener('worker:ipc:' + specifier, wrap)
+    ipcRenderer.on('pear:worker:ipc:' + specifier, wrap)
+    return () => ipcRenderer.removeListener('pear:worker:ipc:' + specifier, wrap)
   },
   onWorkerExit: (specifier, listener) => {
     const wrap = (evt, data) => listener(Buffer.from(data))
-    ipcRenderer.on('worker:ipc:' + specifier, wrap)
-    return () => ipcRenderer.removeListener('worker:exit:' + specifier, wrap)
+    ipcRenderer.on('pear:worker:ipc:' + specifier, wrap)
+    return () => ipcRenderer.removeListener('pear:worker:exit:' + specifier, wrap)
   },
   writeWorkerIPC: (specifier, data) => {
-    return ipcRenderer.invoke('worker:writeIPC:' + specifier, data)
+    return ipcRenderer.invoke('pear:worker:writeIPC:' + specifier, data)
   }
 })

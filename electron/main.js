@@ -27,15 +27,15 @@ function getWorker(specifier) {
   if (workers.has(specifier)) return workers.get(specifier)
   const worker = getPear().run(require.resolve('..' + specifier))
   function sendWorkerStdout(data) {
-    sendToAll('worker:stdout:' + specifier, data)
+    sendToAll('pear:worker:stdout:' + specifier, data)
   }
   function sendWorkerStderr(data) {
-    sendToAll('worker:stderr:' + specifier, data)
+    sendToAll('pear:worker:stderr:' + specifier, data)
   }
   function sendWorkerIPC(data) {
-    sendToAll('worker:ipc:' + specifier, data)
+    sendToAll('pear:worker:ipc:' + specifier, data)
   }
-  ipcMain.handle('worker:writeIPC:' + specifier, (evt, data) => {
+  ipcMain.handle('pear:worker:writeIPC:' + specifier, (evt, data) => {
     return worker.write(Buffer.from(data))
   })
   workers.set(specifier, worker)
@@ -43,11 +43,11 @@ function getWorker(specifier) {
   worker.stdout.on('data', sendWorkerStdout)
   worker.stderr.on('data', sendWorkerStderr)
   worker.once('exit', (code) => {
-    ipcMain.removeHandler('worker:writeIPC:' + specifier)
+    ipcMain.removeHandler('pear:worker:writeIPC:' + specifier)
     worker.removeListener('data', sendWorkerIPC)
     worker.stdout.removeListener('data', sendWorkerStdout)
     worker.stderr.removeListener('data', sendWorkerStderr)
-    sendToAll('worker:exit:' + specifier, code)
+    sendToAll('pear:worker:exit:' + specifier, code)
     worker.delete(specifier)
   })
   return worker
