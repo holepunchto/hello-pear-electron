@@ -1,4 +1,5 @@
 const bridge = window.bridge
+const decoder = new TextDecoder('utf-8')
 
 bridge.onPearEvent('updating', () => {
   document.getElementById('h').innerText = 'VERSION 1: Updating...'
@@ -16,11 +17,11 @@ const workers = {
 bridge.startWorker(workers.main)
 
 const offWorkerStdout = bridge.onWorkerStdout(workers.main, (data) => {
-  console.log('worker stderr', '[', workers.main, ']:', data)
+  console.log('worker stdout', '[', workers.main, ']:', decoder.decode(data))
 })
 
 const offWorkerStderr = bridge.onWorkerStderr(workers.main, (data) => {
-  console.error('worker stderr', '[', workers.main, ']:', data)
+  console.error('worker stderr', '[', workers.main, ']:', decoder.decode(data))
 })
 
 const offWorkerIpc = bridge.onWorkerIPC(workers.main, (data) => {
