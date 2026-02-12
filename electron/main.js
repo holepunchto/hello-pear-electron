@@ -50,6 +50,9 @@ function getWorker(specifier) {
     sendToAll('worker:exit:' + specifier, code)
     worker.delete(specifier)
   })
+  app.on('before-quit', () => {
+    worker.kill()
+  })
   return worker
 }
 
