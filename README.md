@@ -154,6 +154,14 @@ Production MacOS apps must be vendor signed. Supply signing and notarizing keys 
 MAC_CODESIGN_IDENTITY=identity APPLE_ID=id APPLE_PASSWORD=pw npm run make
 ```
 
+If using notarization with password credentials:
+
+```sh
+MAC_CODESIGN_IDENTITY=identity APPLE_ID=id APPLE_PASSWORD=pw TEAM_ID=teamid npm run make
+```
+
+Instructions for obtaining credentials can be found [here](https://www.electronforge.io/guides/code-signing/code-signing-macos#option-1-using-an-app-specific-password)
+
 ##### Windows
 
 TODO
