@@ -31,7 +31,7 @@ function getPear() {
 }
 
 function getAppPath() {
-  if (process.cwd() !== '/') return null
+  if (!app.isPackaged) return null
   return path.join(process.resourcesPath, '..', '..')
 }
 
