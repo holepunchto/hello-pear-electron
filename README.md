@@ -160,6 +160,8 @@ If using notarization with password credentials, you'll need to supply your `TEA
 MAC_CODESIGN_IDENTITY=identity APPLE_ID=id APPLE_PASSWORD=pw TEAM_ID=teamid npm run make
 ```
 
+Instructions for obtaining credentials can be found [here](https://www.electronforge.io/guides/code-signing/code-signing-macos#option-1-using-an-app-specific-password)
+
 ##### Windows
 
 TODO
