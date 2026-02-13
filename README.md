@@ -240,7 +240,7 @@ The `pear install` command can also be used to install distributables peer-to-pe
 TODO - needs pear install pear://qxenz5wmspmryjc13m9yzsqj1conqotn8fb4ocbufwtz9mtbqq5o
 ```
 
-### Updating the Application
+### Application Update Flow
 
 - Ensure the link is seeded
 - Make Production Distributables
@@ -248,4 +248,47 @@ TODO - needs pear install pear://qxenz5wmspmryjc13m9yzsqj1conqotn8fb4ocbufwtz9mt
 - Write (Stage / Provision / Multisign)
 
 A running application will receive `updating` and `update` events, which are sent to the electron renderer
-process via `bridge.onPearEvent()`. After receiving the `update` event, the `bridge.applyUpdate()` method is called. This swaps the current application path with a path to the updated application build and then removes the old application from disk. So once the application is restarted, the application path contains the new build, so the updated application is restarted.
+process via `bridge.onPearEvent()`. After receiving the `update` event, the `bridge.applyUpdate()` method is called. This swaps the current application path with a path to the updated application build and then removes the old application from disk. So once the application is restarted, the application path contains the new build therefore the updated application is executed on restart.
+
+### Storage & Additional Application Instances
+
+A storage dir is used for persistence. In development this defaults to `<tmpdir>/pear/<name>`.
+
+In Production this is per OS:
+
+* Mac: `~/Library/Application Support/<name>`
+* Linux: `~/.config/<name>`
+* Windows: `C:\\%USERPROFILE%\\AppData\\Roaming\\<name>`
+
+Additionally an argument can be passed to set a custom storage path.
+
+This is just boilerplate, a conventional starting point. It can be changed/improved as needed per project.
+For example, peer-to-peer applications can use a lot of disk space. On Windows the `C:` drive is often lower capacity than other drives. Allowing users to set their storage in-app is beyond the scope here but would be a useful feature for any peer-to-peer app.
+
+In development custom storage can be passed as so:
+
+```sh
+npm start -- -- /tmp/custom/store
+```
+
+The double double-dash (`-- --`) there is intentional and correct.
+
+For application builds, an additional instance can be run with the following per OS.
+
+#### MacOS
+
+```sh
+open -n <name>.app --args /tmp/custom/store
+```
+
+#### Linux
+
+```sh
+./<name>.AppImage /tmp/custom/store
+```
+
+#### Windows
+
+```sh
+.\<name>.exe C:\tmp\custom\store
+```

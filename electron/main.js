@@ -1,14 +1,32 @@
 const { app, BrowserWindow, ipcMain } = require('electron')
+const os = require('os')
 const path = require('path')
 const PearRuntime = require('pear-runtime')
-const { version, upgrade } = require('../package.json')
+const { isMac, isLinux } = require('which-runtime')
+const { name, version, upgrade } = require('../package.json')
 
 const workers = new Map()
 let pear = null
 
+const pearStore = app.isPackaged ? process.argv[1] : process.argv[2]
+
 function getPear() {
   if (pear) return pear
-  pear = new PearRuntime({ app: getAppPath(), version, upgrade })
+  const appPath = getAppPath()
+  let dir = null
+  if (pearStore) {
+    console.log('pear store: ' + pearStore)
+    dir = pearStore
+  } else if (appPath === null) {
+    dir = path.join(os.tmpdir(), 'pear', name)
+  } else {
+    dir = isMac
+      ? path.join(os.homedir(), 'Library', 'Application Support', name)
+      : isLinux
+        ? path.join(os.homedir(), '.config', name)
+        : path.join(os.homedir(), 'AppData', 'Roaming', name)
+  }
+  pear = new PearRuntime({ dir, app: appPath, version, upgrade })
   return pear
 }
 
