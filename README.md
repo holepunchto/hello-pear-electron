@@ -10,8 +10,12 @@
 
 ## Install
 
+> [!IMPORTANT]
+> The electron dependency needs post install scripts, need to set ignore-scripts to false.
+> see the [electron docs](https://www.electronjs.org/docs/latest/tutorial/tutorial-first-app#:~:text=ensure%20that%20its-,postinstall,-lifecycle%20script%20is]
+
 ```sh
-npm install
+npm install --ignore-scripts=false
 ```
 
 ## Scripts
@@ -256,9 +260,9 @@ A storage dir is used for persistence. In development this defaults to `<tmpdir>
 
 In Production this is per OS:
 
-* Mac: `~/Library/Application Support/<name>`
-* Linux: `~/.config/<name>`
-* Windows: `C:\\%USERPROFILE%\\AppData\\Roaming\\<name>`
+- Mac: `~/Library/Application Support/<name>`
+- Linux: `~/.config/<name>`
+- Windows: `C:\\%USERPROFILE%\\AppData\\Roaming\\<name>`
 
 Additionally an argument can be passed to set a custom storage path.
 
