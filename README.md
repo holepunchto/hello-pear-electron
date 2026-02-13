@@ -154,6 +154,12 @@ Production MacOS apps must be vendor signed. Supply signing and notarizing keys 
 MAC_CODESIGN_IDENTITY=identity APPLE_ID=id APPLE_PASSWORD=pw npm run make
 ```
 
+If using notarization with password credentials, you'll need to supply your `TEAM_ID`:
+
+```sh
+MAC_CODESIGN_IDENTITY=identity APPLE_ID=id APPLE_PASSWORD=pw TEAM_ID=teamid npm run make
+```
+
 ##### Windows
 
 TODO
