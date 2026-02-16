@@ -10,7 +10,7 @@
   "main": "electron/main.js",
   "private": true,
   "scripts": {
-    "lint": "prettier --check && lunte",
+    "lint": "prettier --check . && lunte",
     "format": "prettier --write . && lunte --fix",
     "start": "electron-forge start",
     "package": "electron-forge package",
