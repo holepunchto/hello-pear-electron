@@ -269,10 +269,20 @@ Say `pear://q9sopzoqgas9usoiq7uzkkwngm5pzj4zo3n4esjwwbmw6offis8o` becomes a pre-
 For example `pear touch` returns `pear://ahzao41564w6fbbh5oxy47zungwyp7bgb1ctwtz3i4j5fbqdayxy`, this is now the new target link:
 
 ```sh
-pear provision pear://0.2081.qxenz5wmspmryjc13m9yzsqj1conqotn8fb4ocbufwtz9mtbqq5o pear://ahzao41564w6fbbh5oxy47zungwyp7bgb1ctwtz3i4j5fbqdayxy pear://0.1079.ahzao41564w6fbbh5oxy47zungwyp7bgb1ctwtz3i4j5fbqdayxy
+pear provision pear://0.2081.qxenz5wmspmryjc13m9yzsqj1conqotn8fb4ocbufwtz9mtbqq5o pear://ahzao41564w6fbbh5oxy47zungwyp7bgb1ctwtz3i4j5fbqdayxy pear://0.1079.q9sopzoqgas9usoiq7uzkkwngm5pzj4zo3n4esjwwbmw6offis8o
 ```
 
 Here the first touched link has become the production link stand-in, the second touched link is now the provision link. This decoupling allows for as many provision links as needed while keeping the production (or production stand-in) link stable. See the next Multisign section for creating a final production link for go-live.
+
+Once any new key is ready, the application can be updated to that key by setting the `package.json` `upgrade` field, for example to move from stage link to pre-production provision link:
+
+```json
+{
+  "version": "1.2.3",
+  "upgrade": "pear://q9sopzoqgas9usoiq7uzkkwngm5pzj4zo3n4esjwwbmw6offis8o",
+  ....
+}
+```
 
 ### Multisign
 
