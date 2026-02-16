@@ -206,8 +206,8 @@ The resulting Deploy Directory should (and must) have the following structure at
 ```
 /package.json
 /by-arch
-  /app
-    /[...platform-arch]
+  /[...platform-arch]
+    /app
 ```
 
 ### Stage
