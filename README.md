@@ -2,7 +2,7 @@
 
 > Pear Hello World for Electron with `pear-runtime`
 
-Quick start boilerplate for embededding [pear-runtime](https://githu.com/holepunchto/pear-runtime) into Electron.
+Quick start boilerplate for embededding [pear-runtime](https://github.com/holepunchto/pear-runtime) into Electron.
 
 ## Requirements
 
