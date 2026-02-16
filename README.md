@@ -1,6 +1,8 @@
 # hello-pear-electron
 
-> Hello World for Pear in Electron
+> Pear Hello World for Electron with `pear-runtime`
+
+Quick start boilerplate for embededding [pear-runtime](https://githu.com/holepunchto/pear-runtime) into Electron.
 
 ## Requirements
 
@@ -105,6 +107,16 @@ npm run publish
 Uses: `electron-forge publish`
 
 ---
+
+### `pear-runtime`
+
+#### OTA P2P Updates
+
+Over-the-Air (OTA) Peer-to-Peer (P2P) updates are enabled
+
+#### Bare Workers
+
+#### Storage
 
 ### Production Build
 
@@ -224,7 +236,43 @@ pear seed pear://qxenz5wmspmryjc13m9yzsqj1conqotn8fb4ocbufwtz9mtbqq5o # on other
 
 ### Provision
 
-TODO - needs release lines
+Iterating on code leads to lots of additions and deletions. When staging, both additions and deletions are entries written to an application drive. A provision synchronizes blocks from one application drive to another which effectively strips intermediate additions/deletions. Use `pear provision` to create a pre-production application drive.
+
+Create a target provision link:
+
+```sh
+pear touch
+```
+
+The signature of `pear provision` is:
+
+```sh
+provision <versioned-source-link> <target-link> <versioned-production-link>
+```
+
+The source link is the stage link. It's a versioned link when the `pear://<fork>.<length>.<key>` format is used. For example: `pear://0.1079.qxenz5wmspmryjc13m9yzsqj1conqotn8fb4ocbufwtz9mtbqq5o`
+
+Let's say the output of `pear touch` is `pear://q9sopzoqgas9usoiq7uzkkwngm5pzj4zo3n4esjwwbmw6offis8o`. This is the target link. It should not be versioned, it's going to have blocks synced to it from the source link.
+
+The `pear provision` command expects a versioned production link to synchronize onto the target link before then synchronizing from the source link so that changes from the source link are layered on top of a production replica.
+
+The production link should be a multisigned link that never changes but the multisigned link should also originate from a provisioned link. Prior to go-live a provisioned link may be used internally as the pre-production stand-in link.
+
+So to bootstrap this flow the first time, supply the target link versioned with 0.0 as the production link:
+
+```sh
+pear provision pear://0.1079.qxenz5wmspmryjc13m9yzsqj1conqotn8fb4ocbufwtz9mtbqq5o pear://q9sopzoqgas9usoiq7uzkkwngm5pzj4zo3n4esjwwbmw6offis8o pear://0.0.q9sopzoqgas9usoiq7uzkkwngm5pzj4zo3n4esjwwbmw6offis8o
+```
+
+Say `pear://q9sopzoqgas9usoiq7uzkkwngm5pzj4zo3n4esjwwbmw6offis8o` becomes a pre-golive pre-production production stand-in link. Subsequent provisions would use this as the production link.
+
+For example `pear touch` returns `pear://ahzao41564w6fbbh5oxy47zungwyp7bgb1ctwtz3i4j5fbqdayxy`, this is now the new target link:
+
+```sh
+pear provision pear://0.2081.qxenz5wmspmryjc13m9yzsqj1conqotn8fb4ocbufwtz9mtbqq5o pear://ahzao41564w6fbbh5oxy47zungwyp7bgb1ctwtz3i4j5fbqdayxy pear://0.1079.ahzao41564w6fbbh5oxy47zungwyp7bgb1ctwtz3i4j5fbqdayxy
+```
+
+Here the first touched link has become the production link stand-in, the second touched link is now the provision link. This decoupling allows for as many provision links as needed while keeping the production (or production stand-in) link stable. See the next Multisign section for creating a final production link for go-live.
 
 ### Multisign
 
