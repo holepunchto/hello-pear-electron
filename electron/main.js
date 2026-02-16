@@ -66,7 +66,7 @@ function getWorker(specifier) {
     worker.stdout.removeListener('data', sendWorkerStdout)
     worker.stderr.removeListener('data', sendWorkerStderr)
     sendToAll('pear:worker:exit:' + specifier, code)
-    worker.delete(specifier)
+    workers.delete(specifier)
   })
   return worker
 }
