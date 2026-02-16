@@ -1,13 +1,15 @@
 const bridge = window.bridge
 const decoder = new TextDecoder('utf-8')
 
+document.getElementById('v').innerText += bridge.pkg().version
+
 bridge.onPearEvent('updating', () => {
-  document.getElementById('h').innerText = 'VERSION 1: Updating...'
+  document.getElementById('v').innerText = 'UPDATING...'
 })
 
 bridge.onPearEvent('updated', () => {
   bridge.applyUpdate()
-  document.getElementById('h').innerText = 'VERSION 1: Updated! Restart for latest'
+  document.getElementById('v').innerText = 'Updated! Restart for latest'
 })
 
 const workers = {
@@ -25,7 +27,7 @@ const offWorkerStderr = bridge.onWorkerStderr(workers.main, (data) => {
 })
 
 const offWorkerIpc = bridge.onWorkerIPC(workers.main, (data) => {
-  console.log('worker ipc', '[', workers.main, ']:', data)
+  console.log('worker ipc', '[', workers.main, ']:', decoder.decode(data))
 
   bridge.writeWorkerIPC(workers.main, 'Hello from renderer')
 })

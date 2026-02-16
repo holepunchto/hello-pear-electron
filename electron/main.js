@@ -3,12 +3,18 @@ const os = require('os')
 const path = require('path')
 const PearRuntime = require('pear-runtime')
 const { isMac, isLinux } = require('which-runtime')
-const { name, version, upgrade } = require('../package.json')
+const pkg = require('../package.json')
+const { name, productName, version, upgrade } = pkg
 
 const workers = new Map()
 let pear = null
 
+const appName = productName ?? name
 const pearStore = app.isPackaged ? process.argv[1] : process.argv[2]
+
+ipcMain.on('pkg', (evt) => {
+  evt.returnValue = pkg
+})
 
 function getPear() {
   if (pear) return pear
@@ -18,13 +24,13 @@ function getPear() {
     console.log('pear store: ' + pearStore)
     dir = pearStore
   } else if (appPath === null) {
-    dir = path.join(os.tmpdir(), 'pear', name)
+    dir = path.join(os.tmpdir(), 'pear', appName)
   } else {
     dir = isMac
-      ? path.join(os.homedir(), 'Library', 'Application Support', name)
+      ? path.join(os.homedir(), 'Library', 'Application Support', appName)
       : isLinux
-        ? path.join(os.homedir(), '.config', name)
-        : path.join(os.homedir(), 'AppData', 'Roaming', name)
+        ? path.join(os.homedir(), '.config', appName)
+        : path.join(os.homedir(), 'AppData', 'Roaming', appName)
   }
   pear = new PearRuntime({ dir, app: appPath, version, upgrade })
   return pear

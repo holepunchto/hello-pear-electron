@@ -1,6 +1,8 @@
 const { contextBridge, ipcRenderer } = require('electron')
-
 contextBridge.exposeInMainWorld('bridge', {
+  pkg() {
+    return ipcRenderer.sendSync('pkg')
+  },
   applyUpdate: () => ipcRenderer.invoke('pear:applyUpdate'),
   onPearEvent: (name, listener) => {
     const wrap = (evt, eventName) => listener(eventName)
