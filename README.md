@@ -256,9 +256,9 @@ A storage dir is used for persistence. In development this defaults to `<tmpdir>
 
 In Production this is per OS:
 
-* Mac: `~/Library/Application Support/<name>`
-* Linux: `~/.config/<name>`
-* Windows: `C:\\%USERPROFILE%\\AppData\\Roaming\\<name>`
+- Mac: `~/Library/Application Support/<name>`
+- Linux: `~/.config/<name>`
+- Windows: `C:\\%USERPROFILE%\\AppData\\Roaming\\<name>`
 
 Additionally an argument can be passed to set a custom storage path.
 
