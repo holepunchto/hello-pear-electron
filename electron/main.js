@@ -16,6 +16,31 @@ ipcMain.on('pkg', (evt) => {
   evt.returnValue = pkg
 })
 
+// fully-local WebRTC proxies, if needed:
+app.commandLine.appendSwitch('allow-loopback-in-peer-connection')
+
+if (isLinux) {
+  // support tweaks:
+  const isWayland = process.env.XDG_SESSION_TYPE === 'wayland'
+  const isX64 = process.arch === 'x64'
+  const isAppImage = process.env.APPIMAGE ?? process.env.APPDIR?.includes('squashfs')
+  if (isWayland) {
+    app.commandLine.appendSwitch(
+      'enable-features',
+      'WebRTCPipeWireCapturer,WaylandWindowDecorations'
+    )
+    app.commandLine.appendSwitch('ozone-platform-hint', 'auto')
+  }
+
+  if (isX64) {
+    app.disableHardwareAcceleration()
+  }
+
+  if (isAppImage) {
+    app.commandLine.appendSwitch('disable-setuid-sandbox')
+  }
+}
+
 function getPear() {
   if (pear) return pear
   const appPath = getAppPath()
