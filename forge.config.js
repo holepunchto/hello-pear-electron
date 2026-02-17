@@ -1,6 +1,7 @@
 module.exports = {
   packagerConfig: process.env.MAC_CODESIGN_IDENTITY
     ? {
+        icon: 'icons/icon',
         osxSign: {
           identity: process.env.MAC_CODESIGN_IDENTITY
         },
@@ -10,7 +11,9 @@ module.exports = {
           teamId: process.env.TEAM_ID
         }
       }
-    : {},
+    : {
+        icon: 'icons/icon'
+      },
 
   makers: [
     {
