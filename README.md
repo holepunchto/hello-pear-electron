@@ -288,7 +288,7 @@ Once any new key is ready, the application can be updated to that key by setting
 
 TODO - needs release lines and multisig tool
 
-### Distribution
+### Distribute
 
 The application distributables can be distributed per usual, eg via website etc.
 
