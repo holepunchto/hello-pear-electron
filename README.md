@@ -170,6 +170,8 @@ MAC_CODESIGN_IDENTITY=identity APPLE_TEAM_ID=teamid APPLE_ID=id APPLE_PASSWORD=p
 
 Instructions for obtaining credentials can be found [here](https://www.electronforge.io/guides/code-signing/code-signing-macos#option-1-using-an-app-specific-password)
 
+Note `APPLE_PASSWORD` is not the sign-in password, it's an [app-specific password](https://support.apple.com/en-us/102654).
+
 ##### Windows
 
 TODO
