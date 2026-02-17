@@ -38,7 +38,7 @@ function getPear() {
 
 function getAppPath() {
   if (!app.isPackaged) return null
-  if (isLinux) return process.env.APPIMAGE
+  if (isLinux && process.env.APPIMAGE) return process.env.APPIMAGE
   return path.join(process.resourcesPath, '..', '..')
 }
 
