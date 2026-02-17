@@ -160,16 +160,12 @@ npm version <v>
 
 ##### MacOS
 
-Production MacOS apps must be vendor signed. Supply signing and notarizing keys with `MAC_CODESIGN_IDENTITY`, `APPLE_ID`, `APPLE_PASSWORD`.
+Production MacOS apps must be vendor signed and notarized.
+
+Supply signing and notarizing keys with `MAC_CODESIGN_IDENTITY`, `APPLE_TEAM_ID`, `APPLE_ID`, `APPLE_PASSWORD`
 
 ```sh
-MAC_CODESIGN_IDENTITY=identity APPLE_ID=id APPLE_PASSWORD=pw npm run make
-```
-
-If using notarization with password credentials:
-
-```sh
-MAC_CODESIGN_IDENTITY=identity APPLE_ID=id APPLE_PASSWORD=pw TEAM_ID=teamid npm run make
+MAC_CODESIGN_IDENTITY=identity APPLE_TEAM_ID=teamid APPLE_ID=id APPLE_PASSWORD=pw npm run make
 ```
 
 Instructions for obtaining credentials can be found [here](https://www.electronforge.io/guides/code-signing/code-signing-macos#option-1-using-an-app-specific-password)
