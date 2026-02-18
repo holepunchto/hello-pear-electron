@@ -3,6 +3,7 @@ const os = require('os')
 const path = require('path')
 const PearRuntime = require('pear-runtime')
 const { isMac, isLinux } = require('which-runtime')
+const { command, flag } = require('paparam')
 const pkg = require('../package.json')
 const { name, productName, version, upgrade } = pkg
 
@@ -10,7 +11,17 @@ const workers = new Map()
 let pear = null
 
 const appName = productName ?? name
-const pearStore = app.isPackaged ? process.argv[1] : process.argv[2]
+
+const cmd = command(
+  appName,
+  flag('--storage', 'pass custom storage to pear-runtime'),
+  flag('--no-updates', 'start without OTA updates')
+)
+
+cmd.parse(app.isPackaged ? process.argv.slice(1) : process.argv.slice(2))
+
+const pearStore = cmd.flags.storage
+const updates = cmd.flags.updates
 
 ipcMain.on('pkg', (evt) => {
   evt.returnValue = pkg
@@ -32,7 +43,7 @@ function getPear() {
         ? path.join(os.homedir(), '.config', appName)
         : path.join(os.homedir(), 'AppData', 'Roaming', appName)
   }
-  pear = new PearRuntime({ dir, app: appPath, version, upgrade })
+  pear = new PearRuntime({ dir, app: appPath, updates, version, upgrade })
   return pear
 }
 
