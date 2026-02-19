@@ -18,12 +18,20 @@ npm install
 
 ## Scripts
 
-### `npm run start`
+### `npm start`
 
 Start app in development mode.
 
 ```sh
-npm run start
+npm start
+```
+
+When running locally, updates aren't turned off to avoid the built application being swapped from local development when there is an update.
+
+To enable updates for testing update flow in local development use
+
+```sh
+npm start -- --updates
 ```
 
 Uses: `electron-forge start`
@@ -81,12 +89,6 @@ npm run make
 ```
 
 Uses: `electron-forge make`
-
----
-
-### `npm run make:linux`
-
-Build Linux distributables.
 
 ```sh
 npm run make:linux
@@ -324,10 +326,8 @@ For example, peer-to-peer applications can use a lot of disk space. On Windows t
 In development custom storage can be passed as so:
 
 ```sh
-npm start -- -- /tmp/custom/store
+npm start -- --storage /tmp/custom/storage
 ```
-
-The double double-dash (`-- --`) there is intentional and correct.
 
 For application builds, an additional instance can be run with the following per OS.
 
