@@ -12,8 +12,12 @@ Quick start boilerplate for embededding [pear-runtime](https://github.com/holepu
 
 ## Install
 
+> [!IMPORTANT]
+> The electron dependency needs post install scripts, need to set ignore-scripts to false.
+> Offical docs here: https://www.electronjs.org/docs/latest/tutorial/tutorial-first-app#:~:text=ensure%20that%20its-,postinstall,-lifecycle%20script%20is
+
 ```sh
-npm install
+npm install --ignore-scripts=false
 ```
 
 ## Scripts
