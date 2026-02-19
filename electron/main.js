@@ -88,6 +88,9 @@ function getWorker(specifier) {
     sendToAll('pear:worker:exit:' + specifier, code)
     workers.delete(specifier)
   })
+  app.on('before-quit', () => {
+    worker.kill()
+  })
   return worker
 }
 
