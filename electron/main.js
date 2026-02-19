@@ -6,6 +6,8 @@ const { isMac, isLinux } = require('which-runtime')
 const pkg = require('../package.json')
 const { name, productName, version, upgrade } = pkg
 
+const protocol = name
+
 const workers = new Map()
 let pear = null
 
@@ -124,23 +126,45 @@ ipcMain.handle('pear:startWorker', (evt, filename) => {
   return true
 })
 
-app.whenReady().then(() => {
-  createWindow().catch((error) => {
-    console.error('Failed to create window:', error)
-    app.quit()
+function handleDeepLink(url) {
+  console.log('deep link:', url)
+}
+
+app.setAsDefaultProtocolClient(protocol)
+
+app.on('open-url', (evt, url) => {
+  evt.preventDefault()
+  handleDeepLink(url)
+})
+
+const lock = app.requestSingleInstanceLock()
+
+if (!lock) {
+  app.quit()
+} else {
+  app.on('second-instance', (evt, args) => {
+    const url = args.find((arg) => arg.startsWith(protocol + '://'))
+    if (url) handleDeepLink(url)
   })
 
-  app.on('activate', () => {
-    if (BrowserWindow.getAllWindows().length === 0) {
-      createWindow().catch((error) => {
-        console.error('Failed to create window:', error)
-      })
+  app.whenReady().then(() => {
+    createWindow().catch((err) => {
+      console.error('Failed to create window:', err)
+      app.quit()
+    })
+
+    app.on('activate', () => {
+      if (BrowserWindow.getAllWindows().length === 0) {
+        createWindow().catch((err) => {
+          console.error('Failed to create window:', err)
+        })
+      }
+    })
+  })
+
+  app.on('window-all-closed', () => {
+    if (process.platform !== 'darwin') {
+      app.quit()
     }
   })
-})
-
-app.on('window-all-closed', () => {
-  if (process.platform !== 'darwin') {
-    app.quit()
-  }
-})
+}
