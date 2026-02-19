@@ -262,7 +262,11 @@ Note `APPLE_PASSWORD` is not the sign-in password, it's an [app-specific passwor
 
 ##### Windows
 
-TODO
+Edit `AppxManifest.xml` and ensure name, publisher, description, executable path are correct throughout - some of these are declared in multiple cases.
+
+```sh
+npm run make
+```
 
 ##### Linux
 

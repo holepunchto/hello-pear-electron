@@ -1,3 +1,4 @@
+const path = require('path')
 const pkg = require('./package.json')
 const appName = pkg.productName ?? pkg.name
 
@@ -32,6 +33,13 @@ module.exports = {
     {
       name: '@forkprince/electron-forge-maker-appimage',
       platforms: ['linux']
+    },
+    {
+      name: '@electron-forge/maker-msix',
+      platforms: ['win32'],
+      config: {
+        manifest: path.join(__dirname, 'build', 'AppxManifest.xml')
+      }
     }
   ],
 
