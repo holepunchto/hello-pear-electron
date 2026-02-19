@@ -2,7 +2,7 @@ const pkg = require('./package.json')
 const appName = pkg.productName ?? pkg.name
 
 let packagerConfig = {
-  icon: 'icons/icon',
+  icon: 'build/icon',
   protocols: [{ name: appName, schemes: [pkg.name] }]
 }
 

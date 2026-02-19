@@ -160,6 +160,18 @@ npm version <v>
 
 #### Make Production Distributables
 
+##### Checklist
+
+- `package.json` `author` field populated
+- `package.json` `license` field populated
+- `package.json` `description` field populated
+- `package.json` `author` field populated
+- `package.json` `name` field set per brand
+- `package.json` `productName` field set per brand
+- `build/icon.icns` is per brand
+- `build/icon.ico` is per brand
+- `build/icon.icon.png` is per brand
+
 ##### MacOS
 
 Production MacOS apps must be vendor signed and notarized.
