@@ -375,6 +375,7 @@ Once any new key is ready, the application can be updated to that key by setting
 ### Multisig
 
 Multisig serves a dual security purpose:
+
 - Multiple people need to get hacked before a malicious build can be published
 - Multiple people need to lose their signing key before a production build can no longer be updated
 
