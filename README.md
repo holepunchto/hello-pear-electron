@@ -403,7 +403,7 @@ Take note of the public key.
 }
 ```
 
-This is an example multisig config file for this app, using the pre-production key defined before as the source of the content to mirror into the multisig drive. Store it as `config.json`.
+This is an example multisig config file for this app, using the pre-production key defined before as the source of the content to mirror into the multisig drive. Store it as `multisig.json`.
 
 #### Prepare Multisig Request
 
@@ -441,7 +441,7 @@ Then share the response. Once a quorum of signers (2 in the example) share their
 hyper-multisig verify-drive --first-commit <signing request>
 ```
 
-If responeses are already available, pass those in as additional parameters after the `<signing request>`.
+If responses are already available, pass those in as additional parameters after the `<signing request>`.
 
 #### Commit Multisig Request
 
@@ -468,7 +468,7 @@ Once the program detects at least 2 seeders have fully downloaded the multisig d
 
 #### More Multisig Requests
 
-Use the same flow for the next multisig requests, but remove the `--force-commit` flag.
+Use the same flow for the next multisig requests, but remove the `--first-commit` flag.
 
 Starting from the second commit, it is technically possible to corrupt the production build. So if a command ever errors with an `INCOMPATIBLE_SOURCE_AND_TARGET` error, never try to work around it, but thank the tool for protecting you from doing something stupid.
 
