@@ -372,9 +372,107 @@ Once any new key is ready, the application can be updated to that key by setting
 }
 ```
 
-### Multisign
+### Multisig
 
-TODO - needs release lines and multisig tool
+Multisig serves a dual security purpose:
+
+- Multiple people need to get hacked before a malicious build can be published
+- Multiple people need to lose their signing key before a production build can no longer be updated
+
+It also provides flexibility, by decoupling the key of a production build from the machine where it is built. Instead, the key of a multisig built is fully determined by a `namespace` (an arbitrary string), a list of signing keys, and a quorum (the amount of signers needed to release a build).
+
+#### Create Signing Keys
+
+Each signer needs to generate a signing key. The same person can use the same key to sign many different builds.
+
+```
+npm i -g hypercore-sign
+hypercore-sign-generate-keys
+```
+
+Take note of the public key.
+
+#### Create Multisig Config
+
+```json
+{
+  "publicKeys": ["pubkey-signer-1", "pubkey-signer-2", "pubkey-signer-3"],
+  "namespace": "hello-pear-electron",
+  "quorum": 2,
+  "srcKey": "q9sopzoqgas9usoiq7uzkkwngm5pzj4zo3n4esjwwbmw6offis8o"
+}
+```
+
+This is an example multisig config file for this app, using the pre-production key defined before as the source of the content to mirror into the multisig drive. Store it as `multisig.json`.
+
+#### Prepare Multisig Request
+
+```
+npm i -g hyper-multisig-cli
+```
+
+```
+hyper-multisig request-drive <length>
+```
+
+Where `<length>` is the current length of the pre-production key. This will return a signing request.
+
+Note: hyper-multisig performs several checks before requesting and committing multisig requests, to protect against accidentally corrupting the production build.
+
+One of the checks ensures the source drive is healthily seeded. If this is not the case, `hyper-multisig` refuses to make the signing request. Solve it by adding the pre-production key to some blind peers (or getting it seeded in other ways).
+
+#### Sign Multisig Request
+
+`hyper-multisig` offers protection from formal mistakes that corrupt the production build, but it is up to the signers to verify that they are signing the correct build.
+
+To check for formal mistakes before signing, run the `hyper-multisig verify-drive` command (next section). Do not sign a build when it fails those checks.
+
+To sign a request, run
+
+```
+hypercore-sign <signing request>
+```
+
+Then share the response. Once a quorum of signers (2 in the example) share their response, the build is ready to go out.
+
+#### Verify Multisig Request
+
+```
+hyper-multisig verify-drive --first-commit <signing request>
+```
+
+If responses are already available, pass those in as additional parameters after the `<signing request>`.
+
+#### Commit Multisig Request
+
+Only run the commit after verifying the request and all responses. Never abort a commit while it is running. If a commit does get aborted while running, run the commit again as soon as possible, since the production build is then stuck in an intermediate state.
+
+Note: it does not matter om which machine the commit is run. So in case of a computer crash, just ask someone else to run the commit. It need not be a signer: the request and the responses suffice to generate the build. This is the reason why hyper-multisig verifies that the source drive is well seeded (it is downloaded as part of the signing process).
+
+```
+hyper-multisig commit-drive --first-commit <signing request>
+```
+
+This is the first commit, so the multisig hyperdrive is created now. The commit is not safely finished until that drive's key is seeded by blind peers (or other seeder services).
+
+The logs indicate when to do this:
+
+```
+Committing the core...
+Committed the core (key <target key>)
+Waiting for remote seeders to pick up the changes...
+Please add this key to the seeders now. The logs here will notify you when it is picked up by them. Do not shut down until that happens.
+```
+
+Once the program detects at least 2 seeders have fully downloaded the multisig drive, it is safe to shut it down (ctrl-c).
+
+#### More Multisig Requests
+
+Use the same flow for the next multisig requests, but remove the `--first-commit` flag.
+
+Starting from the second commit, it is technically possible to corrupt the production build. So if a command ever errors with an `INCOMPATIBLE_SOURCE_AND_TARGET` error, never try to work around it, but thank the tool for protecting you from doing something stupid.
+
+The only safe way to proceed is by creating a new pre-production key.
 
 ### Distribute
 
