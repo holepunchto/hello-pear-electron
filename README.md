@@ -4,6 +4,16 @@
 
 Quick start boilerplate for embededding [pear-runtime](https://github.com/holepunchto/pear-runtime) into Electron.
 
+## MVP - EXPERIMENTAL
+
+This boilerplate is MVP and Experimental.
+
+## OS Support
+
+- MacOS
+- Linux - Work in Progress
+- Windows - Work in Progress
+
 ## Requirements
 
 - `npm`
@@ -238,6 +248,8 @@ npm version <v>
 
 Production MacOS apps must be vendor signed and notarized.
 
+NOTE: If using pear <= v2.2.15 then `{ "pear": {"stage": {"includes": [".github"] } } }` must be assed to the project `package.json`, otherwise stray .github folders in the dependency tree are stripped during stage and the notarized build will fail to run due to lack of signature verification caused by pear <= v2.2.15 pruning these folders during stage.
+
 Supply signing and notarizing keys with `MAC_CODESIGN_IDENTITY`, `APPLE_TEAM_ID`, `APPLE_ID`, `APPLE_PASSWORD`
 
 ```sh
@@ -253,6 +265,8 @@ Note `APPLE_PASSWORD` is not the sign-in password, it's an [app-specific passwor
 TODO
 
 ##### Linux
+
+NOTE: linux AppImage builds must currently be run with the `--no-sandbox` flag
 
 ```sh
 npm run make
@@ -408,17 +422,17 @@ For application builds, an additional instance can be run with the following per
 #### MacOS
 
 ```sh
-open -n <name>.app --args /tmp/custom/store
+open -n <name>.app --args --storage /tmp/custom/storage
 ```
 
 #### Linux
 
 ```sh
-./<name>.AppImage /tmp/custom/store
+./<name>.AppImage --storage /tmp/custom/storage
 ```
 
 #### Windows
 
 ```sh
-.\<name>.exe C:\tmp\custom\store
+.\<name>.exe --storage C:\tmp\custom\storage
 ```
