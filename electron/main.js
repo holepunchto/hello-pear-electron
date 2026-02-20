@@ -63,7 +63,8 @@ function sendToAll(name, data) {
 
 function getWorker(specifier) {
   if (workers.has(specifier)) return workers.get(specifier)
-  const worker = getPear().run(require.resolve('..' + specifier))
+  const pear = getPear()
+  const worker = pear.run(require.resolve('..' + specifier), [pear.storage])
   function sendWorkerStdout(data) {
     sendToAll('pear:worker:stdout:' + specifier, data)
   }

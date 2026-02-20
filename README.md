@@ -110,15 +110,77 @@ Uses: `electron-forge publish`
 
 ---
 
-### `pear-runtime`
+### `pear-runtime` module
 
-#### OTA P2P Updates
+## P2P OTA Updates
 
-Over-the-Air (OTA) Peer-to-Peer (P2P) updates are enabled
+An update occurs when a seeded application drive is written to.
 
-#### Bare Workers
+When an update occurs, the instance will emit two events `updating` and `updated`.
 
-#### Storage
+```js
+pear.on('updating', () => {
+  // update view to indicate updating in progress
+})
+```
+
+```js
+pear.on('updated', () => {
+  // update view to indicate application updated
+})
+```
+
+### Disabling Updates
+
+Pass `--no-updates` flag to disable updates per application run.
+
+To disable updates as an application default, ensure that the package.json is spread into the options (`{...pkg, ...}`) and set the `updates` field to `false`:
+
+```json
+{
+  "version": "1.0.0",
+  "updates": false
+  ...
+}
+```
+
+## Storage
+
+The `dir` option defines where peer-to-peer storage should be kept.
+
+The `pear.storage` property holds a path to application storage, this value should be passed as `Corestore` storage argument.
+
+The `--storage` flag can be passed to use custom storage for multiple running instances. This allows for local end-to-end peer-to-peer flow.
+
+## Workers
+
+The idea is to put application peer-to-peer code into a main worker that then acts as a local backend for the application view layer.
+
+```js
+const IPC = pear.run('./workers/main.js', [pear.storage])
+IPC.on('data', (data) => {
+  console.log('data from worker', data)
+})
+IPC.write('hello')
+```
+
+The `workers/main.js` would then be executed with an embedded Bare runtime.
+
+The other side of the IPC stream can be accessed inside the worker as `Bare.IPC`.
+
+Note how `pear.storage` is passed in as a the first arguments, this can be accessed via `Bare.argv[2]`.
+
+```js
+const Corestore = require('corestore')
+const storage = Bare.argv[2]
+
+Bare.IPC.on('data', (data) => console.log(data.toString()))
+
+Bare.IPC.write('Hello from worker')
+
+const corestore = new Corestore(storage)
+//.. do more with corestore..
+```
 
 ### Production Build
 
