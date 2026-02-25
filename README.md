@@ -129,13 +129,13 @@ An update occurs when a seeded application drive is written to.
 When an update occurs, the instance will emit two events `updating` and `updated`.
 
 ```js
-pear.on('updating', () => {
+pear.updater.on('updating', () => {
   // update view to indicate updating in progress
 })
 ```
 
 ```js
-pear.on('updated', () => {
+pear.updater.on('updated', () => {
   // update view to indicate application updated
 })
 ```

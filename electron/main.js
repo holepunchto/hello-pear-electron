@@ -117,8 +117,8 @@ async function createWindow() {
     if (!win.isDestroyed()) win.webContents.send('pear:event:updated')
   }
 
-  pear.on('updating', onUpdating)
-  pear.on('updated', onUpdated)
+  pear.updater.on('updating', onUpdating)
+  pear.updater.on('updated', onUpdated)
 
   win.on('closed', () => {
     pear.removeListener('updating', onUpdating)
