@@ -22,7 +22,17 @@ if (process.env.MAC_CODESIGN_IDENTITY) {
 
 module.exports = {
   packagerConfig,
-
+  hooks: {
+    packageAfterCopy: async (forgeConfig, buildPath) => {
+     if (process.platform === 'linux') {
+       const path = await import('path')
+       const fs = await import('fs')
+       const customAppRun = path.resolve('build', 'linux', 'AppRun')
+       const targetPath = path.join(buildPath, '..', '..', 'AppRun')
+       fs.copyFileSync(customAppRun, targetPath)
+     }
+    },
+  },
   makers: [
     {
       name: '@electron-forge/maker-dmg',
@@ -30,7 +40,7 @@ module.exports = {
       config: {}
     },
     {
-      name: '@forkprince/electron-forge-maker-appimage',
+      name: 'electron-forge-maker-appimage',
       platforms: ['linux']
     }
   ],
