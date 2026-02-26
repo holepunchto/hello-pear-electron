@@ -14,8 +14,7 @@
     "format": "prettier --write . && lunte --fix",
     "start": "electron-forge start -- --no-updates",
     "package": "electron-forge package",
-    "make": "electron-forge make",
-    "make:app-image": "electron-forge package && ./scripts/build-app-image.sh"
+    "make": "electron-forge make"
   },
   "dependencies": {
     "paparam": "^1.10.0",
