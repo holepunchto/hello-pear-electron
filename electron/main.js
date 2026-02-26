@@ -90,7 +90,7 @@ function getWorker(specifier) {
     workers.delete(specifier)
   })
   app.on('before-quit', () => {
-    worker.kill()
+    worker.destroy()
   })
   return worker
 }
