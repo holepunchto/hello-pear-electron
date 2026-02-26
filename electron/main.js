@@ -2,7 +2,8 @@ const { app, BrowserWindow, ipcMain } = require('electron')
 const os = require('os')
 const path = require('path')
 const PearRuntime = require('pear-runtime')
-const { isMac, isLinux } = require('which-runtime')
+
+const { isMac, isLinux, isWindows } = require('which-runtime')
 const { command, flag } = require('paparam')
 const pkg = require('../package.json')
 const { name, productName, version, upgrade } = pkg
@@ -52,6 +53,7 @@ function getPear() {
 function getAppPath() {
   if (!app.isPackaged) return null
   if (isLinux && process.env.APPIMAGE) return process.env.APPIMAGE
+  if (isWindows) return appName + '.exe'
   return path.join(process.resourcesPath, '..', '..')
 }
 
@@ -74,6 +76,9 @@ function getWorker(specifier) {
   function sendWorkerIPC(data) {
     sendToAll('pear:worker:ipc:' + specifier, data)
   }
+  function onBeforeQuit() {
+    worker.destroy();
+  }
   ipcMain.handle('pear:worker:writeIPC:' + specifier, (evt, data) => {
     return worker.write(Buffer.from(data))
   })
@@ -81,9 +86,6 @@ function getWorker(specifier) {
   worker.on('data', sendWorkerIPC)
   worker.stdout.on('data', sendWorkerStdout)
   worker.stderr.on('data', sendWorkerStderr)
-  const onBeforeQuit = () => {
-    worker.kill()
-  }
   worker.once('exit', (code) => {
     app.removeListener('before-quit', onBeforeQuit)
     ipcMain.removeHandler('pear:worker:writeIPC:' + specifier)
@@ -123,8 +125,8 @@ async function createWindow() {
   pear.updater.on('updated', onUpdated)
 
   win.on('closed', () => {
-    pear.removeListener('updating', onUpdating)
-    pear.removeListener('updated', onUpdated)
+    pear.updater.removeListener('updating', onUpdating)
+    pear.updater.removeListener('updated', onUpdated)
   })
 
   const devServerUrl = process.env.PEAR_DEV_SERVER_URL
@@ -138,7 +140,7 @@ async function createWindow() {
   await win.loadFile(path.join(__dirname, '..', 'renderer', 'index.html'))
 }
 
-ipcMain.handle('pear:applyUpdate', () => getPear().applyUpdate())
+ipcMain.handle('pear:applyUpdate', () => getPear().updater.applyUpdate())
 ipcMain.handle('pear:startWorker', (evt, filename) => {
   getWorker(filename)
   return true
