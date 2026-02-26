@@ -81,7 +81,11 @@ function getWorker(specifier) {
   worker.on('data', sendWorkerIPC)
   worker.stdout.on('data', sendWorkerStdout)
   worker.stderr.on('data', sendWorkerStderr)
+  const onBeforeQuit = () => {
+    worker.kill()
+  }
   worker.once('exit', (code) => {
+    app.removeListener('before-quit', onBeforeQuit)
     ipcMain.removeHandler('pear:worker:writeIPC:' + specifier)
     worker.removeListener('data', sendWorkerIPC)
     worker.stdout.removeListener('data', sendWorkerStdout)
@@ -89,9 +93,7 @@ function getWorker(specifier) {
     sendToAll('pear:worker:exit:' + specifier, code)
     workers.delete(specifier)
   })
-  app.on('before-quit', () => {
-    worker.kill()
-  })
+  app.on('before-quit', onBeforeQuit)
   return worker
 }
 
