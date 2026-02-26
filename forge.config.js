@@ -24,14 +24,14 @@ module.exports = {
   packagerConfig,
   hooks: {
     packageAfterCopy: async (forgeConfig, buildPath) => {
-     if (process.platform === 'linux') {
-       const path = await import('path')
-       const fs = await import('fs')
-       const customAppRun = path.resolve('build', 'linux', 'AppRun')
-       const targetPath = path.join(buildPath, '..', '..', 'AppRun')
-       fs.copyFileSync(customAppRun, targetPath)
-     }
-    },
+      if (process.platform === 'linux') {
+        const path = await import('path')
+        const fs = await import('fs')
+        const customAppRun = path.resolve('build', 'linux', 'AppRun')
+        const targetPath = path.join(buildPath, '..', '..', 'AppRun')
+        fs.copyFileSync(customAppRun, targetPath)
+      }
+    }
   },
   makers: [
     {
