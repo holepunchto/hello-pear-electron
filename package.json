@@ -2,7 +2,7 @@
   "name": "hello-pear-electron",
   "productName": "HelloPear",
   "version": "1.0.0",
-  "upgrade": "pear://qxenz5wmspmryjc13m9yzsqj1conqotn8fb4ocbufwtz9mtbqq5o",
+  "upgrade": "pear://zhpen89iy3iajrrt53engg16ui3uwmyjodg71udbdpktysko3eay",
   "description": "",
   "license": "",
   "author": "",
@@ -17,6 +17,8 @@
     "make": "electron-forge make"
   },
   "dependencies": {
+    "bare-sidecar": "^0.3.0",
+    "msix-manager": "^0.1.1",
     "paparam": "^1.10.0",
     "pear-runtime": "^0.4.3",
     "which-runtime": "^1.3.2"
@@ -25,6 +27,7 @@
     "@electron-forge/cli": "^7.11.1",
     "@electron-forge/maker-deb": "^7.11.1",
     "@electron-forge/maker-dmg": "^7.11.1",
+    "@electron-forge/maker-msix": "^7.11.1",
     "@electron-forge/maker-rpm": "^7.11.1",
     "@electron-forge/maker-zip": "^7.11.1",
     "@forkprince/electron-forge-maker-appimage": "^1.0.11",

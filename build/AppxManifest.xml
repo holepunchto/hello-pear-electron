@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Package
+  xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10"
+  xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10"
+  xmlns:rescap="http://schemas.microsoft.com/appx/manifest/foundation/windows10/restrictedcapabilities"
+  xmlns:desktop6="http://schemas.microsoft.com/appx/manifest/desktop/windows10/6"
+  IgnorableNamespaces="rescap desktop6"
+>
+  <Identity Name="HelloPear" Version="1.0.0.0" Publisher="CN=My Publisher" ProcessorArchitecture="x64" />
+  <Properties>
+    <DisplayName>Hello Pear</DisplayName>
+    <PublisherDisplayName>My Publisher</PublisherDisplayName>
+    <Description>Description of my app</Description>
+    <Logo>build\icon.png</Logo>
+    <desktop6:FileSystemWriteVirtualization>disabled</desktop6:FileSystemWriteVirtualization>
+  </Properties>
+  <Resources>
+    <Resource Language="en-US" />
+  </Resources>
+  <Dependencies>
+    <TargetDeviceFamily Name="Windows.Desktop" MinVersion="10.0.19045.0" MaxVersionTested="10.0.19045.0" />
+  </Dependencies>
+  <Capabilities>
+    <rescap:Capability Name="runFullTrust" />
+    <rescap:Capability Name="packageManagement" />
+    <rescap:Capability Name="unvirtualizedResources" />
+  </Capabilities>
+  <Applications>
+    <Application Id="App" Executable="app\HelloPear.exe" EntryPoint="Windows.FullTrustApplication">
+      <uap:VisualElements DisplayName="Hello Pear" Description="Description of my app" Square150x150Logo="build\icon.png" Square44x44Logo="build\icon.png" BackgroundColor="transparent" />
+    </Application>
+  </Applications>
+</Package>

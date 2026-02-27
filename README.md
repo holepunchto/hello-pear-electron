@@ -12,7 +12,7 @@ This boilerplate is MVP and Experimental.
 
 - MacOS
 - Linux - Work in Progress
-- Windows - Work in Progress
+- Windows
 
 ## Requirements
 
@@ -262,7 +262,37 @@ Note `APPLE_PASSWORD` is not the sign-in password, it's an [app-specific passwor
 
 ##### Windows
 
-TODO
+Production Windows apps must be signed with a code signing certificate.
+
+Supply a `.pfx` certificate file and password with `WINDOWS_CERTIFICATE_FILE` and `WINDOWS_CERTIFICATE_PASSWORD`:
+
+```sh
+WINDOWS_CERTIFICATE_FILE=path/to/cert.pfx WINDOWS_CERTIFICATE_PASSWORD=password npm run make
+```
+
+The `Publisher` field in `build/AppxManifest.xml` must match the `CN` of the signing certificate. For example, if the certificate subject is `CN=My Company`, set `Publisher="CN=My Company"` in the manifest.
+
+Without signing credentials, a self-signed development certificate is automatically generated matching the `Publisher` in `AppxManifest.xml`. This certificate is cached in the local certificate store and reused across builds on the same machine, but is not portable — building on a different machine or clearing the cert store generates a new one.
+
+Edit `build/AppxManifest.xml` and ensure name, publisher, description, and executable path are correct throughout - some of these are declared in multiple locations.
+
+###### Persistent Certificate for OTA Updates
+
+OTA updates require the same certificate across builds — Windows rejects updates where the publisher doesn't match the installed package. Create a persistent code signing certificate following [Microsoft's MSIX signing guide](https://learn.microsoft.com/en-us/windows/msix/package/create-certificate-package-signing), or use a production certificate.
+
+Export the certificate to a `.pfx` file, trust it locally by importing it to `Cert:\LocalMachine\TrustedPeople` (requires admin), and update `Publisher` in `build/AppxManifest.xml` to match the certificate CN.
+
+Then build with:
+
+```powershell
+$env:WINDOWS_CERTIFICATE_FILE = (Resolve-Path ".\cert.pfx").Path
+$env:WINDOWS_CERTIFICATE_PASSWORD = "password"
+npm run make
+```
+
+Install with `Add-AppxPackage .\out\make\msix\x64\HelloPear.msix`, uninstall with `Get-AppxPackage -Name HelloPear | Remove-AppxPackage`.
+
+When testing OTA updates, both the installed base and the update MSIX must be signed with the same certificate (`Publisher` must match), otherwise Windows silently rejects the update.
 
 ##### Linux
 
@@ -282,7 +312,7 @@ Use [`pear-build`](https://npm.im/pear-build) to move all the `package.json` and
 From above the project root run `pear-build` for each arch, for example Mac x64 + arm64, Linux x64 + arm64 and Windows x64 would be:
 
 ```sh
-pear-build --package=./hello-pear-electron/package.json --darwin-arm64-app ./hello-pear-electron/out/HelloPear-darwin-arm64/HelloPear.app --darwin-x64-app ./hello-pear-electron/out/HelloPear-darwin-x64/HelloPear.app --linux-arm64-app ./hello-pear-electron/out/HelloPear-linux-arm64/HelloPear.AppImage --linux-x64-app ./hello-pear-electron/out/HelloPear-darwin-x64/HelloPear.AppImage --win32-x64-app ./hello-pear-electron/out/HelloPear-win32-x64/HelloPear.exe --target hello-pear-electron-1.0.0
+pear-build --package=./hello-pear-electron/package.json --darwin-arm64-app ./hello-pear-electron/out/HelloPear-darwin-arm64/HelloPear.app --darwin-x64-app ./hello-pear-electron/out/HelloPear-darwin-x64/HelloPear.app --linux-arm64-app ./hello-pear-electron/out/HelloPear-linux-arm64/HelloPear.AppImage --linux-x64-app ./hello-pear-electron/out/HelloPear-darwin-x64/HelloPear.AppImage --win32-x64-app ./hello-pear-electron/out/make/msix/x64/HelloPear.msix --target hello-pear-electron-1.0.0
 ```
 
 If the `--target` flag is ommited, then target folder is in the current working directory named `{name}-{version}` per `package.json` fields.
@@ -502,7 +532,7 @@ In Production this is per OS:
 
 - Mac: `~/Library/Application Support/<name>`
 - Linux: `~/.config/<name>`
-- Windows: `C:\\%USERPROFILE%\\AppData\\Local\\<name>`
+- Windows: `%USERPROFILE%\AppData\Local\<name>`
 
 Additionally an argument can be passed to set a custom storage path.
 
