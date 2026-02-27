@@ -43,7 +43,7 @@ function getPear() {
       ? path.join(os.homedir(), 'Library', 'Application Support', appName)
       : isLinux
         ? path.join(os.homedir(), '.config', appName)
-        : path.join(os.homedir(), 'AppData', 'Roaming', appName)
+        : path.join(os.homedir(), 'AppData', 'Local', appName)
   }
   pear = new PearRuntime({ dir, app: appPath, updates, version, upgrade })
   return pear
