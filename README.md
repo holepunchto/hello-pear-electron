@@ -2,7 +2,7 @@
 
 > Pear Hello World for Electron with `pear-runtime`
 
-Quick start boilerplate for embededding [pear-runtime](https://github.com/holepunchto/pear-runtime) into Electron.
+Quick start boilerplate for embedding [pear-runtime](https://github.com/holepunchto/pear-runtime) into Electron.
 
 ## MVP - EXPERIMENTAL
 
@@ -10,7 +10,7 @@ This boilerplate is MVP and Experimental.
 
 ## OS Support
 
-- MacOS
+- macOS
 - Linux - Work in Progress
 - Windows - Work in Progress
 
@@ -244,11 +244,11 @@ npm version <v>
 - `build/icon.ico` is per brand
 - `build/icon.icon.png` is per brand
 
-##### MacOS
+##### macOS
 
-Production MacOS apps must be vendor signed and notarized.
+Production macOS apps must be vendor signed and notarized.
 
-NOTE: If using pear <= v2.2.15 then `{ "pear": {"stage": {"includes": [".github"] } } }` must be assed to the project `package.json`, otherwise stray .github folders in the dependency tree are stripped during stage and the notarized build will fail to run due to lack of signature verification caused by pear <= v2.2.15 pruning these folders during stage.
+NOTE: If using pear <= v2.2.15 then `{ "pear": {"stage": {"includes": [".github"] } } }` must be added to the project `package.json`, otherwise stray .github folders in the dependency tree are stripped during stage and the notarized build will fail to run due to lack of signature verification caused by pear <= v2.2.15 pruning these folders during stage.
 
 Supply signing and notarizing keys with `MAC_CODESIGN_IDENTITY`, `APPLE_TEAM_ID`, `APPLE_ID`, `APPLE_PASSWORD`
 
@@ -517,7 +517,7 @@ npm start -- --storage /tmp/custom/storage
 
 For application builds, an additional instance can be run with the following per OS.
 
-#### MacOS
+#### macOS
 
 ```sh
 open -n <name>.app --args --storage /tmp/custom/storage
