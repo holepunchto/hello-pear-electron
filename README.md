@@ -90,12 +90,32 @@ Uses: `electron-forge package`
 
 ---
 
-### `npm run make`
+### `npm run make:linux`
 
-Create distributables for current platform.
+Create distributables on Linux.
 
 ```sh
-npm run make
+npm run make:linux
+```
+
+---
+
+### `npm run make:darwin`
+
+Create distributables on macOs.
+
+```sh
+npm run make:darwin
+```
+
+---
+
+### `npm run make:win32`
+
+Create distributables on Windows.
+
+```sh
+npm run make:win32
 ```
 
 ---
@@ -289,7 +309,7 @@ npm version patch
 For development or internal usage:
 
 ```sh
-npm run make
+npm run make:darwin
 ```
 
 Production macOS apps must be vendor signed and notarized.
@@ -315,7 +335,7 @@ TODO
 Build distributables with:
 
 ```sh
-npm run make
+npm run make:linux
 ```
 
 #### 4. Build Deploy Directory
