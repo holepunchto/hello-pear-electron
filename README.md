@@ -330,7 +330,7 @@ Install with `Add-AppxPackage .\out\HelloPear-win32-x64\HelloPear.msix`, uninsta
 Production Windows apps must be signed with a code signing certificate. The `Publisher` field in `build/AppxManifest.xml` must match the `CN` of the signing certificate. Supply a `.pfx` certificate file and password with `WINDOWS_CERTIFICATE_FILE` and `WINDOWS_CERTIFICATE_PASSWORD`:
 
 ```sh
-WINDOWS_CERTIFICATE_FILE=path/to/cert.pfx WINDOWS_CERTIFICATE_PASSWORD=password npm run make
+WINDOWS_CERTIFICATE_FILE=path/to/cert.pfx WINDOWS_CERTIFICATE_PASSWORD=password npm run make:win32
 ```
 
 For OTA updates, the same certificate must be used across builds — Windows rejects updates where the `Publisher` doesn't match the installed package. Create a persistent code signing certificate following [Microsoft's MSIX signing guide](https://learn.microsoft.com/en-us/windows/msix/package/create-certificate-package-signing), or use a production certificate.
