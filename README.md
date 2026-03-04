@@ -98,14 +98,6 @@ Create distributables for current platform.
 npm run make
 ```
 
-Uses: `electron-forge make`
-
-```sh
-npm run make:linux
-```
-
-Uses: `electron-forge make --platform=linux`
-
 ---
 
 ### `npm run publish`
