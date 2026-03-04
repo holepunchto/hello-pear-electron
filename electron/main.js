@@ -53,7 +53,7 @@ function getPear() {
 function getAppPath() {
   if (!app.isPackaged) return null
   if (isLinux && process.env.APPIMAGE) return process.env.APPIMAGE
-  if (isWindows) return appName + '.exe'
+  if (isWindows) return process.execPath
   return path.join(process.resourcesPath, '..', '..')
 }
 
