@@ -465,7 +465,7 @@ Multiple signers, enough to break quorom would have to lose their signing keys t
 
 A multisigged application drive is not machine-bound. Write access is determined by signing capability.
 
-A multisig key is fully by a `namespace` (an arbitrary string), a list of signing keys, and a quorum.
+A multisig key is defined by a `namespace` (an arbitrary string), a list of signing keys, and a quorum.
 
 To setup a new key follow:
 
@@ -510,7 +510,7 @@ Set the public keys of each signer on `publicKey` and use the key of the provisi
 }
 ```
 
-This configuration has three signers with a quorom of 2. Which means two signers out of three can trigger a production a release.
+This configuration has three signers with a quorom of 2. Which means two signers out of three can trigger a production release.
 
 Store it as `multisig.json`.
 
@@ -614,9 +614,9 @@ Never abort a commit while it is running. If a commit does get aborted while run
 
 It does not matter om which machine the commit is run. So in case of a computer crash, just ask someone else to run the commit.
 
-It need not be a signer who commits as the request and the responses suffice to generate the build. This is the reason why `hyper-multisig` verifies that the source drive is well seeded by downloading it as part of the signing process.
+It need not be a signer who commits as the request and the responses suffice to generate the build. This is the reason why `hyper-multisig` verifies that the source drive is well seeded.
 
-Note: starting from the second commit, it is technically possible to corrupt the production build. So if a command ever errors with an `INCOMPATIBLE_SOURCE_AND_TARGET` error, never try to work around it, the only safe way to proceed is by creating reseeding the provision on other
+Note: starting from the second commit, it is technically possible to corrupt the production build. So if a command ever errors with an `INCOMPATIBLE_SOURCE_AND_TARGET` error, never try to work around it, the only safe way to proceed is by creating reseeding the provision on other peers.
 
 ### Build Lines
 
