@@ -12,7 +12,7 @@ This boilerplate is MVP and Experimental.
 
 - macOS
 - Linux
-- Windows - Work in Progress
+- Windows
 
 ## Requirements
 
@@ -118,21 +118,9 @@ Create distributables on Windows.
 npm run make:win32
 ```
 
----
-
-### `npm run publish`
-
-Publish packaged app (requires configured makers/publishers).
-
-```sh
-npm run publish
-```
-
-Uses: `electron-forge publish`
+Uses: `electron-forge make`
 
 ---
-
-### `pear-runtime` module
 
 ## P2P OTA Updates
 
@@ -297,7 +285,6 @@ npm version patch
 - `package.json` `author` field populated
 - `package.json` `license` field populated
 - `package.json` `description` field populated
-- `package.json` `author` field populated
 - `package.json` `name` field set per brand
 - `package.json` `productName` field set per brand
 - `build/icon.icns` is per brand
@@ -328,7 +315,25 @@ Note `APPLE_PASSWORD` is not the sign-in password, it's an [app-specific passwor
 
 ##### Windows
 
-TODO
+Requires [Windows SDK](https://developer.microsoft.com/en-us/windows/downloads/windows-sdk/) (the build auto-detects the installed version) and [PowerShell 7+](https://learn.microsoft.com/en-us/powershell/scripting/install/installing-powershell-on-windows) (`winget install Microsoft.PowerShell`).
+
+Without signing credentials, a self-signed development certificate is automatically generated matching the `Publisher` in `AppxManifest.xml`. This certificate is cached in the local certificate store and reused across builds on the same machine, but is not portable — building on a different machine or clearing the cert store generates a new one.
+
+```sh
+npm run make:win32
+```
+
+Edit `build/AppxManifest.xml` and ensure name, publisher, description, and executable path are correct throughout - some of these are declared in multiple locations.
+
+Install with `Add-AppxPackage .\out\HelloPear-win32-x64\HelloPear.msix`, uninstall with `Get-AppxPackage -Name HelloPear | Remove-AppxPackage`.
+
+Production Windows apps must be signed with a code signing certificate. The `Publisher` field in `build/AppxManifest.xml` must match the `CN` of the signing certificate. Supply a `.pfx` certificate file and password with `WINDOWS_CERTIFICATE_FILE` and `WINDOWS_CERTIFICATE_PASSWORD`:
+
+```sh
+WINDOWS_CERTIFICATE_FILE=path/to/cert.pfx WINDOWS_CERTIFICATE_PASSWORD=password npm run make:win32
+```
+
+For OTA updates, the same certificate must be used across builds — Windows rejects updates where the `Publisher` doesn't match the installed package. Create a persistent code signing certificate following [Microsoft's MSIX signing guide](https://learn.microsoft.com/en-us/windows/msix/package/create-certificate-package-signing), or use a production certificate.
 
 ##### Linux
 
@@ -348,7 +353,7 @@ Use [`pear-build`](https://npm.im/pear-build) to move all the `package.json` and
 From above the project root run `pear-build` for each arch, for example Mac x64 + arm64, Linux x64 + arm64 and Windows x64 would be:
 
 ```sh
-pear-build --package=./hello-pear-electron/package.json --darwin-arm64-app ./hello-pear-electron/out/HelloPear-darwin-arm64/HelloPear.app --darwin-x64-app ./hello-pear-electron/out/HelloPear-darwin-x64/HelloPear.app --linux-arm64-app ./hello-pear-electron/out/HelloPear-linux-arm64/HelloPear.AppImage --linux-x64-app ./hello-pear-electron/out/HelloPear-linux-x64/HelloPear.AppImage --win32-x64-app ./hello-pear-electron/out/HelloPear-win32-x64/HelloPear.exe --target hello-pear-electron-1.0.0
+pear-build --package=./hello-pear-electron/package.json --darwin-arm64-app ./hello-pear-electron/out/HelloPear-darwin-arm64/HelloPear.app --darwin-x64-app ./hello-pear-electron/out/HelloPear-darwin-x64/HelloPear.app --linux-arm64-app ./hello-pear-electron/out/HelloPear-linux-arm64/HelloPear.AppImage --linux-x64-app ./hello-pear-electron/out/HelloPear-linux-x64/HelloPear.AppImage --win32-x64-app ./hello-pear-electron/out/HelloPear-win32-x64/HelloPear.msix --target hello-pear-electron-1.0.0
 ```
 
 If the `--target` flag is omitted, then target folder is in the current working directory named `{name}-{version}` per `package.json` fields.
@@ -710,7 +715,7 @@ In Production this is per OS:
 
 - Mac: `~/Library/Application Support/<name>`
 - Linux: `~/.config/<name>`
-- Windows: `C:\\%USERPROFILE%\\AppData\\Local\\<name>`
+- Windows: `%USERPROFILE%\AppData\Local\<name>`
 
 Additionally an argument can be passed to set a custom storage path.
 

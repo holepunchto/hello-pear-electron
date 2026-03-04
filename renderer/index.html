@@ -19,10 +19,30 @@
         font-size: 48px;
         text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
       }
+      #update-btn {
+        display: none;
+        margin-top: 20px;
+        padding: 12px 24px;
+        font-size: 18px;
+        border: 2px solid white;
+        border-radius: 8px;
+        background: green;
+        color: white;
+        cursor: pointer;
+      }
+      #update-btn:hover {
+        background: greenyellow;
+      }
+      .container {
+        text-align: center;
+      }
     </style>
   </head>
   <body>
-    <h1 id="v">v</h1>
+    <div class="container">
+      <h1 id="v">v</h1>
+      <button id="update-btn">Apply update</button>
+    </div>
     <script type="module" src="app.js"></script>
   </body>
 </html>

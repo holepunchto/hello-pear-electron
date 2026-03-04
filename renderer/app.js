@@ -8,8 +8,19 @@ bridge.onPearEvent('updating', () => {
 })
 
 bridge.onPearEvent('updated', () => {
-  bridge.applyUpdate()
-  document.getElementById('v').innerText = 'Updated! Restart for latest'
+  document.getElementById('v').innerText = 'Update ready!'
+  const btn = document.getElementById('update-btn')
+  btn.style.display = 'inline-block'
+  btn.onclick = async () => {
+    btn.disabled = true
+    btn.innerText = 'Updating...'
+    try {
+      await bridge.applyUpdate()
+    } catch (err) {
+      document.getElementById('v').innerText = 'Update failed: ' + err.message
+      btn.style.display = 'none'
+    }
+  }
 })
 
 const workers = {
