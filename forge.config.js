@@ -92,6 +92,7 @@ module.exports = {
           result.artifacts[result.artifacts.indexOf(artifact)] = dest
         }
       }
+      fs.rmSync(path.join(__dirname, 'out', 'make'), { recursive: true, force: true })
     }
   },
 
