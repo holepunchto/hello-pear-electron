@@ -320,7 +320,7 @@ Requires [Windows SDK](https://developer.microsoft.com/en-us/windows/downloads/w
 Without signing credentials, a self-signed development certificate is automatically generated matching the `Publisher` in `AppxManifest.xml`. This certificate is cached in the local certificate store and reused across builds on the same machine, but is not portable — building on a different machine or clearing the cert store generates a new one.
 
 ```sh
-npm run make
+npm run make:win32
 ```
 
 Edit `build/AppxManifest.xml` and ensure name, publisher, description, and executable path are correct throughout - some of these are declared in multiple locations.
