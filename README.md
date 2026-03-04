@@ -36,7 +36,7 @@ Start app in development mode.
 npm start
 ```
 
-When running locally, updates aren't turned off to avoid the built application being swapped from local development when there is an update.
+When running locally, updates are turned off to avoid the built application being swapped from local development when there is an update.
 
 To enable updates for testing update flow in local development use
 
