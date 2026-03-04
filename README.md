@@ -320,7 +320,7 @@ TODO
 
 ##### Linux
 
-NOTE: linux AppImage builds must currently be run with the `--no-sandbox` flag
+Build distributables with:
 
 ```sh
 npm run make
