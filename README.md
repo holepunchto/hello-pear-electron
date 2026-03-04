@@ -11,7 +11,7 @@ This boilerplate is MVP and Experimental.
 ## OS Support
 
 - macOS
-- Linux - Work in Progress
+- Linux
 - Windows - Work in Progress
 
 ## Requirements
