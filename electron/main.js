@@ -17,7 +17,8 @@ const appName = productName ?? name
 const cmd = command(
   appName,
   flag('--storage', 'pass custom storage to pear-runtime'),
-  flag('--no-updates', 'start without OTA updates')
+  flag('--no-updates', 'start without OTA updates'),
+  flag('--no-sandbox', 'disable Chromium sandboxing')
 )
 
 cmd.parse(app.isPackaged ? process.argv.slice(1) : process.argv.slice(2))
