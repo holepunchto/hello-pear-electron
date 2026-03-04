@@ -31,7 +31,7 @@ echo "→ Description: $DESCRIPTION"
 
 APP_DIR="$ROOT/out/${APP_NAME}-linux-${ARCH}"
 STAGE_DIR="$ROOT/out/make/__appImage-${ARCH}"
-OUTPUT="$ROOT/out/make/${APP_NAME}-${VERSION}-${ARCH}.AppImage"
+OUTPUT="$ROOT/out/make/${APP_NAME}.AppImage"
 
 echo "→ Using app dir: $APP_DIR"
 
