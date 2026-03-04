@@ -209,7 +209,7 @@ Each of these phases fully support P2P OTA updates.
 #### Terminology
 
 - application drive - the [Hyperdrive](https://github.com/holepunchto/hyperdrive) behind a Pear application
-- pear link - a [link format][https://github.com/holepunchto/pear-link?tab=readme-ov-file#pear-link-format] for self-describing peer-to-peer links
+- pear link - a [link format](https://github.com/holepunchto/pear-link?tab=readme-ov-file#pear-link-format) for self-describing peer-to-peer links
 - versioned link - a pear link of the form `pear://<fork>.<length>.<key>` where fork, length and key correspond to [core.fork](https://github.com/holepunchto/hypercore#corefork), [core.length](https://github.com/holepunchto/hypercore#corelength), and [core.key](https://github.com/holepunchto/hypercore?tab=readme-ov-file#corekey) of the [Hypercore](https://github.com/holepunchto/hypercore) behind the [Hyperdrive](https://github.com/holepunchto/hyperdrive) behind the Pear application
 
 #### 0. Touch and Seed
