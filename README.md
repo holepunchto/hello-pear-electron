@@ -755,3 +755,64 @@ open -n <name>.app --args --storage /tmp/custom/storage
 ```sh
 .\<name>.exe --storage C:\tmp\custom\storage
 ```
+
+## Troubleshooting
+
+### Recovering from lost write-access
+
+Staged and provisioned drives are machine-bound. If data is lost, write access to those keys is lost.
+
+Multisig drives are not machine-bound.
+
+If a stage link is lost, just create a new link and stage to it - update the stage builds.
+
+If a provision key is lost, make a new one using production as the source:
+
+```sh
+pear provision <versioned-production-key> <target-key> <versioned-production-key>
+```
+
+Then provision to the new prerelease key with stage key as source.
+
+```sh
+pear provision <versioned-stage-key> <target-key> <versioned-production-key>
+```
+
+Then set the new provision link key as the `srcKey` of the `multisig.json`config.
+
+- [7b. Create Multisig Config](#7b-create-multisig-config)
+
+
+### Recovering from lost signing keys
+
+TODO
+
+### App did not update
+
+#### Was the version updated?
+
+See [2. Version](#2-version)
+
+#### Is the upgrade link correct?
+
+[1. Set upgrade link](#1-set-upgrade-link)
+
+#### Is the app seeded?
+
+The upgrade link must be seeded:
+
+```sh
+pear seed <link>
+```
+
+#### Was the app seeded after opening the app?
+
+TODO
+
+#### Is the seeder unreachable?
+
+TODO
+
+#### Is the client unable to holepunch?
+
+TODO
