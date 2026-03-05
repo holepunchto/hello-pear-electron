@@ -192,27 +192,33 @@ const corestore = new Corestore(storage)
 //.. do more with corestore..
 ```
 
-### Peer-to-Peer Deployments
+## Peer-to-Peer Deployments
 
 Use the `pear` CLI to deploy applications.
 
-There are different phases of deployment
+Centralized deployments tend to have at minimum a staging server, a preview server for stakeholders and a production server.
 
-- staged - internal usage, local checks, checks between devs
-- provisioned - preproduction, QA, unsigned releases
-- multisigged - production, cryptographically signed by stakeholders
+Application builds are written to [pear:// links](https://github.com/holepunchto/pear-link?tab=readme-ov-file#pear-link-format) through three operations - stage, provision and multisig — to create release tracks with increasing trust guarantees:
 
-Apps in each phase are represented by a [pear:// link](https://github.com/holepunchto/pear-link?tab=readme-ov-file#pear-link-format) and each phase feeds into the next. A staged link is the source for a provisioned link, a provisioned link is the source for a multisigged link.
+- **Stage** - internal usage, local checks, checks between devs
+- **Provision** - preproduction, QA, unsigned releases
+- **Multisig** - production, cryptographically signed by stakeholders
 
-Each of these phases fully support P2P OTA updates.
+Each operation feeds into the next: a staged link is the source for a provisioned link, a provisioned link is the source for a multisig'd link.
 
-#### Terminology
+```
+Stage -> Provision -> Multisig
+```
+
+This approach enables rapid collaborative iteration on Stage links, a stakeholder preview with Provisioned links, and cryptographically signed-off machine-independent production releases with Multisigged links.
+
+### Terminology
 
 - application drive - the [Hyperdrive](https://github.com/holepunchto/hyperdrive) behind a Pear application
 - pear link - a [link format](https://github.com/holepunchto/pear-link?tab=readme-ov-file#pear-link-format) for self-describing peer-to-peer links
 - versioned link - a pear link of the form `pear://<fork>.<length>.<key>` where fork, length and key correspond to [core.fork](https://github.com/holepunchto/hypercore#corefork), [core.length](https://github.com/holepunchto/hypercore#corelength), and [core.key](https://github.com/holepunchto/hypercore?tab=readme-ov-file#corekey) of the [Hypercore](https://github.com/holepunchto/hypercore) behind the [Hyperdrive](https://github.com/holepunchto/hyperdrive) behind the Pear application
 
-#### 0. Touch and Seed
+### 0. Touch and Seed
 
 Create a new pear link:
 
@@ -234,7 +240,7 @@ On other always-online machines reseed with:
 pear seed pear://qxenz5wmspmryjc13m9yzsqj1conqotn8fb4ocbufwtz9mtbqq5o # on other machines
 ```
 
-#### 1. Set upgrade link
+### 1. Set upgrade link
 
 The `package.json` `upgrade` field should be set to a production `pear://` link.
 
@@ -258,7 +264,7 @@ To set the upgrade link from the command line `npm set pkg upgrade=<link>` can b
 npm set pkg upgrade=pear://qxenz5wmspmryjc13m9yzsqj1conqotn8fb4ocbufwtz9mtbqq5o
 ```
 
-#### 2. Version
+### 2. Version
 
 If this is first time leave the version at 1.0.0 and skip to Make distributables.
 
@@ -278,9 +284,9 @@ For example:
 npm version patch
 ```
 
-#### 3. Make Distributables
+### 3. Make Distributables
 
-##### Checklist
+#### Checklist
 
 - `package.json` `author` field populated
 - `package.json` `license` field populated
@@ -289,19 +295,19 @@ npm version patch
 - `package.json` `productName` field set per brand
 - `build/icon.icns` is per brand
 - `build/icon.ico` is per brand
-- `build/icon.icon.png` is per brand
+- `build/icon.png` is per brand
 
-##### macOS
+#### macOS
 
-For development or internal usage:
+For local development only:
 
 ```sh
 npm run make:darwin
 ```
 
-Production macOS apps must be vendor signed and notarized.
+macOs apps that aren't signed and notarized won't run on other machines because they will be qaurantined by the OS. For OTA updates to work on other machines, macOS apps must be vendor signed and notarized.
 
-NOTE: If using pear <= v2.2.15 then `{ "pear": {"stage": {"includes": [".github"] } } }` must be added to the project `package.json`, otherwise stray .github folders in the dependency tree are stripped during stage and the notarized build will fail to run due to lack of signature verification caused by pear <= v2.2.15 pruning these folders during stage.
+NOTE: If using pear <= v2.2.15 then `{ "pear": {"stage": {"includes": [".github"] } } }` must be added to the project `package.json`, otherwise stray `.github` folders in the dependency tree are stripped during stage and the notarized build will fail to run due to lack of signature verification caused by pear <= v2.2.15 pruning these folders during stage.
 
 Supply signing and notarizing keys with `MAC_CODESIGN_IDENTITY`, `APPLE_TEAM_ID`, `APPLE_ID`, `APPLE_PASSWORD`
 
@@ -313,7 +319,7 @@ Instructions for obtaining credentials can be found [here](https://www.electronf
 
 Note `APPLE_PASSWORD` is not the sign-in password, it's an [app-specific password](https://support.apple.com/en-us/102654).
 
-##### Windows
+#### Windows
 
 Requires [Windows SDK](https://developer.microsoft.com/en-us/windows/downloads/windows-sdk/) (the build auto-detects the installed version) and [PowerShell 7+](https://learn.microsoft.com/en-us/powershell/scripting/install/installing-powershell-on-windows) (`winget install Microsoft.PowerShell`).
 
@@ -335,7 +341,7 @@ WINDOWS_CERTIFICATE_FILE=path/to/cert.pfx WINDOWS_CERTIFICATE_PASSWORD=password 
 
 For OTA updates, the same certificate must be used across builds — Windows rejects updates where the `Publisher` doesn't match the installed package. Create a persistent code signing certificate following [Microsoft's MSIX signing guide](https://learn.microsoft.com/en-us/windows/msix/package/create-certificate-package-signing), or use a production certificate.
 
-##### Linux
+#### Linux
 
 Build distributables with:
 
@@ -343,7 +349,7 @@ Build distributables with:
 npm run make:linux
 ```
 
-#### 4. Build Deploy Directory
+### 4. Build Deploy Directory
 
 Each make runs on a different OS and architecture. Each must be moved to a single build machine,
 this assumes that they've all been moved into the same project `./out` folder.
@@ -377,9 +383,9 @@ Use Pear to synchronize the Deploy Directory from disk to [hypercore](https://gi
 pear stage pear://qxenz5wmspmryjc13m9yzsqj1conqotn8fb4ocbufwtz9mtbqq5o ./hello-pear-electron-1.0.0
 ```
 
-This completes first-phase deployment.
+This completes a stage deployment.
 
-#### 5a. Confirm Updating with Stage
+### 5a. Confirm Updating with Stage
 
 Open the application on multiple different machines - the seeding process from [0. Touch and Seed](#0-touch-and-seed) should show peers joining as application instances are opened per machine.
 
@@ -454,7 +460,7 @@ Now provision again so that the `upgrade` link is set correctly on the provision
 pear provision pear://0.1080.qxenz5wmspmryjc13m9yzsqj1conqotn8fb4ocbufwtz9mtbqq5o pear://q9sopzoqgas9usoiq7uzkkwngm5pzj4zo3n4esjwwbmw6offis8o pear://0.0.q9sopzoqgas9usoiq7uzkkwngm5pzj4zo3n4esjwwbmw6offis8o
 ```
 
-#### 6a. Confirm Updating with Provision
+### 6a. Confirm Updating with Provision
 
 To update with provision, first update by staging, following:
 
@@ -470,7 +476,7 @@ As long as the `upgrade` field is pointing to the provisioned link, then this sh
 
 ### 7. Multisig
 
-A multisigged application drive is recommendeded for serious production deployment.
+A multisig'd application drive is recommendeded for serious production deployment.
 
 A quoruom is the amount of signers needed to release a build.
 
@@ -480,7 +486,7 @@ A malicious build cannot be published without multiple signers being compromised
 
 Multiple signers, enough to break quorom would have to lose their signing keys to be unable to update a production build.
 
-A multisigged application drive is not machine-bound. Write access is determined by signing capability.
+A multisig'd application drive is not machine-bound. Write access is determined by signing capability.
 
 A multisig key is defined by a `namespace` (an arbitrary string), a list of signing keys, and a quorum.
 
@@ -501,13 +507,13 @@ To make a multisig request on an existing drive follow:
 - [7e. Verify](#7e-verify)
 - [7f. Commit](#7f-commit)
 
-#### 7a. Create Signing Keys
+### 7a. Create Signing Keys
 
 Each signer needs to generate a signing key.
 
 The same person can use the same key to sign many different builds.
 
-```
+```sh
 npm i -g hypercore-sign
 hypercore-sign-generate-keys
 ```
@@ -516,7 +522,7 @@ Take note of the public key.
 
 The public key is stored in `~/.hypercore-sign/default.public`.
 
-#### 7b. Create Multisig Config
+### 7b. Create Multisig Config
 
 Set the public keys of each signer on `publicKey` and use the key of the provision link as the `srcKey`:
 
@@ -534,9 +540,9 @@ This configuration has three signers with a quorom of 2. Which means two signers
 
 Store it as `multisig.json`.
 
-#### 7c. Set `upgrade` field to Multisig Link
+### 7c. Set `upgrade` field to Multisig Link
 
-```
+```sh
 npm i -g hyper-multisig-cli
 ```
 
@@ -552,7 +558,7 @@ Then update the `upgrade` field of the `package.json` to the multisig link.
 
 - [1. Set upgrade link](#1-set-upgrade-link)
 
-The `upgrade` link now points to an appropriate production multisigged application drive.
+The `upgrade` link now points to an appropriate production multisig'd application drive.
 
 Go through the update flow steps:
 
@@ -569,11 +575,11 @@ pear provision pear://0.1082.qxenz5wmspmryjc13m9yzsqj1conqotn8fb4ocbufwtz9mtbqq5
 
 - [6. Provision](#6-provision) (excluding 6a)
 
-The `upgrade` field in the source drive (the provision drive) now points to the multisigged application drive.
+The `upgrade` field in the source drive (the provision drive) now points to the multisig'd application drive.
 
-#### 7d. Prepare Multisig Request
+### 7d. Prepare Multisig Request
 
-```
+```sh
 hyper-multisig request <length>
 ```
 
@@ -583,7 +589,7 @@ Note: `hyper-multisig` performs several checks before requesting and committing 
 
 One of the checks ensures the source drive is healthily seeded. If this is not the case, `hyper-multisig` refuses to make the signing request. Solve it by reseeding the provision on other peers.
 
-#### 7e. Sign
+### 7e. Sign
 
 `hyper-multisig` offers protection from formal mistakes that corrupt the production build, but it is up to the signers to verify that they are signing the correct build.
 
@@ -591,15 +597,15 @@ To check for formal mistakes before signing, run the `hyper-multisig verify` com
 
 To sign a request, run
 
-```
+```sh
 hypercore-sign <signing request>
 ```
 
 Then share the response. Once a quorum of signers (2 in the example) share their response, the build is ready to go out.
 
-#### 7f. Verify
+### 7f. Verify
 
-```
+```sh
 hyper-multisig verify [--first-commit] <signing request>
 ```
 
@@ -607,11 +613,11 @@ Use the `--first-commit` flag if this is the first commit to this drive.
 
 If responses are already available, pass those in as additional parameters after the `<signing request>`.
 
-#### 7g. Commit
+### 7g. Commit
 
 Only commit after verifying the request and all responses.
 
-```
+```sh
 hyper-multisig commit [--first-commit] <signing request>
 ```
 
@@ -638,32 +644,7 @@ It need not be a signer who commits as the request and the responses suffice to 
 
 Note: starting from the second commit, it is technically possible to corrupt the production build. So if a command ever errors with an `INCOMPATIBLE_SOURCE_AND_TARGET` error, never try to work around it, the only safe way to proceed is by creating reseeding the provision on other peers.
 
-## Convention
-
-### Delivery Pipeline
-
-Once fully setup, the delivery pipeline is always: Stage -> Provision -> Multisig.
-
-An update will not occur unless the `package.json` is `version` is updated.
-
-Always start by updating the version:
-
-- [2. Version](#2-version)
-
-Iterate as much as needed and continually stage.
-
-- [5. Stage](#5-stage)
-
-Once application is considered stable move on to provision.
-
-- [6. Provision](#6-provision)
-
-Once stakeholders, QA, dogfooder devs and any one else relevant has confirmed stability then multisig the provision key.
-
-- [7c. Prepare Multisig Request](#7c-prepare-multisig-request)
-- [7d. Sign](#7d-sign)
-- [7e. Verify](#7e-verify)
-- [7f. Commit](#7f-commit)
+## Conventions
 
 ### Release Lines
 
@@ -673,7 +654,7 @@ Depending on team scale, it can be worth having three stage drives, one provisio
 - staging - staged for wider developer and technical stakeholders, more stable than development,
 - rc - staged release candidate, ultra stable
 - prerelease - provisioned from rc source
-- production - multisigged from prerelease source
+- production - multisig'd from prerelease source
 
 For each of these lines:
 
@@ -694,6 +675,29 @@ Share the stage build with developer collaborators.
 Share the provision build with stakeholders, especially signers.
 
 Any updates to the stage or provision links will then update in the dedicated application builds.
+
+### Delivery Flow
+
+An update will not occur unless the `package.json` `version` field is updated.
+
+Always start by updating the version:
+
+- [2. Version](#2-version)
+
+Iterate as much as needed and continually stage.
+
+- [5. Stage](#5-stage)
+
+Once application is considered stable move on to provision.
+
+- [6. Provision](#6-provision)
+
+Once stakeholders, QA, dogfooder devs and any one else relevant has confirmed stability then multisig the provision key.
+
+- [7c. Prepare Multisig Request](#7c-prepare-multisig-request)
+- [7d. Sign](#7d-sign)
+- [7e. Verify](#7e-verify)
+- [7f. Commit](#7f-commit)
 
 ### Custom Builds
 
@@ -751,27 +755,3 @@ open -n <name>.app --args --storage /tmp/custom/storage
 ```sh
 .\<name>.exe --storage C:\tmp\custom\storage
 ```
-
-### Recovering from losing keys
-
-Staged and provisioned drives are machine-bound. If data is lost, write access to those keys is lost.
-
-Multisig drives are not machine-bound.
-
-If a stage link is lost, just create a new link and stage to it - update the stage builds.
-
-If a provision key is lost, make a new one using production as the source:
-
-```sh
-pear provision <versioned-production-key> <target-key> <versioned-production-key>
-```
-
-Then provision to the new prerelease key with stage key as source.
-
-```sh
-pear provision <versioned-stage-key> <target-key> <versioned-production-key>
-```
-
-Then set the new provision link key as the `srcKey` of the `multisig.json`config.
-
-- [7b. Create Multisig Config](#7b-create-multisig-config)
