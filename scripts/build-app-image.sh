@@ -114,5 +114,7 @@ echo "$APP_BUILDER appimage --stage $STAGE_DIR --arch $ARCH --output $OUTPUT --a
   --app "$APP_DIR" \
   --configuration "$CONFIG_JSON"
 
+chmod +x "$OUTPUT"
+
 echo ""
 echo "→ AppImage built at: $OUTPUT"
