@@ -758,34 +758,6 @@ open -n <name>.app --args --storage /tmp/custom/storage
 
 ## Troubleshooting
 
-### Recovering from lost write-access
-
-Staged and provisioned drives are machine-bound. If data is lost, write access to those keys is lost.
-
-Multisig drives are not machine-bound.
-
-If a stage link is lost, just create a new link and stage to it - update the stage builds.
-
-If a provision key is lost, make a new one using production as the source:
-
-```sh
-pear provision <versioned-production-key> <target-key> <versioned-production-key>
-```
-
-Then provision to the new prerelease key with stage key as source.
-
-```sh
-pear provision <versioned-stage-key> <target-key> <versioned-production-key>
-```
-
-Then set the new provision link key as the `srcKey` of the `multisig.json`config.
-
-- [7b. Create Multisig Config](#7b-create-multisig-config)
-
-### Recovering from lost signing keys
-
-TODO
-
 ### App did not update
 
 #### Was the version updated?
@@ -824,8 +796,61 @@ With the following order of events, the client will not connect to the seeder un
 
 #### Is the seeder unreachable?
 
-Ask the seeder to add the key to a few always-on seeders. Then there is less dependence on the seeder being reachable.
+Add the key to a few always-on seeders. Then there is less dependence on the seeder being reachable.
 
-#### Is the client unable to holepunch?
+### Recovering from lost write-access
 
-TODO
+Staged and provisioned drives are machine-bound. If data is lost, write access to those keys is lost.
+
+Multisig drives are not machine-bound.
+
+If a stage link is lost, just create a new link and stage to it - update the stage builds.
+
+If a provision key is lost, make a new one using production as the source:
+
+```sh
+pear provision <versioned-production-key> <target-key> <versioned-production-key>
+```
+
+Then provision to the new prerelease key with stage key as source.
+
+```sh
+pear provision <versioned-stage-key> <target-key> <versioned-production-key>
+```
+
+Then set the new provision link key as the `srcKey` of the `multisig.json` config.
+
+- [7b. Create Multisig Config](#7b-create-multisig-config)
+
+### Every `pear stage` is showing unexpected size increases
+
+#### Is the `pear-build` deployment folder inside the app folder?
+
+If the deployment folder ends up in the build and then that ends up in the deployment folder the build inflates each time. When it comes to running `pear stage` it will show file sizes that are unexpectedly large.
+
+Avoid this by never putting the deployment folder into the application folder.
+
+The deployment folder output by `pear-build` can be a considered as a sort of multi-architecture container.
+Think about it is as above, external to the project as a deployment artifact instead of inside the project.
+
+Never make deployment folders inside applications:
+
+```sh
+pear-build ... --package ./my-app/package.json --target ./my-app/my-build # <-- DON'T DO THIS
+
+cd my-app && pear-build ... --package ./mpackage.json --target ./my-build # <-- DON'T DO THIS
+```
+
+Always make the deployment folder them outside of the app-dir:
+
+```sh
+pear-build ... --package ./my-app/package.json --target ./my-build # <-- do this
+```
+
+Or don't use target at all and always run pear-build outside of the app folder:
+
+```sh
+pear-build ... --package ./my-app/package.json # <-- do this
+```
+
+That will output a build folder per version e.g. `hello-pear-electron-v1.2.3` creating a deploy folder per deploy. This can be very useful for reviewing any deployment issues and for quickly rolling back to a prior version (i.e. stage -> provision -> multisig from an older build folder).
