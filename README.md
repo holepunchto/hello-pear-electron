@@ -782,7 +782,6 @@ Then set the new provision link key as the `srcKey` of the `multisig.json`config
 
 - [7b. Create Multisig Config](#7b-create-multisig-config)
 
-
 ### Recovering from lost signing keys
 
 TODO
@@ -807,11 +806,25 @@ pear seed <link>
 
 #### Was the app seeded after opening the app?
 
-TODO
+Just wait about 15 minutes if you're not in a hurry.
+
+Also ask the seeder to add the key to a few always-on seeders, such as blind peers. Then there is less dependence on subtleties and this issue won't occur.
+
+Explanation of the subtlety (advanced, normal user do not need to care about this):
+
+- The client looks for peers who have the key when starting up, and will do anothere lookup roughly every 15 minutes
+- The server announces the key, so clients who look up the key will connect to the server
+
+With the following order of events, the client will not connect to the seeder until its second lookup
+
+- Seeder is offline, and nobody else is seeding
+- Client comes online, looks up the key and finds nobody
+- Seeder comes online and announces the key
+- After about 15 minutes, the client does another lookup, and now connects to the seeder
 
 #### Is the seeder unreachable?
 
-TODO
+Ask the seeder to add the key to a few always-on seeders, such as blind peers. Then there is less dependence on the seeder being reachable.
 
 #### Is the client unable to holepunch?
 
