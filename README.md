@@ -203,9 +203,9 @@ Centralized deployments tend to have at minimum a staging server, a preview serv
 
 Application builds are written to [pear:// links](https://github.com/holepunchto/pear-link?tab=readme-ov-file#pear-link-format) through three operations stage, provision and multisig — these are used to create successive layers of deployment with increasing trust guarantees:
 
-- **Stage** - internal usage, local checks, checks between devs
-- **Provision** - preproduction, QA, unsigned releases
-- **Multisig** - production, cryptographically signed by stakeholders
+- **Stage** - local checks, checks between dev peers, builds without vendor signing, feature branches, ephemeral throwaways
+- **Provision** - prereleases, stakeholder preview, Quality Assurance, dogfooding
+- **Multisig** - production, multisig'd by stakeholders, machine-independent, tamper-resistant
 
 Each operation feeds into the next: a staged link is the source for a provisioned link, a provisioned link is the source for a multisig'd link.
 
