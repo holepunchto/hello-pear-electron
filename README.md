@@ -808,7 +808,7 @@ pear seed <link>
 
 Just wait about 15 minutes if you're not in a hurry.
 
-Also ask the seeder to add the key to a few always-on seeders, such as blind peers. Then there is less dependence on subtleties and this issue won't occur.
+Also ask the seeder to add the key to a few always-on seeders. Then there is less dependence on subtleties and this issue won't occur.
 
 Explanation of the subtlety (advanced, normal user do not need to care about this):
 
@@ -824,7 +824,7 @@ With the following order of events, the client will not connect to the seeder un
 
 #### Is the seeder unreachable?
 
-Ask the seeder to add the key to a few always-on seeders, such as blind peers. Then there is less dependence on the seeder being reachable.
+Ask the seeder to add the key to a few always-on seeders. Then there is less dependence on the seeder being reachable.
 
 #### Is the client unable to holepunch?
 
