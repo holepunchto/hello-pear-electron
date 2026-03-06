@@ -145,6 +145,10 @@ ipcMain.handle('pear:startWorker', (evt, filename) => {
   getWorker(filename)
   return true
 })
+ipcMain.handle('restart-app', () => {
+  app.relaunch()
+  app.exit(0)
+})
 
 function handleDeepLink(url) {
   console.log('deep link:', url)

@@ -16,6 +16,7 @@ bridge.onPearEvent('updated', () => {
     btn.innerText = 'Updating...'
     try {
       await bridge.applyUpdate()
+      await bridge.restartApp()
     } catch (err) {
       document.getElementById('v').innerText = 'Update failed: ' + err.message
       btn.style.display = 'none'
