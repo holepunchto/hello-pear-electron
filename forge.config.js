@@ -92,7 +92,9 @@ module.exports = {
           result.artifacts[result.artifacts.indexOf(artifact)] = dest
         }
       }
-      if (isWindows) fs.rmSync(path.join(__dirname, 'out', 'make'), { recursive: true, force: true })
+      if (isWindows) {
+        fs.rmSync(path.join(__dirname, 'out', 'make'), { recursive: true, force: true })
+      }
     }
   },
 
