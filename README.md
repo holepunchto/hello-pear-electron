@@ -8,6 +8,29 @@ Quick start boilerplate for embedding [pear-runtime](https://github.com/holepunc
 - Embedded [bare](https://github.com/holepunchto/bare) runtime workers
 - Application storage management
 
+## Table of Contents
+
+- [OS Support](#os-support)
+- [Requirements](#requirements)
+- [Terminology](#terminology)
+- [Development](#development)
+  - [Install](#install)
+  - [Start](#start)
+- [P2P OTA Updates](#p2p-ota-updates)
+  - [Disabling Updates](#disabling-updates)
+  - [Runtime Update Flow](#runtime-update-flow)
+- [Storage](#storage)
+  - [Additional Instances](#additional-instances)
+- [Workers](#workers)
+- [Peer-to-Peer Deployments](#peer-to-peer-deployments)
+  - [Release Cycle](#release-cycle)
+  - [Foundational Steps](#foundational-steps)
+  - [Release Lines](#release-lines)
+  - [Release Line Builds](#release-line-builds)
+  - [Custom Builds](#custom-builds)
+- [Scripts](#scripts)
+- [Troubleshooting](#troubleshooting)
+
 ## OS Support
 
 - macOS
@@ -19,12 +42,6 @@ Quick start boilerplate for embedding [pear-runtime](https://github.com/holepunc
 - `npm` via [Node.js](nodejs.org)
 - [`pear`](https://docs.pears.com) - `npx pear`
 
-## Install
-
-```sh
-npm install
-```
-
 ## Terminology
 
 - P2P - Peer-to-Peer
@@ -35,6 +52,14 @@ npm install
 - versioned link - a pear link of the form `pear://<fork>.<length>.<key>` where fork, length and key correspond to [core.fork](https://github.com/holepunchto/hypercore#corefork), [core.length](https://github.com/holepunchto/hypercore#corelength), and [core.key](https://github.com/holepunchto/hypercore?tab=readme-ov-file#corekey) of the [Hypercore](https://github.com/holepunchto/hypercore) behind the [Hyperdrive](https://github.com/holepunchto/hyperdrive) behind the Pear application
 
 ## Development
+
+### Install
+
+```sh
+npm install
+```
+
+### Start
 
 Start app in development mode:
 
@@ -82,13 +107,56 @@ To disable updates as an application default, ensure that the package.json is sp
 }
 ```
 
+### Runtime Update Flow
+
+A running application will receive `updating` and `update` events, which are sent to the electron renderer
+process via `bridge.onPearEvent()`. After receiving the `update` event, the `bridge.applyUpdate()` method is called. This swaps the current application path with a path to the updated application build and then removes the old application from disk. So once the application is restarted, the application path contains the new build therefore the updated application is executed on restart.
+
 ## Storage
+
+A storage dir is used for persistence. In development this defaults to `<tmpdir>/pear/<name>`.
+
+In Production this is per OS:
+
+- Mac: `~/Library/Application Support/<name>`
+- Linux: `~/.config/<name>`
+- Windows: `%USERPROFILE%\AppData\Local\<name>`
 
 The `dir` option defines where peer-to-peer storage should be kept.
 
-The `pear.storage` property holds a path to application storage, this value should be passed as `Corestore` storage argument.
+The `pear.storage` property holds a path to application storage, this value should be passed as to [`Corestore`](https://github.com/holepunchto/corestore) as its `storage` argument.
 
 The `--storage` flag can be passed to use custom storage for multiple running instances. This allows for local end-to-end peer-to-peer flow.
+
+In development custom storage can be passed as so:
+
+```sh
+npm start -- --storage /tmp/custom/storage
+```
+
+### Additional Instances
+
+The storage dir holds a [`Corestore`](https://github.com/holepunchto/corestore) and may hold application corestores. Running an application with a different storage location means using a separate `Corestore`, just like an app running on another machine would be using a separate `Corestore`.
+
+An additional application instance can be run with the following (per OS).
+
+#### macOS
+
+```sh
+open -n <name>.app --args --storage /tmp/custom/storage
+```
+
+#### Linux
+
+```sh
+./<name>.AppImage --storage /tmp/custom/storage
+```
+
+#### Windows
+
+```sh
+.\<name>.exe --storage C:\tmp\custom\storage
+```
 
 ## Workers
 
@@ -644,8 +712,6 @@ It need not be a signer who commits as the request and the responses suffice to 
 
 Note: starting from the second commit, it is technically possible to corrupt the production build. So if a command ever errors with an `INCOMPATIBLE_SOURCE_AND_TARGET` error, never try to work around it, the only safe way to proceed is by creating reseeding the provision on other peers.
 
-## Conventions
-
 ### Release Lines
 
 Depending on team scale, it can be worth having three stage drives, one provision drive and one multisig drive
@@ -688,52 +754,6 @@ The `upgrade` field can be set to one link only. Share alternative builds intern
 - [3. Make Distributables](#3-make-distributables)
 - [4. Build Deploy Directory](#4-build-deploy-directory)
 - [5. Stage](#5-stage)
-
-### Runtime Update Flow
-
-A running application will receive `updating` and `update` events, which are sent to the electron renderer
-process via `bridge.onPearEvent()`. After receiving the `update` event, the `bridge.applyUpdate()` method is called. This swaps the current application path with a path to the updated application build and then removes the old application from disk. So once the application is restarted, the application path contains the new build therefore the updated application is executed on restart.
-
-### Runtime Storage & Additional Application Instances
-
-A storage dir is used for persistence. In development this defaults to `<tmpdir>/pear/<name>`.
-
-In Production this is per OS:
-
-- Mac: `~/Library/Application Support/<name>`
-- Linux: `~/.config/<name>`
-- Windows: `%USERPROFILE%\AppData\Local\<name>`
-
-Additionally an argument can be passed to set a custom storage path.
-
-This is just boilerplate, a conventional starting point. It can be changed/improved as needed per project.
-For example, peer-to-peer applications can use a lot of disk space. On Windows the `C:` drive is often lower capacity than other drives. Allowing users to set their storage in-app is beyond the scope here but would be a useful feature for any peer-to-peer app.
-
-In development custom storage can be passed as so:
-
-```sh
-npm start -- --storage /tmp/custom/storage
-```
-
-For application builds, an additional instance can be run with the following per OS.
-
-#### macOS
-
-```sh
-open -n <name>.app --args --storage /tmp/custom/storage
-```
-
-#### Linux
-
-```sh
-./<name>.AppImage --storage /tmp/custom/storage
-```
-
-#### Windows
-
-```sh
-.\<name>.exe --storage C:\tmp\custom\storage
-```
 
 ## Scripts
 
