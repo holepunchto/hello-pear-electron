@@ -2,11 +2,12 @@
 
 > Pear Hello World for Electron with `pear-runtime`
 
-Quick start boilerplate for embedding [pear-runtime](https://github.com/holepunchto/pear-runtime) into [Electron](https://www.electronjs.org/).
+End-to-end boilerplate for embedding [pear-runtime](https://github.com/holepunchto/pear-runtime) into [Electron](https://www.electronjs.org/) apps and deploying peer-to-peer application updates.
 
 - Peer-to-Peer Over-the-Air updates with update-restart
 - Embedded [bare](https://github.com/holepunchto/bare) runtime workers
 - Application storage management
+- Staged deployment pipeline with multisig production releases
 
 ## Table of Contents
 
