@@ -806,11 +806,11 @@ pear seed <link>
 
 #### Was the app seeded after opening the app?
 
-Just wait about 15 minutes if you're not in a hurry.
+Just wait about 15 minutes if there is no rush.
 
-Also ask the seeder to add the key to a few always-on seeders. Then there is less dependence on subtleties and this issue won't occur.
+Also add the key to a few always-on seeders. Then there is less dependence on subtleties and this issue won't occur.
 
-Explanation of the subtlety (advanced, normal user do not need to care about this):
+Explanation (advanced):
 
 - The client looks for peers who have the key when starting up, and will do anothere lookup roughly every 15 minutes
 - The server announces the key, so clients who look up the key will connect to the server
