@@ -46,7 +46,7 @@ function getPear() {
         ? path.join(os.homedir(), '.config', appName)
         : path.join(os.homedir(), 'AppData', 'Local', appName)
   }
-  pear = new PearRuntime({ dir, app: appPath, updates, version, upgrade })
+  pear = new PearRuntime({ dir, app: appPath, updates, version, upgrade, win32: { restart: true } })
   return pear
 }
 
@@ -145,7 +145,7 @@ ipcMain.handle('pear:startWorker', (evt, filename) => {
   getWorker(filename)
   return true
 })
-ipcMain.handle('restart-app', () => {
+ipcMain.handle('app:restart', () => {
   app.relaunch(
     isLinux && process.env.APPIMAGE
       ? {
