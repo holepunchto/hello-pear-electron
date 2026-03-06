@@ -150,7 +150,10 @@ ipcMain.handle('restart-app', () => {
     isLinux && process.env.APPIMAGE
       ? {
           execPath: process.env.APPIMAGE,
-          args: ['--appimage-extract-and-run', ...process.argv.slice(1)]
+          args: [
+            '--appimage-extract-and-run',
+            ...process.argv.slice(1).filter((arg) => arg !== '--appimage-extract-and-run')
+          ]
         }
       : {}
   )
