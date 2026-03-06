@@ -146,7 +146,14 @@ ipcMain.handle('pear:startWorker', (evt, filename) => {
   return true
 })
 ipcMain.handle('restart-app', () => {
-  app.relaunch()
+  app.relaunch(
+    isLinux && process.env.APPIMAGE
+      ? {
+          execPath: process.env.APPIMAGE,
+          args: ['--appimage-extract-and-run', ...process.argv.slice(1)]
+        }
+      : {}
+  )
   app.exit(0)
 })
 
