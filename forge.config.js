@@ -2,6 +2,7 @@ const fs = require('fs')
 const path = require('path')
 const pkg = require('./package.json')
 const appName = pkg.productName ?? pkg.name
+const { isWindows } = require('which-runtime')
 
 function getWindowsKitVersion() {
   const programFiles = process.env['PROGRAMFILES(X86)'] || process.env.PROGRAMFILES
@@ -91,7 +92,9 @@ module.exports = {
           result.artifacts[result.artifacts.indexOf(artifact)] = dest
         }
       }
-      fs.rmSync(path.join(__dirname, 'out', 'make'), { recursive: true, force: true })
+      if (isWindows) {
+        fs.rmSync(path.join(__dirname, 'out', 'make'), { recursive: true, force: true })
+      }
     }
   },
 
