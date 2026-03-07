@@ -249,10 +249,10 @@ pear provision <pear://<fork>.<length>.<stage-key> <pear://<provision-key>> <pea
 
 Once stakeholders, QA, dogfooder devs and any one else relevant has assessed, have a quorum of signers multisig the provision link to confirm production viability and release a production update in four steps:
 
-- [7c. Prepare Multisig Request](#7c-prepare-multisig-request)
-- [7d. Sign](#7d-sign)
-- [7e. Verify](#7e-verify)
-- [7f. Commit](#7f-commit)
+- [7d. Prepare Multisig Request](#7d-prepare-multisig-request)
+- [7e. Sign](#7e-sign)
+- [7f. Verify](#7f-verify)
+- [7g. Commit](#7g-commit)
 
 ### Foundational Steps
 
@@ -267,10 +267,13 @@ Follow the foundational steps at a pace suitable to the project until the [Relea
 - [4. Build Deploy Directory](#4-build-deploy-directory)
 - [5. Stage](#5-stage)
 - [6. Provision](#6-provision)
-- [7c. Prepare Multisig Request](#7c-prepare-multisig-request)
-- [7d. Sign](#7d-sign)
-- [7e. Verify](#7e-verify)
-- [7f. Commit](#7f-commit)
+- [7a. Create Signing Keys](#7a-create-signing-keys)
+- [7b. Create Multisig Config](#7b-create-multisig-config)
+- [7c. Set `upgrade` field to Multisig Link](#7c-set-upgrade-field-to-multisig-link)
+- [7d. Prepare Multisig Request](#7d-prepare-multisig-request)
+- [7e. Sign](#7e-sign)
+- [7f. Verify](#7f-verify)
+- [7g. Commit](#7g-commit)
 
 #### 0. Touch and Seed
 
