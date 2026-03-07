@@ -1,11 +1,11 @@
-# hello-pear-electron
+# hello-pear-electron <a name="hello-pear-electron"></a>
 
 > Pear Hello World for Electron with `pear-runtime`
 
-End-to-end boilerplate for embedding [pear-runtime](https://github.com/holepunchto/pear-runtime) into [Electron](https://www.electronjs.org/) apps and deploying peer-to-peer application updates.
+End-to-end boilerplate for embedding [pear-runtime][pear-runtime] into [Electron][electron] apps and deploying peer-to-peer application updates.
 
 - Peer-to-Peer Over-the-Air updates with update-restart
-- Embedded [bare](https://github.com/holepunchto/bare) runtime workers
+- Embedded [bare][bare] runtime workers
 - Application storage management
 - Staged deployment pipeline with multisig production releases
 
@@ -23,7 +23,7 @@ End-to-end boilerplate for embedding [pear-runtime](https://github.com/holepunch
 - [Storage](#storage)
   - [Additional Instances](#additional-instances)
 - [Workers](#workers)
-- [Peer-to-Peer Deployments](#peer-to-peer-deployments)
+- [Peer-to-Peer Deployments](#deployments)
   - [Release Cycle](#release-cycle)
   - [Foundational Steps](#foundational-steps)
   - [Release Lines](#release-lines)
@@ -32,35 +32,35 @@ End-to-end boilerplate for embedding [pear-runtime](https://github.com/holepunch
 - [Scripts](#scripts)
 - [Troubleshooting](#troubleshooting)
 
-## OS Support
+## OS Support <a name="os-support"></a>
 
 - macOS
 - Linux
 - Windows
 
-## Requirements
+## Requirements <a name="requirements"></a>
 
-- `npm` via [Node.js](nodejs.org)
-- [`pear`](https://docs.pears.com) - `npx pear`
+- `npm` via [Node.js][nodejs]
+- [`pear`][pear-docs] - `npx pear`
 
-## Terminology
+## Terminology <a name="terminology"></a>
 
 - P2P - Peer-to-Peer
 - OTA - Over-the-Air
-- application drive - the [Hyperdrive](https://github.com/holepunchto/hyperdrive) behind a Pear application
+- application drive - the [Hyperdrive][hyperdrive] behind a Pear application
 - deployment folder - the build directory as output by `pear-build` which is then staged
-- pear link - a [link format](https://github.com/holepunchto/pear-link?tab=readme-ov-file#pear-link-format) for self-describing peer-to-peer links
-- versioned link - a pear link of the form `pear://<fork>.<length>.<key>` where fork, length and key correspond to [core.fork](https://github.com/holepunchto/hypercore#corefork), [core.length](https://github.com/holepunchto/hypercore#corelength), and [core.key](https://github.com/holepunchto/hypercore?tab=readme-ov-file#corekey) of the [Hypercore](https://github.com/holepunchto/hypercore) behind the [Hyperdrive](https://github.com/holepunchto/hyperdrive) behind the Pear application
+- pear link - a [link format][pear-link-format] for self-describing peer-to-peer links
+- versioned link - a pear link of the form `pear://<fork>.<length>.<key>` where fork, length and key correspond to [core.fork][hypercore-fork], [core.length][hypercore-length], and [core.key][hypercore-key] of the [Hypercore][hypercore] behind the [Hyperdrive][hyperdrive] behind the Pear application
 
-## Development
+## Development <a name="development"></a>
 
-### Install
+### Install <a name="install"></a>
 
 ```sh
 npm install
 ```
 
-### Start
+### Start <a name="start"></a>
 
 Start app in development mode:
 
@@ -76,7 +76,7 @@ To enable updates for testing update flow in local development use
 npm start -- --updates
 ```
 
-## P2P OTA Updates
+## P2P OTA Updates <a name="p2p-ota-updates"></a>
 
 An update occurs when a seeded application drive is written to.
 
@@ -94,7 +94,7 @@ pear.updater.on('updated', () => {
 })
 ```
 
-### Disabling Updates
+### Disabling Updates <a name="disabling-updates"></a>
 
 Pass `--no-updates` flag to disable updates per application run.
 
@@ -108,12 +108,12 @@ To disable updates as an application default, ensure that the package.json is sp
 }
 ```
 
-### Runtime Update Flow
+### Runtime Update Flow <a name="runtime-update-flow"></a>
 
 A running application will receive `updating` and `update` events, which are sent to the electron renderer
 process via `bridge.onPearEvent()`. After receiving the `update` event, the `bridge.applyUpdate()` method is called. This swaps the current application path with a path to the updated application build and then removes the old application from disk. So once the application is restarted, the application path contains the new build therefore the updated application is executed on restart.
 
-## Storage
+## Storage <a name="storage"></a>
 
 A storage dir is used for persistence. In development this defaults to `<tmpdir>/pear/<name>`.
 
@@ -125,7 +125,7 @@ In Production this is per OS:
 
 The `dir` option defines where peer-to-peer storage should be kept.
 
-The `pear.storage` property holds a path to application storage, this value should be passed as to [`Corestore`](https://github.com/holepunchto/corestore) as its `storage` argument.
+The `pear.storage` property holds a path to application storage, this value should be passed as to [`Corestore`][corestore] as its `storage` argument.
 
 The `--storage` flag can be passed to use custom storage for multiple running instances. This allows for local end-to-end peer-to-peer flow.
 
@@ -135,31 +135,31 @@ In development custom storage can be passed as so:
 npm start -- --storage /tmp/custom/storage
 ```
 
-### Additional Instances
+### Additional Instances <a name="additional-instances"></a>
 
-The storage dir holds a [`Corestore`](https://github.com/holepunchto/corestore) and may hold application corestores. Running an application with a different storage location means using a separate `Corestore`, just like an app running on another machine would be using a separate `Corestore`.
+The storage dir holds a [`Corestore`][corestore] and may hold application corestores. Running an application with a different storage location means using a separate `Corestore`, just like an app running on another machine would be using a separate `Corestore`.
 
 An additional application instance can be run with the following (per OS).
 
-#### macOS
+#### macOS <a name="additional-instances-macos"></a>
 
 ```sh
 open -n <name>.app --args --storage /tmp/custom/storage
 ```
 
-#### Linux
+#### Linux <a name="additional-instances-linux"></a>
 
 ```sh
 ./<name>.AppImage --storage /tmp/custom/storage
 ```
 
-#### Windows
+#### Windows <a name="additional-instances-windows"></a>
 
 ```sh
 .\<name>.exe --storage C:\tmp\custom\storage
 ```
 
-## Workers
+## Workers <a name="workers"></a>
 
 The idea is to put application peer-to-peer code into a main worker that then acts as a local backend for the application view layer.
 
@@ -189,9 +189,9 @@ const corestore = new Corestore(storage)
 //.. do more with corestore..
 ```
 
-## Peer-to-Peer Deployments
+## Peer-to-Peer Deployments <a name="deployments"></a>
 
-Use the [`pear`](https://docs.pears.com) CLI to deploy applications.
+Use the [`pear`][pear-docs] CLI to deploy applications.
 
 Install with:
 
@@ -201,7 +201,7 @@ npx pear
 
 Centralized deployments tend to have at minimum a staging server, a preview server for stakeholders and a production server.
 
-Application builds are written to [pear:// links](https://github.com/holepunchto/pear-link?tab=readme-ov-file#pear-link-format) through three operations stage, provision and multisig — these are used to create successive layers of deployment with increasing trust guarantees:
+Application builds are written to [pear:// links][pear-link-format] through three operations stage, provision and multisig — these are used to create successive layers of deployment with increasing trust guarantees:
 
 - **Stage** - local checks, checks between dev peers, builds without vendor signing, feature branches, ephemeral throwaways
 - **Provision** - prereleases, stakeholder preview, Quality Assurance, dogfooding
@@ -215,7 +215,7 @@ Stage -> Provision -> Multisig
 
 This approach enables rapid collaborative iteration on Stage links, a stakeholder preview with Provisioned links, and cryptographically signed-off machine-independent production releases with Multisigged links.
 
-### Release Cycle
+### Release Cycle <a name="release-cycle"></a>
 
 After the [Foundational Steps](#foundational-steps) are all in place the deployment reaches steady state. From there the delivery flow is always the same.
 
@@ -223,13 +223,13 @@ An update will not occur unless the `package.json` `version` field is updated.
 
 Always start by updating the version:
 
-- [2. Version](#2-version)
+- [2. Version](#version)
 
 Iterate as much as needed and continually make, build and stage:
 
-- [3. Make Distributables](#3-make-distributables)
-- [4. Build Deploy Directory](#4-build-deploy-directory)
-- [5. Stage](#5-stage)
+- [3. Make Distributables](#make-distributables)
+- [4. Build Deploy Directory](#build-deploy-directory)
+- [5. Stage](#stage)
 
 There can be multiple stage link targets (development, staging, rc) see [Release Lines](#release-lines).
 
@@ -245,34 +245,37 @@ Once a multisig link exists, the provision command is always:
 pear provision <pear://<fork>.<length>.<stage-key> <pear://<provision-key>> <pear://<fork>.<length>.<multisig-key>
 ```
 
-- [6. Provision](#6-provision)
+- [6. Provision](#provision)
 
 Once stakeholders, QA, dogfooder devs and any one else relevant has assessed, have a quorum of signers multisig the provision link to confirm production viability and release a production update in four steps:
 
-- [7c. Prepare Multisig Request](#7c-prepare-multisig-request)
-- [7d. Sign](#7d-sign)
-- [7e. Verify](#7e-verify)
-- [7f. Commit](#7f-commit)
+- [7d. Prepare Multisig Request](#prepare-multisig-request)
+- [7e. Sign](#sign)
+- [7f. Verify](#verify)
+- [7g. Commit](#commit)
 
-### Foundational Steps
+### Foundational Steps <a name="foundational-steps"></a>
 
 Establishing the entire [Release Cycle](#release-cycle) doesn't have to happen all at once. It can, but how productionized it needs to be is project-dependent. If an application is in a Proof of Concept phase, then just using a stage link will do. If an application is intended for production release then multisig is crucial to practices, resilience and machine independence. In order to reach a multisig deployment there are some bootstrapping steps involved. Once completed, a remaining subset of these steps is the standard [Release Cycle](#release-cycle).
 
 Follow the foundational steps at a pace suitable to the project until the [Release Cycle](#release-cycle) is established:
 
-- [0. Touch and Seed](#0-touch-and-seed)
-- [1. Set upgrade link](#1-set-upgrade-link)
-- [2. Version](#2-version)
-- [3. Make Distributables](#3-make-distributables)
-- [4. Build Deploy Directory](#4-build-deploy-directory)
-- [5. Stage](#5-stage)
-- [6. Provision](#6-provision)
-- [7c. Prepare Multisig Request](#7c-prepare-multisig-request)
-- [7d. Sign](#7d-sign)
-- [7e. Verify](#7e-verify)
-- [7f. Commit](#7f-commit)
+- [0. Touch and Seed](#touch-and-seed)
+- [1. Set upgrade link](#set-upgrade-link)
+- [2. Version](#version)
+- [3. Make Distributables](#make-distributables)
+- [4. Build Deploy Directory](#build-deploy-directory)
+- [5. Stage](#stage)
+- [6. Provision](#provision)
+- [7a. Create Signing Keys](#create-signing-keys)
+- [7b. Create Multisig Config](#create-multisig-config)
+- [7c. Set `upgrade` field to Multisig Link](#set-multisig-link)
+- [7d. Prepare Multisig Request](#prepare-multisig-request)
+- [7e. Sign](#sign)
+- [7f. Verify](#verify)
+- [7g. Commit](#commit)
 
-#### 0. Touch and Seed
+#### 0. Touch and Seed <a name="touch-and-seed"></a>
 
 Create a new pear link:
 
@@ -294,7 +297,7 @@ On other always-online machines reseed with:
 pear seed pear://qxenz5wmspmryjc13m9yzsqj1conqotn8fb4ocbufwtz9mtbqq5o # on other machines
 ```
 
-#### 1. Set upgrade link
+#### 1. Set upgrade link <a name="set-upgrade-link"></a>
 
 The `package.json` `upgrade` field should be set to a `pear://` link.
 
@@ -314,7 +317,7 @@ To set the upgrade link from the command line `npm set pkg upgrade=<link>` can b
 npm set pkg upgrade=pear://qxenz5wmspmryjc13m9yzsqj1conqotn8fb4ocbufwtz9mtbqq5o
 ```
 
-#### 2. Version
+#### 2. Version <a name="version"></a>
 
 If this is first time leave the version at 1.0.0 and skip to Make distributables.
 
@@ -334,9 +337,9 @@ For example:
 npm version patch
 ```
 
-#### 3. Make Distributables
+#### 3. Make Distributables <a name="make-distributables"></a>
 
-##### Checklist
+##### Checklist <a name="make-checklist"></a>
 
 - `package.json` `author` field populated
 - `package.json` `license` field populated
@@ -347,7 +350,7 @@ npm version patch
 - `build/icon.ico` is per brand
 - `build/icon.png` is per brand
 
-##### macOS
+##### macOS <a name="make-macos"></a>
 
 For local development only:
 
@@ -365,13 +368,13 @@ Supply signing and notarizing keys with `MAC_CODESIGN_IDENTITY`, `APPLE_TEAM_ID`
 MAC_CODESIGN_IDENTITY=identity APPLE_TEAM_ID=teamid APPLE_ID=id APPLE_PASSWORD=pw npm run make
 ```
 
-Instructions for obtaining credentials can be found [here](https://www.electronforge.io/guides/code-signing/code-signing-macos#option-1-using-an-app-specific-password)
+Instructions for obtaining credentials can be found [here][electron-forge-macos-signing]
 
-Note `APPLE_PASSWORD` is not the sign-in password, it's an [app-specific password](https://support.apple.com/en-us/102654).
+Note `APPLE_PASSWORD` is not the sign-in password, it's an [app-specific password][apple-app-specific-password].
 
-##### Windows
+##### Windows <a name="make-windows"></a>
 
-Requires [Windows SDK](https://developer.microsoft.com/en-us/windows/downloads/windows-sdk/) (the build auto-detects the installed version) and [PowerShell 7+](https://learn.microsoft.com/en-us/powershell/scripting/install/installing-powershell-on-windows) (`winget install Microsoft.PowerShell`).
+Requires [Windows SDK][windows-sdk] (the build auto-detects the installed version) and [PowerShell 7+][powershell-install] (`winget install Microsoft.PowerShell`).
 
 Without signing credentials, a self-signed development certificate is automatically generated matching the `Publisher` in `AppxManifest.xml`. This certificate is cached in the local certificate store and reused across builds on the same machine, but is not portable — building on a different machine or clearing the cert store generates a new one.
 
@@ -389,9 +392,9 @@ Production Windows apps must be signed with a code signing certificate. The `Pub
 WINDOWS_CERTIFICATE_FILE=path/to/cert.pfx WINDOWS_CERTIFICATE_PASSWORD=password npm run make:win32
 ```
 
-For OTA updates, the same certificate must be used across builds — Windows rejects updates where the `Publisher` doesn't match the installed package. Create a persistent code signing certificate following [Microsoft's MSIX signing guide](https://learn.microsoft.com/en-us/windows/msix/package/create-certificate-package-signing), or use a production certificate.
+For OTA updates, the same certificate must be used across builds — Windows rejects updates where the `Publisher` doesn't match the installed package. Create a persistent code signing certificate following [Microsoft's MSIX signing guide][msix-signing-guide], or use a production certificate.
 
-##### Linux
+##### Linux <a name="make-linux"></a>
 
 Build distributables with:
 
@@ -399,12 +402,12 @@ Build distributables with:
 npm run make:linux
 ```
 
-#### 4. Build Deploy Directory
+#### 4. Build Deploy Directory <a name="build-deploy-directory"></a>
 
 Each make runs on a different OS and architecture. Each must be moved to a single build machine,
 this assumes that they've all been moved into the same project `./out` folder.
 
-Use [`pear-build`](https://npm.im/pear-build) to move all the `package.json` and architectures into a single build target directory. The resulting directory is the Deploy Directory.
+Use [`pear-build`][pear-build] to move all the `package.json` and architectures into a single build target directory. The resulting directory is the Deploy Directory.
 
 From above the project root run `pear-build` for each arch, for example Mac x64 + arm64, Linux x64 + arm64 and Windows x64 would be:
 
@@ -425,9 +428,9 @@ The resulting Deploy Directory should (and must) have the following structure at
     /app
 ```
 
-#### 5. Stage
+#### 5. Stage <a name="stage"></a>
 
-Use Pear to synchronize the Deploy Directory from disk to [hypercore](https://github.com/holepunchto/hypercore) within Pear by executing `pear stage <upgrade-link> <deploy-directory>`.
+Use Pear to synchronize the Deploy Directory from disk to [hypercore][hypercore] within Pear by executing `pear stage <upgrade-link> <deploy-directory>`.
 
 First perform a dry run:
 
@@ -443,25 +446,25 @@ pear stage pear://qxenz5wmspmryjc13m9yzsqj1conqotn8fb4ocbufwtz9mtbqq5o ./hello-p
 
 This will likewise output file diffs showing memory sizes per file for additions, deletions and changes - confirm they're the same as the dry run output to ensure nothing was accidentally altered between the dry run and the real run.
 
-##### Confirm Stage Updates
+##### Confirm Stage Updates <a name="confirm-stage"></a>
 
-Open the application on multiple different machines - the seeding process from [0. Touch and Seed](#0-touch-and-seed) should show peers joining as application instances are opened per machine.
+Open the application on multiple different machines - the seeding process from [0. Touch and Seed](#touch-and-seed) should show peers joining as application instances are opened per machine.
 
 Make a change, save it and repeat steps:
 
-- [2. Version](#2-version) (do `npm version patch`)
-- [3. Make Distributables](#3-make-distributables)
-- [4. Build Deploy Directory](#4-build-deploy-directory)
+- [2. Version](#version) (do `npm version patch`)
+- [3. Make Distributables](#make-distributables)
+- [4. Build Deploy Directory](#build-deploy-directory)
 
 As long as the `upgrade` field is pointing to the staged link, then this should trigger an update in every application on every machine it was run on, if so the steps were completed successfully. Restart the application to see the latest update.
 
-##### Checklist
+##### Checklist <a name="stage-checklist"></a>
 
 - Always dry run first
 - Check output diffs before staging
 - Checkout stage outputs against dry run output diffs
 
-#### 6. Provision
+#### 6. Provision <a name="provision"></a>
 
 With `pear stage` both additions and deletions are appended to the application drive. When productionizing an application, removing history and overhead is an important step. A provision synchronizes from another pear:// link in a way that strips additions/deletions resulting in a smaller data footprint.
 
@@ -481,7 +484,7 @@ The source link would be a prior staged application, for example: `pear://0.1079
 
 The target link needs to be created and seeded, follow step:
 
-- [0. Touch and Seed](#0-touch-and-seed)
+- [0. Touch and Seed](#touch-and-seed)
 
 Synchronize the stage key to the new provision link with the `pear provision` command.
 
@@ -501,22 +504,22 @@ pear provision pear://0.1079.qxenz5wmspmryjc13m9yzsqj1conqotn8fb4ocbufwtz9mtbqq5
 
 The `package.json` `upgrade` field determines where the app updates from, so to check that the provisioned link works it must be set to the provisioned link.
 
-- [1. Set upgrade link](#1-set-upgrade-link)
+- [1. Set upgrade link](#set-upgrade-link)
 
 Since this an update, it should be versioned:
 
-- [2. Version](#2-version)
+- [2. Version](#version)
 
 The source link for the provisioned drive has to be updated with the new `package.json` `upgrade` field pointing to the provisioned link.
 
 Make a new build that contains the new `package.json` with the new `upgrade` field, following steps:
 
-- [3. Make Distributables](#3-make-distributables)
-- [4. Build Deploy Directory](#4-build-deploy-directory)
+- [3. Make Distributables](#make-distributables)
+- [4. Build Deploy Directory](#build-deploy-directory)
 
 Stage again to the stage link, following:
 
-- [5. Stage](#5-stage)
+- [5. Stage](#stage)
 
 Now provision again so that the `upgrade` link is set correctly on the provisioned link:
 
@@ -524,11 +527,11 @@ Now provision again so that the `upgrade` link is set correctly on the provision
 pear provision pear://0.1080.qxenz5wmspmryjc13m9yzsqj1conqotn8fb4ocbufwtz9mtbqq5o pear://q9sopzoqgas9usoiq7uzkkwngm5pzj4zo3n4esjwwbmw6offis8o pear://0.0.q9sopzoqgas9usoiq7uzkkwngm5pzj4zo3n4esjwwbmw6offis8o
 ```
 
-#### Confirm Provision Updates
+#### Confirm Provision Updates <a name="confirm-provision"></a>
 
 To update with provision, first update by staging, following:
 
-- [5. Stage](#5-stage)
+- [5. Stage](#stage)
 
 Then provision:
 
@@ -538,12 +541,12 @@ pear provision pear://0.1081.qxenz5wmspmryjc13m9yzsqj1conqotn8fb4ocbufwtz9mtbqq5
 
 As long as the `upgrade` field is pointing to the provisioned link, then this should trigger an update in every application on every machine it was run on, if so the steps were completed successfully. Restart the application to see the latest update.
 
-##### Checklist
+##### Checklist <a name="provision-checklist"></a>
 
 - Always dry run first
 - Check dry run output diffs before provisioning
 
-#### 7. Multisig
+#### 7. Multisig <a name="multisig"></a>
 
 A multisig'd application drive is recommended for serious production deployment.
 
@@ -561,22 +564,22 @@ A multisig key is defined by a `namespace` (an arbitrary string), a list of sign
 
 To setup a new key follow:
 
-- [7a. Create Signing Keys](#7a-create-signing-keys)
-- [7b. Create Multisig Config](#7b-create-multisig-config)
-- [7c. Set `upgrade` field to Multisig Link](#7c-set-upgrade-field-to-multisig-link)
-- [7d. Prepare Multisig Request](#7d-prepare-multisig-request)
-- [7e. Sign](#7e-sign)
-- [7f. Verify](#7f-verify)
-- [7g. Commit](#7g-commit)
+- [7a. Create Signing Keys](#create-signing-keys)
+- [7b. Create Multisig Config](#create-multisig-config)
+- [7c. Set `upgrade` field to Multisig Link](#set-multisig-link)
+- [7d. Prepare Multisig Request](#prepare-multisig-request)
+- [7e. Sign](#sign)
+- [7f. Verify](#verify)
+- [7g. Commit](#commit)
 
 To make a multisig request on an existing drive follow:
 
-- [7d. Prepare Multisig Request](#7d-prepare-multisig-request)
-- [7e. Sign](#7e-sign)
-- [7f. Verify](#7f-verify)
-- [7g. Commit](#7g-commit)
+- [7d. Prepare Multisig Request](#prepare-multisig-request)
+- [7e. Sign](#sign)
+- [7f. Verify](#verify)
+- [7g. Commit](#commit)
 
-#### 7a. Create Signing Keys
+#### 7a. Create Signing Keys <a name="create-signing-keys"></a>
 
 Each signer needs to generate a signing key.
 
@@ -591,7 +594,7 @@ Take note of the public key.
 
 The public key is stored in `~/.hypercore-sign/default.public`.
 
-#### 7b. Create Multisig Config
+#### 7b. Create Multisig Config <a name="create-multisig-config"></a>
 
 Set the public keys of each signer on `publicKey` and use the key of the provision link as the `srcKey`:
 
@@ -609,7 +612,7 @@ This configuration has three signers with a quorum of 2. Which means two signers
 
 Store it as `multisig.json`.
 
-#### 7c. Set `upgrade` field to Multisig Link
+#### 7c. Set `upgrade` field to Multisig Link <a name="set-multisig-link"></a>
 
 ```sh
 npm i -g hyper-multisig-cli
@@ -625,16 +628,16 @@ This will output a pear link, example: `pear://69qwbihxj4c8te15wt3skj4j1g3ufmbo3
 
 Then update the `upgrade` field of the `package.json` to the multisig link.
 
-- [1. Set upgrade link](#1-set-upgrade-link)
+- [1. Set upgrade link](#set-upgrade-link)
 
 The `upgrade` link now points to an appropriate production multisig'd application drive.
 
 Go through the update flow steps:
 
-- [2. Version](#2-version)
-- [3. Make Distributables](#3-make-distributables)
-- [4. Build Deploy Directory](#4-build-deploy-directory)
-- [5. Stage](#5-stage)
+- [2. Version](#version)
+- [3. Make Distributables](#make-distributables)
+- [4. Build Deploy Directory](#build-deploy-directory)
+- [5. Stage](#stage)
 
 When provisioning, the production link argument should be the multisig link, for example:
 
@@ -642,11 +645,11 @@ When provisioning, the production link argument should be the multisig link, for
 pear provision pear://0.1082.qxenz5wmspmryjc13m9yzsqj1conqotn8fb4ocbufwtz9mtbqq5o pear://q9sopzoqgas9usoiq7uzkkwngm5pzj4zo3n4esjwwbmw6offis8o pear://0.0.69qwbihxj4c8te15wt3skj4j1g3ufmbo3mperedjqr1hb55mspoo
 ```
 
-- [6. Provision](#6-provision)
+- [6. Provision](#provision)
 
 The `upgrade` field in the source drive (the provision drive) now points to the multisig'd application drive.
 
-#### 7d. Prepare Multisig Request
+#### 7d. Prepare Multisig Request <a name="prepare-multisig-request"></a>
 
 ```sh
 hyper-multisig request <length>
@@ -658,7 +661,7 @@ Note: `hyper-multisig` performs several checks before requesting and committing 
 
 One of the checks ensures the source drive is healthily seeded. If this is not the case, `hyper-multisig` refuses to make the signing request. Solve it by reseeding the provision on other peers.
 
-#### 7e. Sign
+#### 7e. Sign <a name="sign"></a>
 
 `hyper-multisig` offers protection from formal mistakes that corrupt the production build, but it is up to the signers to verify that they are signing the correct build.
 
@@ -672,7 +675,7 @@ hypercore-sign <signing request>
 
 Then share the response. Once a quorum of signers (2 in the example) share their response, the build is ready to go out.
 
-#### 7f. Verify
+#### 7f. Verify <a name="verify"></a>
 
 ```sh
 hyper-multisig verify [--first-commit] <signing request>
@@ -682,7 +685,7 @@ Use the `--first-commit` flag if this is the first commit to this drive.
 
 If responses are already available, pass those in as additional parameters after the `<signing request>`.
 
-#### 7g. Commit
+#### 7g. Commit <a name="commit"></a>
 
 Only commit after verifying the request and all responses.
 
@@ -713,7 +716,7 @@ It need not be a signer who commits as the request and the responses suffice to 
 
 Note: starting from the second commit, it is technically possible to corrupt the production build. So if a command ever errors with an `INCOMPATIBLE_SOURCE_AND_TARGET` error, never try to work around it, the only safe way to proceed is by creating reseeding the provision on other peers.
 
-### Release Lines
+### Release Lines <a name="release-lines"></a>
 
 Depending on team scale, it can be worth having three stage drives, one provision drive and one multisig drive
 
@@ -725,19 +728,19 @@ Depending on team scale, it can be worth having three stage drives, one provisio
 
 For each of these lines:
 
-- [0. Touch and Seed](#0-touch-and-seed)
-- [1. Set upgrade link](#1-set-upgrade-link)
-- [3. Make Distributables](#3-make-distributables)
+- [0. Touch and Seed](#touch-and-seed)
+- [1. Set upgrade link](#set-upgrade-link)
+- [3. Make Distributables](#make-distributables)
 
 Note: No need to version since this creates an initial application build for a release line
 
-### Release Line Builds
+### Release Line Builds <a name="release-line-builds"></a>
 
 Create a build that points to each link for each release line.
 
-- [1. Set upgrade link](#1-set-upgrade-link)
-- [3. Make Distributables](#3-make-distributables)
-- [4. Build Deploy Directory](#4-build-deploy-directory)
+- [1. Set upgrade link](#set-upgrade-link)
+- [3. Make Distributables](#make-distributables)
+- [4. Build Deploy Directory](#build-deploy-directory)
 
 Share the stage build with developer collaborators.
 
@@ -745,20 +748,20 @@ Share the provision build with stakeholders, especially signers.
 
 Any updates to the stage or provision links will then update in the dedicated application builds.
 
-### Custom Builds
+### Custom Builds <a name="custom-builds"></a>
 
 The `upgrade` field can be set to one link only. Share alternative builds internally peer-to-peer by forking, creating a custom stage link, seeding, building and sharing custom staged builds with developer collaborators.
 
-- [0. Touch and Seed](#0-touch-and-seed)
-- [1. Set upgrade link](#1-set-upgrade-link)
-- [2. Version](#2-version)
-- [3. Make Distributables](#3-make-distributables)
-- [4. Build Deploy Directory](#4-build-deploy-directory)
-- [5. Stage](#5-stage)
+- [0. Touch and Seed](#touch-and-seed)
+- [1. Set upgrade link](#set-upgrade-link)
+- [2. Version](#version)
+- [3. Make Distributables](#make-distributables)
+- [4. Build Deploy Directory](#build-deploy-directory)
+- [5. Stage](#stage)
 
-## Scripts
+## Scripts <a name="scripts"></a>
 
-### `npm start`
+### `npm start` <a name="script-start"></a>
 
 Start app in development mode.
 
@@ -770,7 +773,7 @@ Uses: `electron-forge start`
 
 ---
 
-### `npm run lint`
+### `npm run lint` <a name="script-lint"></a>
 
 Check formatting and linting.
 
@@ -785,7 +788,7 @@ Runs:
 
 ---
 
-### `npm run format`
+### `npm run format` <a name="script-format"></a>
 
 Auto-format and fix lint issues.
 
@@ -800,7 +803,7 @@ Runs:
 
 ---
 
-### `npm run package`
+### `npm run package` <a name="script-package"></a>
 
 Package app without creating distributables.
 
@@ -812,7 +815,7 @@ Uses: `electron-forge package`
 
 ---
 
-### `npm run make:linux`
+### `npm run make:linux` <a name="script-make-linux"></a>
 
 Create distributables on Linux.
 
@@ -822,7 +825,7 @@ npm run make:linux
 
 ---
 
-### `npm run make:darwin`
+### `npm run make:darwin` <a name="script-make-darwin"></a>
 
 Create distributables on macOS.
 
@@ -832,7 +835,7 @@ npm run make:darwin
 
 ---
 
-### `npm run make:win32`
+### `npm run make:win32` <a name="script-make-win32"></a>
 
 Create distributables on Windows.
 
@@ -844,19 +847,19 @@ Uses: `electron-forge make`
 
 ---
 
-## Troubleshooting
+## Troubleshooting <a name="troubleshooting"></a>
 
-### App did not update
+### App did not update <a name="app-did-not-update"></a>
 
-#### Was the version updated?
+#### Was the version updated? <a name="check-version-updated"></a>
 
-See [2. Version](#2-version)
+See [2. Version](#version)
 
-#### Is the upgrade link correct?
+#### Is the upgrade link correct? <a name="check-upgrade-link"></a>
 
-[1. Set upgrade link](#1-set-upgrade-link)
+[1. Set upgrade link](#set-upgrade-link)
 
-#### Is the app seeded?
+#### Is the app seeded? <a name="check-app-seeded"></a>
 
 The upgrade link must be seeded:
 
@@ -864,7 +867,7 @@ The upgrade link must be seeded:
 pear seed <link>
 ```
 
-#### Was the app seeded after opening the app?
+#### Was the app seeded after opening the app? <a name="check-seeded-after-open"></a>
 
 Just wait about 15 minutes if there is no rush.
 
@@ -882,11 +885,11 @@ With the following order of events, the client will not connect to the seeder un
 - Seeder comes online and announces the key
 - After about 15 minutes, the client does another lookup, and now connects to the seeder
 
-#### Is the seeder unreachable?
+#### Is the seeder unreachable? <a name="check-seeder-unreachable"></a>
 
 Add the key to a few always-on seeders. Then there is less dependence on the seeder being reachable.
 
-### Recovering from lost write-access
+### Recovering from lost write-access <a name="lost-write-access"></a>
 
 Staged and provisioned drives are machine-bound. If data is lost, write access to those keys is lost.
 
@@ -908,11 +911,11 @@ pear provision <versioned-stage-key> <target-key> <versioned-production-key>
 
 Then set the new provision link key as the `srcKey` of the `multisig.json` config.
 
-- [7b. Create Multisig Config](#7b-create-multisig-config)
+- [7b. Create Multisig Config](#create-multisig-config)
 
-### `pear stage` is showing unexpected size increases
+### `pear stage` is showing unexpected size increases <a name="stage-size-increases"></a>
 
-#### Is the `pear-build` deployment folder inside the app folder?
+#### Is the `pear-build` deployment folder inside the app folder? <a name="check-deployment-folder-inside-app"></a>
 
 If the deployment folder ends up in the build and then that ends up in the deployment folder the build inflates each time. When it comes to running `pear stage` it will show file sizes that are unexpectedly large.
 
@@ -942,3 +945,24 @@ pear-build ... --package ./my-app/package.json # <-- do this
 ```
 
 That will output a build folder per version e.g. `hello-pear-electron-v1.2.3` creating a deploy folder per deploy. This can be very useful for reviewing any deployment issues and for quickly rolling back to a prior version (i.e. stage -> provision -> multisig from an older build folder).
+
+<!-- Reference Links -->
+
+[pear-runtime]: https://github.com/holepunchto/pear-runtime
+[electron]: https://www.electronjs.org/
+[bare]: https://github.com/holepunchto/bare
+[nodejs]: https://nodejs.org
+[pear-docs]: https://docs.pears.com
+[hyperdrive]: https://github.com/holepunchto/hyperdrive
+[hypercore]: https://github.com/holepunchto/hypercore
+[hypercore-fork]: https://github.com/holepunchto/hypercore#corefork
+[hypercore-length]: https://github.com/holepunchto/hypercore#corelength
+[hypercore-key]: https://github.com/holepunchto/hypercore?tab=readme-ov-file#corekey
+[pear-link-format]: https://github.com/holepunchto/pear-link?tab=readme-ov-file#pear-link-format
+[corestore]: https://github.com/holepunchto/corestore
+[pear-build]: https://npm.im/pear-build
+[electron-forge-macos-signing]: https://www.electronforge.io/guides/code-signing/code-signing-macos#option-1-using-an-app-specific-password
+[apple-app-specific-password]: https://support.apple.com/en-us/102654
+[windows-sdk]: https://developer.microsoft.com/en-us/windows/downloads/windows-sdk/
+[powershell-install]: https://learn.microsoft.com/en-us/powershell/scripting/install/installing-powershell-on-windows
+[msix-signing-guide]: https://learn.microsoft.com/en-us/windows/msix/package/create-certificate-package-signing
