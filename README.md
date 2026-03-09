@@ -694,9 +694,9 @@ graph TD
     subgraph Multisig Setup
         K[7a. Create Signing Keys] --> C[7b. Create Multisig Config]
         C --> L[7]
-        subgraph "7c. Set upgrade field to Multisig link"
+        subgraph "7c. Mulisig link upgrade field"
             direction LR
-            L([<br>1 → 2 → 3 → 4 → 5 → 6<br>&nbsp;])
+            L([1 → 2 → 3 → 4 → 5 → 6<br>])
         end
     end
 
