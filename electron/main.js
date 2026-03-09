@@ -114,7 +114,7 @@ async function createWindow() {
   const pear = getPear()
 
   const onError = (err) => {
-    console.error('error during update download:', err)
+    console.error('updater error:', err)
   }
 
   const onUpdating = () => {
