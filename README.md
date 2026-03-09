@@ -330,7 +330,7 @@ Once stakeholders, QA, dogfooder devs and any one else relevant has assessed, ha
 
 ### Foundational Steps <a name="foundational-steps"></a>
 
-Foundational Steps bootstrap and feed into the [Release-Cycle].
+Foundational Steps bootstrap and feed into the [Release-Cycle](#release-cycle).
 
 ```mermaid
 graph TD
