@@ -280,15 +280,15 @@ Once the [Foundational Steps](#foundational-steps) are all in place the delivery
 
 ```mermaid
 graph TD
-    V[2. Version] --> Make[3. Make Distributables]
-    Make --> Build[4. Build Deployment Directory]
-    Build --> Stage[5. Stage]
+    V(2. Version) --> Make(3. Make Distributables)
+    Make --> Build(4. Build Deployment Directory)
+    Build --> Stage(5. Stage)
     Stage -->|iterate| V
-    Stage -->|stable| Prov[6. Provision]
-    Prov -->|assessed| Req[7d. Prepare Request]
-    Req --> Sign[7e. Sign]
-    Sign --> Verify[7f. Verify]
-    Verify --> Commit[7g. Commit]
+    Stage -->|stable| Prov(6. Provision)
+    Prov -->|assessed| Req(7d. Prepare Request)
+    Req --> Sign(7e. Sign)
+    Sign --> Verify(7f. Verify)
+    Verify --> Commit(7g. Commit)
     Commit --> Live[Production Live]
     Live -->|next release| V
 ```
@@ -335,26 +335,26 @@ Foundational Steps bootstrap and feed into the [Release-Cycle](#release-cycle).
 ```mermaid
 graph TD
     subgraph Link Setup
-        T[0. Touch & Seed] --> U[1. Set upgrade link]
+        T(0. Touch & Seed) --> U(1. Set upgrade link)
     end
 
     U -.-> V
 
-    V[2. Version] --> Make[3. Make Distributables]
-    Make --> Build[4. Build Deployment Directory]
-    Build --> Stage[5. Stage]
+    V(2. Version) --> Make(3. Make Distributables)
+    Make --> Build(4. Build Deployment Directory)
+    Build --> Stage(5. Stage)
     Stage -->|iterate| V
-    Stage -->|stable| Prov[6. Provision]
-    Prov -->|assessed| Req[7d. Prepare Request]
-    Req --> Sign[7e. Sign]
-    Sign --> Verify[7f. Verify]
-    Verify --> Commit[7g. Commit]
+    Stage -->|stable| Prov(6. Provision)
+    Prov -->|assessed| Req(7d. Prepare Request)
+    Req --> Sign(7e. Sign)
+    Sign --> Verify(7f. Verify)
+    Verify --> Commit(7g. Commit)
     Commit --> Live[Production Live]
     Live -->|next release| V
 
-    K[7a. Create Signing Keys] --> C[7b. Create Multisig Config]
+    K(7a. Create Signing Keys) --> C(7b. Create Multisig Config)
     Prov -->|setup| C
-    C --> L[7c. Set upgrade to Multisig Link]
+    C --> L(7c. Set upgrade to Multisig Link)
     L --> Req
 ```
 
@@ -517,11 +517,11 @@ Use [`pear-build`][pear-build] to assemble all architecture builds into a single
 
 ```mermaid
 graph BT
-    V([Version]) -->|make| MakeWin[/Windows/]
+    V(Version) -->|make| MakeWin[/Windows/]
     V -->|make| MakeMac[/macOS/]
     V -->|make| MakeLinux[/Linux/]
 
-    MakeWin --> Build([Build])
+    MakeWin --> Build(Build)
     MakeMac --> Build
     MakeLinux --> Build
 
@@ -553,11 +553,11 @@ Once a Deployment Directory has been assembled it can be synchronized into Pear 
 
 ```mermaid
 graph BT
-    V([Version]) -->|make| MakeWin[/Windows/]
+    V(Version) -->|make| MakeWin[/Windows/]
     V -->|make| MakeMac[/macOS/]
     V -->|make| MakeLinux[/Linux/]
 
-    MakeWin --> Build([Build])
+    MakeWin --> Build(Build)
     MakeMac --> Build
     MakeLinux --> Build
 
@@ -734,8 +734,8 @@ To setup a Multisig drive follow:
 ```mermaid
 graph TD
     subgraph Multisig Setup
-        K[7a. Create Signing Keys] --> C[7b. Create Multisig Config]
-        C --> L[7c. Set upgrade field to Multisig link]
+        K(7a. Create Signing Keys) --> C(7b. Create Multisig Config)
+        C --> L(7c. Set upgrade field to Multisig link)
     end
 
     L .-> R([Release Flow<br>1→2→3→4→5→6])
@@ -756,15 +756,19 @@ Once a Multisig Drive has been setup the release flow is:
 
 ```mermaid
 graph TD
-    Prov[Provisioned Drive] --> Req[7d. Prepare Request]
-    Req -->|signing request| S1[Signer 1 ✓]
-    Req -->|signing request| S2[Signer N ✓]
-    Req -->|signing request| S3[Signer ...]
+    Prov[Provisioned Drive] --> Req(7d. Prepare Request)
+    Req --> G((Gather<br>Signatures))
+    G -->|signing request| S1[/Signer 1 ✓\]
+    G -->|signing request| S2[/Signer ... \]
     S1 -->|response| Q{Quorum met?}
     S2 -->|response| Q
-    Q -->|2 of ...| Ver[7f. Verify]
-    Ver --> Com[7g. Commit]
+    Q .-> N(((no)))
+    Q .-> Y(((yes)))
+    Y --> Ver(7f. Verify)
+    N .-> G
+    Ver --> Com(7g. Commit)
     Com --> Live[Production Live]
+    N ~~~ Y
 ```
 
 For a first-time release follow the full flow:
