@@ -1174,7 +1174,7 @@ That will output a build folder per version e.g. `hello-pear-electron-v1.2.3` cr
 
 [pear-runtime]: https://github.com/holepunchto/pear-runtime
 [electron]: https://www.electronjs.org/
-[bare]: `https://github.com/holepunchto/bare
+[bare]: https://github.com/holepunchto/bare
 [nodejs]: https://nodejs.org
 [pear-docs]: https://docs.pears.com
 [hyperdrive]: https://github.com/holepunchto/hyperdrive
