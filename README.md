@@ -33,7 +33,7 @@ End-to-end boilerplate for embedding [pear-runtime][pear-runtime] into [Electron
     - [1. Set upgrade link](#set-upgrade-link)
     - [2. Version](#version)
     - [3. Make Distributables](#make-distributables)
-    - [4. Build Deploy Directory](#build-deploy-directory)
+    - [4. Build Deployment Directory](#build-deploy-directory)
     - [5. Stage](#stage)
     - [6. Provision](#provision)
     - [7. Multisig](#multisig)
@@ -245,7 +245,7 @@ For production, the rc release line must use the production (multisig) link as i
 
 ```mermaid
 graph BT
-    DF[Deploy Directory] -->|"pear://‹dev-key›"| Dev
+    DF[(Deployment Directory)] -->|"pear://‹dev-key›"| Dev
     DF -->|"pear://‹staging-key›"| Stg
     DF ==>|"pear://‹PROD-KEY›"| RC
 
@@ -280,7 +280,7 @@ Once the [Foundational Steps](#foundational-steps) are all in place the delivery
 ```mermaid
 graph TD
     V[2. Version] --> Make[3. Make Distributables]
-    Make --> Build[4. Build Deploy Directory]
+    Make --> Build[4. Build Deployment Directory]
     Build --> Stage[5. Stage]
     Stage -->|iterate| V
     Stage -->|stable| Prov[6. Provision]
@@ -301,7 +301,7 @@ Always start by updating the version:
 Iterate as much as needed and continually make, build and stage:
 
 - [3. Make Distributables](#make-distributables)
-- [4. Build Deploy Directory](#build-deploy-directory)
+- [4. Build Deployment Directory](#build-deploy-directory)
 - [5. Stage](#stage)
 
 There can be multiple stage link targets (development, staging, rc) see [Release Lines](#release-lines).
@@ -340,7 +340,7 @@ graph TD
     U -.-> V
 
     V[2. Version] --> Make[3. Make Distributables]
-    Make --> Build[4. Build Deploy Directory]
+    Make --> Build[4. Build Deployment Directory]
     Build --> Stage[5. Stage]
     Stage -->|iterate| V
     Stage -->|stable| Prov[6. Provision]
@@ -369,7 +369,7 @@ Follow the foundational steps at a pace suitable to the project until the [Relea
 - [1. Set upgrade link](#set-upgrade-link)
 - [2. Version](#version)
 - [3. Make Distributables](#make-distributables)
-- [4. Build Deploy Directory](#build-deploy-directory)
+- [4. Build Deployment Directory](#build-deploy-directory)
 - [5. Stage](#stage)
 - [6. Provision](#provision)
 - [7. Multisig](#multisig)
@@ -508,11 +508,11 @@ Build distributables with:
 npm run make:linux
 ```
 
-#### 4. Build Deploy Directory <a name="build-deploy-directory"></a>
+#### 4. Build Deployment Directory <a name="build-deploy-directory"></a>
 
 Each make runs on a different OS and architecture.
 
-Use [`pear-build`][pear-build] to assemble all architecture builds into a single multi-architecture directory, referred to as the **Deploy Directory**.
+Use [`pear-build`][pear-build] to assemble all architecture builds into a single multi-architecture directory, referred to as the **Deployment Directory**.
 
 ```mermaid
 graph BT
@@ -524,7 +524,7 @@ graph BT
     MakeMac --> Build
     MakeLinux --> Build
 
-    Build --> DF[(Deploy Directory)]
+    Build --> DF[(Deployment Directory)]
 ```
 
 From above the project root run `pear-build` for each arch, for example Mac x64 + arm64, Linux x64 + arm64 and Windows x64 would be:
@@ -533,13 +533,13 @@ From above the project root run `pear-build` for each arch, for example Mac x64 
 pear-build --package=./hello-pear-electron/package.json --darwin-arm64-app ./hello-pear-electron/out/HelloPear-darwin-arm64/HelloPear.app --darwin-x64-app ./hello-pear-electron/out/HelloPear-darwin-x64/HelloPear.app --linux-arm64-app ./hello-pear-electron/out/HelloPear-linux-arm64/HelloPear.AppImage --linux-x64-app ./hello-pear-electron/out/HelloPear-linux-x64/HelloPear.AppImage --win32-x64-app ./hello-pear-electron/out/HelloPear-win32-x64/HelloPear.msix --target hello-pear-electron-1.0.0
 ```
 
-NOTE: Since building occurs on other machines, they need to be transferred to the build machine first, and then assembled into a Deploy Directory with pear-build.
+NOTE: Since building occurs on other machines, they need to be transferred to the build machine first, and then assembled into a Deployment Directory with pear-build.
 
 If the `--target` flag is omitted, then target folder is in the current working directory named `{name}-{version}` per `package.json` fields.
 
 Once the `<target>/by-arch` folder is hydrated with builds for all required target architectures it's ready to move on to be staged, provisioned and multisigned.
 
-The resulting Deploy Directory should (and must) have the following structure at minimum:
+The resulting Deployment Directory should (and must) have the following structure at minimum:
 
 ```
 /package.json
@@ -548,7 +548,7 @@ The resulting Deploy Directory should (and must) have the following structure at
     /app
 ```
 
-Once a Deploy Directory has been assembled it can be synchronized into Pear Hyperdrives using `pear stage`, `pear provision` and `pear multisig` to create a full deployment flow.
+Once a Deployment Directory has been assembled it can be synchronized into Pear Hyperdrives using `pear stage`, `pear provision` and `pear multisig` to create a full deployment flow.
 
 ```mermaid
 graph BT
@@ -560,7 +560,7 @@ graph BT
     MakeMac --> Build
     MakeLinux --> Build
 
-    Build --> DF[(Deployment Folder)]
+    Build --> DF[(Deployment Directory)]
 
     DF -->|"pear://‹dev-key›"| Dev[development]
     DF -->|"pear://‹staging-key›"| Stg[staging]
@@ -590,7 +590,7 @@ graph BT
 
 #### 5. Stage <a name="stage"></a>
 
-Use Pear to synchronize the Deploy Directory from disk to [hypercore][hypercore] within Pear by executing `pear stage <upgrade-link> <deploy-directory>`.
+Use Pear to synchronize the Deployment Directory from disk to [hypercore][hypercore] within Pear by executing `pear stage <upgrade-link> <deploy-directory>`.
 
 First perform a dry run:
 
@@ -614,7 +614,7 @@ Make a change, save it and repeat steps:
 
 - [2. Version](#version) (do `npm version patch`)
 - [3. Make Distributables](#make-distributables)
-- [4. Build Deploy Directory](#build-deploy-directory)
+- [4. Build Deployment Directory](#build-deploy-directory)
 
 As long as the `upgrade` field is pointing to the staged link, then this should trigger an update in every application on every machine it was run on, if so the steps were completed successfully. Restart the application to see the latest update.
 
@@ -675,7 +675,7 @@ The source link for the provisioned drive has to be updated with the new `packag
 Make a new build that contains the new `package.json` with the new `upgrade` field, following steps:
 
 - [3. Make Distributables](#make-distributables)
-- [4. Build Deploy Directory](#build-deploy-directory)
+- [4. Build Deployment Directory](#build-deploy-directory)
 
 Stage again to the stage link, following:
 
@@ -830,7 +830,7 @@ Go through the update flow steps:
 
 - [2. Version](#version)
 - [3. Make Distributables](#make-distributables)
-- [4. Build Deploy Directory](#build-deploy-directory)
+- [4. Build Deployment Directory](#build-deploy-directory)
 - [5. Stage](#stage)
 
 When provisioning, the production link argument should be the multisig link, for example:
@@ -961,7 +961,7 @@ Create a build that points to each link for each release line.
 
 - [1. Set upgrade link](#set-upgrade-link)
 - [3. Make Distributables](#make-distributables)
-- [4. Build Deploy Directory](#build-deploy-directory)
+- [4. Build Deployment Directory](#build-deploy-directory)
 
 Share the stage build with developer collaborators.
 
@@ -977,7 +977,7 @@ The `upgrade` field can be set to one link only. Share alternative builds intern
 - [1. Set upgrade link](#set-upgrade-link)
 - [2. Version](#version)
 - [3. Make Distributables](#make-distributables)
-- [4. Build Deploy Directory](#build-deploy-directory)
+- [4. Build Deployment Directory](#build-deploy-directory)
 - [5. Stage](#stage)
 
 ## Scripts <a name="scripts"></a>
