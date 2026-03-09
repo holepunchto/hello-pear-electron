@@ -667,8 +667,8 @@ Release flow once setup is:
 - [7g. Commit](#commit)
 
 ```mermaid
-graph BT
-    Prov[Source Drive] --> Req[7d. Prepare Request]
+graph TD
+    Prov[Provisioned Drive] --> Req[7d. Prepare Request]
     Req -->|signing request| S1[Signer 1 ✓]
     Req -->|signing request| S2[Signer 2 ✓]
     Req -->|signing request| S3[Signer ...]
@@ -690,7 +690,7 @@ To setup a new key use the entire flow.
 - [7g. Commit](#commit)
 
 ```mermaid
-graph BT
+graph TD
     subgraph Multisig Setup
         K[7a. Create Signing Keys] --> C[7b. Create Multisig Config]
         C --> L[7c. Set upgrade field to Multisig link]
@@ -698,16 +698,13 @@ graph BT
 
     L --> S1L
 
-    subgraph Provisioned Drive
+    subgraph " "
         direction LR
-        S1L([1. Set upgrade link]) --> S2([2. Version])
-        S2 --> S3([3. Make])
-        S3 --> S4([4. Build])
-        S4 --> S5([5. Stage])
-        S5 --> S6([6. Provision])
+        S1L([1 → 2 → 3 → 4 → 5 → 6])
     end
 
-    S6 --> Req[7d. Prepare Request]
+    S1L --> Prov[Provisioned Drive]
+    Prov --> Req[7d. Prepare Request]
     Req -->|signing request| Sg1[Signer 1 ✓]
     Req -->|signing request| Sg2[Signer 2 ✓]
     Req -->|signing request| Sg3[Signer ...]
