@@ -361,13 +361,14 @@ Follow the foundational steps at a pace suitable to the project until the [Relea
 - [4. Build Deploy Directory](#build-deploy-directory)
 - [5. Stage](#stage)
 - [6. Provision](#provision)
-- [7a. Create Signing Keys](#create-signing-keys)
-- [7b. Create Multisig Config](#create-multisig-config)
-- [7c. Set `upgrade` field to Multisig Link](#set-multisig-link)
-- [7d. Prepare Multisig Request](#prepare-multisig-request)
-- [7e. Sign](#sign)
-- [7f. Verify](#verify)
-- [7g. Commit](#commit)
+- [7. Multisig](#multisig)
+  - [7a. Create Signing Keys](#create-signing-keys)
+  - [7b. Create Multisig Config](#create-multisig-config)
+  - [7c. Set `upgrade` field to Multisig Link](#set-multisig-link)
+  - [7d. Prepare Multisig Request](#prepare-multisig-request)
+  - [7e. Sign](#sign)
+  - [7f. Verify](#verify)
+  - [7g. Commit](#commit)
 
 #### 0. Touch and Seed <a name="touch-and-seed"></a>
 
@@ -650,13 +651,35 @@ Requiring a quorum of signers before a release can go out distributes production
 
 A malicious build cannot be published without multiple signers being compromised, enough signers to establish quorum.
 
-Multiple signers, enough to break quorum would have to lose their signing keys to be unable to update a production build.
+An amount of signers sufficient to break quorum would have to lose their signing keys to be unable to update a production build.
 
 A multisig'd application drive is not machine-bound. Write access is determined by signing capability.
 
 A multisig key is defined by a `namespace` (an arbitrary string), a list of signing keys, and a quorum.
 
-To setup a new key follow:
+There are three setups steps, and then four release steps.
+
+Release flow once setup is:
+
+- [7d. Prepare Multisig Request](#prepare-multisig-request)
+- [7e. Sign](#sign)
+- [7f. Verify](#verify)
+- [7g. Commit](#commit)
+
+```mermaid
+graph BT
+    Prov[Source Drive] --> Req[7d. Prepare Request]
+    Req -->|signing request| S1[Signer 1 ✓]
+    Req -->|signing request| S2[Signer 2 ✓]
+    Req -->|signing request| S3[Signer ...]
+    S1 -->|response| Q{Quorum met?}
+    S2 -->|response| Q
+    Q -->|2 of ...| Ver[7f. Verify]
+    Ver --> Com[7g. Commit]
+    Com --> Live[Production Live]
+```
+
+To setup a new key use the entire flow.
 
 - [7a. Create Signing Keys](#create-signing-keys)
 - [7b. Create Multisig Config](#create-multisig-config)
@@ -666,12 +689,34 @@ To setup a new key follow:
 - [7f. Verify](#verify)
 - [7g. Commit](#commit)
 
-To make a multisig request on an existing drive follow:
+```mermaid
+graph TD
+    subgraph Multisig Setup
+        K[7a. Create Signing Keys] --> C[7b. Create Multisig Config]
+        C --> L[7c. Set upgrade field to Multisig link]
+    end
 
-- [7d. Prepare Multisig Request](#prepare-multisig-request)
-- [7e. Sign](#sign)
-- [7f. Verify](#verify)
-- [7g. Commit](#commit)
+    L --> S1L
+
+    subgraph Provisioned Drive
+        direction LR
+        S1L([1. Set upgrade link]) --> S2([2. Version])
+        S2 --> S3([3. Make])
+        S3 --> S4([4. Build])
+        S4 --> S5([5. Stage])
+        S5 --> S6([6. Provision])
+    end
+
+    S6 --> Req[7d. Prepare Request]
+    Req -->|signing request| Sg1[Signer 1 ✓]
+    Req -->|signing request| Sg2[Signer 2 ✓]
+    Req -->|signing request| Sg3[Signer ...]
+    Sg1 -->|response| Q{Quorum met?}
+    Sg2 -->|response| Q
+    Q -->|2 of ...| Ver[7f. Verify]
+    Ver --> Com[7g. Commit]
+    Com --> Live[Production Live]
+```
 
 #### 7a. Create Signing Keys <a name="create-signing-keys"></a>
 
