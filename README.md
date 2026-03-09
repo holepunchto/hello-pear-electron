@@ -693,17 +693,14 @@ To setup a new key use the entire flow.
 graph TD
     subgraph Multisig Setup
         K[7a. Create Signing Keys] --> C[7b. Create Multisig Config]
-        C --> L[7c. Set upgrade field to Multisig link]
+        C --> L[7]
+        subgraph "7c. Set upgrade field to Multisig link"
+            direction LR
+            L([<br>1 → 2 → 3 → 4 → 5 → 6<br>&nbsp;])
+        end
     end
 
-    L --> S1L
-
-    subgraph " "
-        direction LR
-        S1L([1 → 2 → 3 → 4 → 5 → 6])
-    end
-
-    S1L --> Prov[Provisioned Drive]
+    L --> Prov[Provisioned Drive]
     Prov --> Req[7d. Prepare Request]
     Req -->|signing request| Sg1[Signer 1 ✓]
     Req -->|signing request| Sg2[Signer 2 ✓]
