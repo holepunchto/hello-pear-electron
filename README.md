@@ -215,15 +215,82 @@ Application builds are written to [pear:// links][pear-link-format] through thre
 
 Each operation feeds into the next: a staged link is the source for a provisioned link, a provisioned link is the source for a multisig'd link.
 
-```
-Stage -> Provision -> Multisig
+```mermaid
+graph LR
+    S[Stage] --> P[Provision] --> M[Multisig]
 ```
 
 This approach enables rapid collaborative iteration on Stage links, a stakeholder preview with Provisioned links, and cryptographically signed-off machine-independent production releases with Multisigged links.
 
+### Deployment Layers
+
+Release lines are deployment targets at different stability levels — from early development through to production. A single deployment folder can be staged to any of them depending on the upgrade link.
+
+Release lines are deployment targets at different stability levels. Multiple stage links allow parallel development streams to coexist, each feeding forward through provision and multisig as confidence increases.
+
+A deployment folder containing builds for each supported architecture is staged to a Pear link for a given release line. The upgrade link in `package.json` determines which release line a build belongs to.
+
+For production, the rc release line must use the production (multisig) link as its upgrade link — this is the build that gets provisioned and ultimately multisig'd.
+
+```mermaid
+graph BT
+    DF[Deployment Folder] -->|"pear://‹dev-key›"| Dev
+    DF -->|"pear://‹staging-key›"| Stg
+    DF ==>|"pear://‹PROD-KEY›"| RC
+
+    subgraph "    STAGE"
+        Dev[development]
+        Stg[staging]
+        RC[rc]
+    end
+
+    subgraph PROVISION
+        Pre[prerelease]
+    end
+
+    subgraph MULTISIG
+        Prod[production]
+    end
+
+    RC ==>|source| Pre
+    Pre ==>|source| Prod
+
+    linkStyle 2 stroke:#3fb950,color:#3fb950
+    linkStyle 3 stroke:#3fb950
+    linkStyle 4 stroke:#3fb950
+```
+
+Since the rc upgrade link points to the production multisig link, rc builds do not receive OTA updates. Each rc iteration requires distributing a new build. Provision is a sync from rc, so the same applies: updates will not occur, provision builds must be distributed for checks. See [Release Lines](#release-lines) and [Release Line Builds](#release-line-builds).
+
 ### Release Cycle <a name="release-cycle"></a>
 
-After the [Foundational Steps](#foundational-steps) are all in place the deployment reaches steady state. From there the delivery flow is always the same.
+Once the [Foundational Steps](#foundational-steps) are all in place the delivery flow is always the same.
+
+```mermaid
+graph TD
+    subgraph Link Setup
+        T[0. Touch & Seed] --> U[1. Set upgrade link]
+    end
+
+    U -.-> V
+
+    V[2. Version] --> Make[3. Make Distributables]
+    Make --> Build[4. Build Deploy Directory]
+    Build --> Stage[5. Stage]
+    Stage -->|iterate| V
+    Stage -->|stable| Prov[6. Provision]
+    Prov -->|assessed| Req[7d. Prepare Request]
+    Req --> Sign[7e. Sign]
+    Sign --> Verify[7f. Verify]
+    Verify --> Commit[7g. Commit]
+    Commit --> Live[Production Live]
+    Live -->|next release| V
+
+    K[7a. Create Signing Keys] --> C[7b. Create Multisig Config]
+    Prov -->|setup| C
+    C --> L[7c. Set upgrade to Multisig Link]
+    L --> Req
+```
 
 An update will not occur unless the `package.json` `version` field is updated.
 
@@ -724,7 +791,7 @@ Note: starting from the second commit, it is technically possible to corrupt the
 
 ### Release Lines <a name="release-lines"></a>
 
-Depending on team scale, it can be worth having three stage drives, one provision drive and one multisig drive
+A reasonable target deployment is three stage drives, one provision drive and one multisig drive.
 
 - **development** - staged for developer team experimentation
 - **staging** - staged for wider developer and technical stakeholders, more stable than development,
@@ -738,7 +805,9 @@ For each of these lines:
 - [1. Set upgrade link](#set-upgrade-link)
 - [3. Make Distributables](#make-distributables)
 
-Note: No need to version since this creates an initial application build for a release line
+Note: No need to version since this creates an initial application build for a release line.
+
+For small teams/lean projects just rc, prerelease and production lines can work, but a staging key is good for checking update flow first.
 
 ### Release Line Builds <a name="release-line-builds"></a>
 
