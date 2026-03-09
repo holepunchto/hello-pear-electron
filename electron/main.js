@@ -113,6 +113,10 @@ async function createWindow() {
 
   const pear = getPear()
 
+  const onError = (err) => {
+    console.error('error during update download:', err)
+  }
+
   const onUpdating = () => {
     if (!win.isDestroyed()) win.webContents.send('pear:event:updating')
   }
@@ -121,6 +125,7 @@ async function createWindow() {
     if (!win.isDestroyed()) win.webContents.send('pear:event:updated')
   }
 
+  pear.updater.on('error', onError)
   pear.updater.on('updating', onUpdating)
   pear.updater.on('updated', onUpdated)
 
