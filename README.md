@@ -11,20 +11,16 @@ End-to-end boilerplate for embedding [pear-runtime][pear-runtime] into [Electron
 
 ## Table of Contents
 
-## Table of Contents
-
 - [OS Support](#os-support)
 - [Requirements](#requirements)
 - [Terminology](#terminology)
 - [Development](#development)
   - [Install](#install)
   - [Start](#start)
-- [P2P OTA Updates](#p2p-ota-updates)
-  - [Disabling Updates](#disabling-updates)
-  - [Runtime Update Flow](#runtime-update-flow)
-- [Storage](#storage)
-  - [Additional Instances](#additional-instances)
-- [Workers](#workers)
+- [Architecture](#architecture)
+  - [Updates](#updates)
+  - [Storage](#storage)
+  - [Workers](#workers)
 - [Peer-to-Peer Deployments](#deployments)
   - [Deployment Layers](#deployment-layers)
   - [Release Cycle](#release-cycle)
@@ -37,9 +33,10 @@ End-to-end boilerplate for embedding [pear-runtime][pear-runtime] into [Electron
     - [5. Stage](#stage)
     - [6. Provision](#provision)
     - [7. Multisig](#multisig)
-  - [Release Lines](#release-lines)
-  - [Release Line Builds](#release-line-builds)
-  - [Custom Builds](#custom-builds)
+  - [Practices](#practices)
+    - [Release Lines](#release-lines)
+    - [Release Line Builds](#release-line-builds)
+    - [Custom Builds](#custom-builds)
 - [Scripts](#scripts)
 - [Troubleshooting](#troubleshooting)
 
@@ -93,7 +90,11 @@ To enable updates for testing update flow in local development use
 npm start -- --updates
 ```
 
-## P2P OTA Updates <a name="p2p-ota-updates"></a>
+## Architecture
+
+The application architecture is tightly scoped to handling P2P OTA Updates, running embedded [Bare][bare] workers and facilitating [Peer-to-Peer Deployment](#deployments) flows.
+
+### Updates <a name="updates"></a>
 
 An update occurs when a seeded application drive is written to.
 
@@ -111,7 +112,7 @@ pear.updater.on('updated', () => {
 })
 ```
 
-### Disabling Updates <a name="disabling-updates"></a>
+#### Disabling Updates <a name="disabling-updates"></a>
 
 Pass `--no-updates` flag to disable updates per application run.
 
@@ -125,14 +126,14 @@ To disable updates as an application default, ensure that the package.json is sp
 }
 ```
 
-### Runtime Update Flow <a name="runtime-update-flow"></a>
+#### Runtime Update Flow <a name="runtime-update-flow"></a>
 
 A running application will receive `updating` and `update` events, which are sent to the electron renderer
 process via `bridge.onPearEvent()`. After receiving the `update` event, the `bridge.applyUpdate()` method is called. This swaps the current application path with a path to the updated application build and then removes the old application from disk. So once the application is restarted, the application path contains the new build therefore the updated application is executed on restart.
 
-## Storage <a name="storage"></a>
+### Storage <a name="storage"></a>
 
-A storage dir is used for persistence. In development this defaults to `<tmpdir>/pear/<name>`.
+A storage dir is used for persistence of peer-to-peer/local data. In development this defaults to `<tmpdir>/pear/<name>`.
 
 In Production this is per OS:
 
@@ -152,31 +153,31 @@ In development custom storage can be passed as so:
 npm start -- --storage /tmp/custom/storage
 ```
 
-### Additional Instances <a name="additional-instances"></a>
+#### Setting Storage for Additional Instances <a name="additional-instances"></a>
 
 The storage dir holds a [`Corestore`][corestore] and may hold application corestores. Running an application with a different storage location means using a separate `Corestore`, just like an app running on another machine would be using a separate `Corestore`.
 
 An additional application instance can be run with the following (per OS).
 
-#### macOS <a name="additional-instances-macos"></a>
+##### macOS <a name="additional-instances-macos"></a>
 
 ```sh
 open -n <name>.app --args --storage /tmp/custom/storage
 ```
 
-#### Linux <a name="additional-instances-linux"></a>
+##### Linux <a name="additional-instances-linux"></a>
 
 ```sh
 ./<name>.AppImage --storage /tmp/custom/storage
 ```
 
-#### Windows <a name="additional-instances-windows"></a>
+##### Windows <a name="additional-instances-windows"></a>
 
 ```sh
 .\<name>.exe --storage C:\tmp\custom\storage
 ```
 
-## Workers <a name="workers"></a>
+### Workers <a name="workers"></a>
 
 The idea is to put application peer-to-peer code into a main worker that then acts as a local backend for the application view layer.
 
@@ -216,7 +217,7 @@ Install with:
 npx pear
 ```
 
-Centralized deployments tend to have at minimum a staging server, a preview server for stakeholders and a production server.
+Centralized deployments tend to have at minimum a staging server for internal checks, a preview server for stakholders and a production server for users.
 
 Application builds are written to [pear:// links][pear-link-format] through three operations stage, provision and multisig — these are used to create successive layers of deployment with increasing trust guarantees:
 
@@ -910,7 +911,9 @@ It need not be a signer who commits as the request and the responses suffice to 
 
 Note: starting from the second commit, it is technically possible to corrupt the production build. So if a command ever errors with an `INCOMPATIBLE_SOURCE_AND_TARGET` error, never try to work around it, the only safe way to proceed is by creating reseeding the provision on other peers.
 
-### Release Lines <a name="release-lines"></a>
+### Practices <a name="practices"></a>
+
+#### Release Lines <a name="release-lines"></a>
 
 A reasonable target deployment is three stage drives, one provision drive and one multisig drive.
 
@@ -955,7 +958,7 @@ Note: No need to version since this creates an initial application build for a r
 
 For small teams/lean projects just rc, prerelease and production lines can work, but a staging key is good for checking update flow first.
 
-### Release Line Builds <a name="release-line-builds"></a>
+#### Release Line Builds <a name="release-line-builds"></a>
 
 Create a build that points to each link for each release line.
 
@@ -969,7 +972,7 @@ Share the provision build with stakeholders, especially signers.
 
 Any updates to the stage or provision links will then update in the dedicated application builds.
 
-### Custom Builds <a name="custom-builds"></a>
+#### Custom Builds <a name="custom-builds"></a>
 
 The `upgrade` field can be set to one link only. Share alternative builds internally peer-to-peer by forking, creating a custom stage link, seeding, building and sharing custom staged builds with developer collaborators.
 
@@ -1171,7 +1174,7 @@ That will output a build folder per version e.g. `hello-pear-electron-v1.2.3` cr
 
 [pear-runtime]: https://github.com/holepunchto/pear-runtime
 [electron]: https://www.electronjs.org/
-[bare]: https://github.com/holepunchto/bare
+[bare]: `https://github.com/holepunchto/bare
 [nodejs]: https://nodejs.org
 [pear-docs]: https://docs.pears.com
 [hyperdrive]: https://github.com/holepunchto/hyperdrive
