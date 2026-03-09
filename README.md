@@ -690,7 +690,7 @@ To setup a new key use the entire flow.
 - [7g. Commit](#commit)
 
 ```mermaid
-graph TD
+graph BT
     subgraph Multisig Setup
         K[7a. Create Signing Keys] --> C[7b. Create Multisig Config]
         C --> L[7c. Set upgrade field to Multisig link]
