@@ -11,6 +11,8 @@ End-to-end boilerplate for embedding [pear-runtime][pear-runtime] into [Electron
 
 ## Table of Contents
 
+## Table of Contents
+
 - [OS Support](#os-support)
 - [Requirements](#requirements)
 - [Terminology](#terminology)
@@ -24,8 +26,17 @@ End-to-end boilerplate for embedding [pear-runtime][pear-runtime] into [Electron
   - [Additional Instances](#additional-instances)
 - [Workers](#workers)
 - [Peer-to-Peer Deployments](#deployments)
+  - [Deployment Layers](#deployment-layers)
   - [Release Cycle](#release-cycle)
   - [Foundational Steps](#foundational-steps)
+    - [0. Touch and Seed](#touch-and-seed)
+    - [1. Set upgrade link](#set-upgrade-link)
+    - [2. Version](#version)
+    - [3. Make Distributables](#make-distributables)
+    - [4. Build Deploy Directory](#build-deploy-directory)
+    - [5. Stage](#stage)
+    - [6. Provision](#provision)
+    - [7. Multisig](#multisig)
   - [Release Lines](#release-lines)
   - [Release Line Builds](#release-line-builds)
   - [Custom Builds](#custom-builds)
@@ -234,7 +245,7 @@ For production, the rc release line must use the production (multisig) link as i
 
 ```mermaid
 graph BT
-    DF[Deployment Folder] -->|"pear://‹dev-key›"| Dev
+    DF[Deploy Directory] -->|"pear://‹dev-key›"| Dev
     DF -->|"pear://‹staging-key›"| Stg
     DF ==>|"pear://‹PROD-KEY›"| RC
 
@@ -499,16 +510,30 @@ npm run make:linux
 
 #### 4. Build Deploy Directory <a name="build-deploy-directory"></a>
 
-Each make runs on a different OS and architecture. Each must be moved to a single build machine,
-this assumes that they've all been moved into the same project `./out` folder.
+Each make runs on a different OS and architecture.
 
-Use [`pear-build`][pear-build] to move all the `package.json` and architectures into a single build target directory. The resulting directory is the Deploy Directory.
+Use [`pear-build`][pear-build] to assemble all architecture builds into a single multi-architecture directory, referred to as the **Deploy Directory**.
+
+```mermaid
+graph BT
+    V([Version]) -->|make| MakeWin[/Windows/]
+    V -->|make| MakeMac[/macOS/]
+    V -->|make| MakeLinux[/Linux/]
+
+    MakeWin --> Build([Build])
+    MakeMac --> Build
+    MakeLinux --> Build
+
+    Build --> DF[(Deploy Directory)]
+```
 
 From above the project root run `pear-build` for each arch, for example Mac x64 + arm64, Linux x64 + arm64 and Windows x64 would be:
 
 ```sh
 pear-build --package=./hello-pear-electron/package.json --darwin-arm64-app ./hello-pear-electron/out/HelloPear-darwin-arm64/HelloPear.app --darwin-x64-app ./hello-pear-electron/out/HelloPear-darwin-x64/HelloPear.app --linux-arm64-app ./hello-pear-electron/out/HelloPear-linux-arm64/HelloPear.AppImage --linux-x64-app ./hello-pear-electron/out/HelloPear-linux-x64/HelloPear.AppImage --win32-x64-app ./hello-pear-electron/out/HelloPear-win32-x64/HelloPear.msix --target hello-pear-electron-1.0.0
 ```
+
+NOTE: Since building occurs on other machines, they need to be transferred to the build machine first, and then assembled into a Deploy Directory with pear-build.
 
 If the `--target` flag is omitted, then target folder is in the current working directory named `{name}-{version}` per `package.json` fields.
 
@@ -521,6 +546,46 @@ The resulting Deploy Directory should (and must) have the following structure at
 /by-arch
   /[...platform-arch]
     /app
+```
+
+Once a Deploy Directory has been assembled it can be synchronized into Pear Hyperdrives using `pear stage`, `pear provision` and `pear multisig` to create a full deployment flow.
+
+```mermaid
+graph BT
+    V([Version]) -->|make| MakeWin[/Windows/]
+    V -->|make| MakeMac[/macOS/]
+    V -->|make| MakeLinux[/Linux/]
+
+    MakeWin --> Build([Build])
+    MakeMac --> Build
+    MakeLinux --> Build
+
+    Build --> DF[(Deployment Folder)]
+
+    DF -->|"pear://‹dev-key›"| Dev[development]
+    DF -->|"pear://‹staging-key›"| Stg[staging]
+    DF ==>|"pear://‹PROD-KEY›"| RC[rc]
+
+    subgraph "    STAGE"
+        Dev
+        Stg
+        RC
+    end
+
+    subgraph PROVISION
+        Pre[prerelease]
+    end
+
+    subgraph MULTISIG
+        Prod[production]
+    end
+
+    RC ==>|source| Pre
+    Pre ==>|source| Prod
+
+    linkStyle 9 stroke:#3fb950,color:#3fb950
+    linkStyle 10 stroke:#3fb950
+    linkStyle 11 stroke:#3fb950
 ```
 
 #### 5. Stage <a name="stage"></a>
@@ -854,6 +919,31 @@ A reasonable target deployment is three stage drives, one provision drive and on
 - **rc** - staged release candidate, ultra stable
 - **prerelease** - provisioned from rc source
 - **production** - multisig'd from prerelease source
+
+Besides these ephemeral release lines, additional internal lines can be staged and seeded at-will for experiments, hotfixes, feature spikes, forks and instrumented builds for shared debugging. Whether ephmeral or longlived these can all be categorized as custom lines.
+
+```mermaid
+graph LR
+    subgraph "STAGED"
+        Dev[development]
+        Stg[staging]
+        RC[rc]
+        subgraph " "
+          Cst[custom...]
+        end
+    end
+
+    subgraph "PROVISIONED"
+        Pre[prerelease]
+    end
+
+    subgraph "MULTISIG'D"
+        Prod[production]
+    end
+
+    RC ~~~ Pre
+    Pre ~~~ Prod
+```
 
 For each of these lines:
 
