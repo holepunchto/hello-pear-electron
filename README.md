@@ -268,12 +268,6 @@ Once the [Foundational Steps](#foundational-steps) are all in place the delivery
 
 ```mermaid
 graph TD
-    subgraph Link Setup
-        T[0. Touch & Seed] --> U[1. Set upgrade link]
-    end
-
-    U -.-> V
-
     V[2. Version] --> Make[3. Make Distributables]
     Make --> Build[4. Build Deploy Directory]
     Build --> Stage[5. Stage]
@@ -285,11 +279,6 @@ graph TD
     Verify --> Commit[7g. Commit]
     Commit --> Live[Production Live]
     Live -->|next release| V
-
-    K[7a. Create Signing Keys] --> C[7b. Create Multisig Config]
-    Prov -->|setup| C
-    C --> L[7c. Set upgrade to Multisig Link]
-    L --> Req
 ```
 
 An update will not occur unless the `package.json` `version` field is updated.
@@ -329,7 +318,39 @@ Once stakeholders, QA, dogfooder devs and any one else relevant has assessed, ha
 
 ### Foundational Steps <a name="foundational-steps"></a>
 
-Establishing the entire [Release Cycle](#release-cycle) doesn't have to happen all at once. It can, but how productionized it needs to be is project-dependent. If an application is in a Proof of Concept phase, then just using a stage link will do. If an application is intended for production release then multisig is crucial to practices, resilience and machine independence. In order to reach a multisig deployment there are some bootstrapping steps involved. Once completed, a remaining subset of these steps is the standard [Release Cycle](#release-cycle).
+Foundational Steps bootstrap and feed into the [Release-Cycle].
+
+```mermaid
+graph TD
+    subgraph Link Setup
+        T[0. Touch & Seed] --> U[1. Set upgrade link]
+    end
+
+    U -.-> V
+
+    V[2. Version] --> Make[3. Make Distributables]
+    Make --> Build[4. Build Deploy Directory]
+    Build --> Stage[5. Stage]
+    Stage -->|iterate| V
+    Stage -->|stable| Prov[6. Provision]
+    Prov -->|assessed| Req[7d. Prepare Request]
+    Req --> Sign[7e. Sign]
+    Sign --> Verify[7f. Verify]
+    Verify --> Commit[7g. Commit]
+    Commit --> Live[Production Live]
+    Live -->|next release| V
+
+    K[7a. Create Signing Keys] --> C[7b. Create Multisig Config]
+    Prov -->|setup| C
+    C --> L[7c. Set upgrade to Multisig Link]
+    L --> Req
+```
+
+Establishing the entire [Release Cycle](#release-cycle) doesn't have to happen all at once. It can, but how productionized it needs to be is project-dependent. If an application is in a Proof of Concept phase, then just using a stage link will do.
+
+If an application is intended for production release then multisig is crucial to practices, resilience and machine independence.
+
+In order to reach a multisig deployment there are some bootstrapping steps involved. Once completed, a remaining subset of these steps is the standard [Release Cycle](#release-cycle).
 
 Follow the foundational steps at a pace suitable to the project until the [Release Cycle](#release-cycle) is established:
 
