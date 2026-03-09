@@ -11,6 +11,8 @@ End-to-end boilerplate for embedding [pear-runtime][pear-runtime] into [Electron
 
 ## Table of Contents
 
+## Table of Contents
+
 - [OS Support](#os-support)
 - [Requirements](#requirements)
 - [Terminology](#terminology)
@@ -24,8 +26,17 @@ End-to-end boilerplate for embedding [pear-runtime][pear-runtime] into [Electron
   - [Additional Instances](#additional-instances)
 - [Workers](#workers)
 - [Peer-to-Peer Deployments](#deployments)
+  - [Deployment Layers](#deployment-layers)
   - [Release Cycle](#release-cycle)
   - [Foundational Steps](#foundational-steps)
+    - [0. Touch and Seed](#touch-and-seed)
+    - [1. Set upgrade link](#set-upgrade-link)
+    - [2. Version](#version)
+    - [3. Make Distributables](#make-distributables)
+    - [4. Build Deployment Directory](#build-deploy-directory)
+    - [5. Stage](#stage)
+    - [6. Provision](#provision)
+    - [7. Multisig](#multisig)
   - [Release Lines](#release-lines)
   - [Release Line Builds](#release-line-builds)
   - [Custom Builds](#custom-builds)
@@ -215,15 +226,71 @@ Application builds are written to [pear:// links][pear-link-format] through thre
 
 Each operation feeds into the next: a staged link is the source for a provisioned link, a provisioned link is the source for a multisig'd link.
 
-```
-Stage -> Provision -> Multisig
+```mermaid
+graph LR
+    S[Stage] --> P[Provision] --> M[Multisig]
 ```
 
 This approach enables rapid collaborative iteration on Stage links, a stakeholder preview with Provisioned links, and cryptographically signed-off machine-independent production releases with Multisigged links.
 
+### Deployment Layers
+
+Release lines are deployment targets at different stability levels — from early development through to production. A single deployment folder can be staged to any of them depending on the upgrade link.
+
+Release lines are deployment targets at different stability levels. Multiple stage links allow parallel development streams to coexist, each feeding forward through provision and multisig as confidence increases.
+
+A deployment folder containing builds for each supported architecture is staged to a Pear link for a given release line. The upgrade link in `package.json` determines which release line a build belongs to.
+
+For production, the rc release line must use the production (multisig) link as its upgrade link — this is the build that gets provisioned and ultimately multisig'd.
+
+```mermaid
+graph BT
+    DF[(Deployment Directory)] -->|"pear://‹dev-key›"| Dev
+    DF -->|"pear://‹staging-key›"| Stg
+    DF ==>|"pear://‹PROD-KEY›"| RC
+
+    subgraph "    STAGE"
+        Dev[development]
+        Stg[staging]
+        RC[rc]
+    end
+
+    subgraph PROVISION
+        Pre[prerelease]
+    end
+
+    subgraph MULTISIG
+        Prod[production]
+    end
+
+    RC ==>|source| Pre
+    Pre ==>|source| Prod
+
+    linkStyle 2 stroke:#3fb950,color:#3fb950
+    linkStyle 3 stroke:#3fb950
+    linkStyle 4 stroke:#3fb950
+```
+
+Since the rc upgrade link points to the production multisig link, rc builds do not receive OTA updates. Each rc iteration requires distributing a new build. Provision is a sync from rc, so the same applies: updates will not occur, provision builds must be distributed for checks. See [Release Lines](#release-lines) and [Release Line Builds](#release-line-builds).
+
 ### Release Cycle <a name="release-cycle"></a>
 
-After the [Foundational Steps](#foundational-steps) are all in place the deployment reaches steady state. From there the delivery flow is always the same.
+Once the [Foundational Steps](#foundational-steps) are all in place the delivery flow is always the same.
+
+```mermaid
+graph TD
+    V[2. Version] --> Make[3. Make Distributables]
+    Make --> Build[4. Build Deployment Directory]
+    Build --> Stage[5. Stage]
+    Stage -->|iterate| V
+    Stage -->|stable| Prov[6. Provision]
+    Prov -->|assessed| Req[7d. Prepare Request]
+    Req --> Sign[7e. Sign]
+    Sign --> Verify[7f. Verify]
+    Verify --> Commit[7g. Commit]
+    Commit --> Live[Production Live]
+    Live -->|next release| V
+```
 
 An update will not occur unless the `package.json` `version` field is updated.
 
@@ -234,7 +301,7 @@ Always start by updating the version:
 Iterate as much as needed and continually make, build and stage:
 
 - [3. Make Distributables](#make-distributables)
-- [4. Build Deploy Directory](#build-deploy-directory)
+- [4. Build Deployment Directory](#build-deploy-directory)
 - [5. Stage](#stage)
 
 There can be multiple stage link targets (development, staging, rc) see [Release Lines](#release-lines).
@@ -262,7 +329,39 @@ Once stakeholders, QA, dogfooder devs and any one else relevant has assessed, ha
 
 ### Foundational Steps <a name="foundational-steps"></a>
 
-Establishing the entire [Release Cycle](#release-cycle) doesn't have to happen all at once. It can, but how productionized it needs to be is project-dependent. If an application is in a Proof of Concept phase, then just using a stage link will do. If an application is intended for production release then multisig is crucial to practices, resilience and machine independence. In order to reach a multisig deployment there are some bootstrapping steps involved. Once completed, a remaining subset of these steps is the standard [Release Cycle](#release-cycle).
+Foundational Steps bootstrap and feed into the [Release-Cycle].
+
+```mermaid
+graph TD
+    subgraph Link Setup
+        T[0. Touch & Seed] --> U[1. Set upgrade link]
+    end
+
+    U -.-> V
+
+    V[2. Version] --> Make[3. Make Distributables]
+    Make --> Build[4. Build Deployment Directory]
+    Build --> Stage[5. Stage]
+    Stage -->|iterate| V
+    Stage -->|stable| Prov[6. Provision]
+    Prov -->|assessed| Req[7d. Prepare Request]
+    Req --> Sign[7e. Sign]
+    Sign --> Verify[7f. Verify]
+    Verify --> Commit[7g. Commit]
+    Commit --> Live[Production Live]
+    Live -->|next release| V
+
+    K[7a. Create Signing Keys] --> C[7b. Create Multisig Config]
+    Prov -->|setup| C
+    C --> L[7c. Set upgrade to Multisig Link]
+    L --> Req
+```
+
+Establishing the entire [Release Cycle](#release-cycle) doesn't have to happen all at once. It can, but how productionized it needs to be is project-dependent. If an application is in a Proof of Concept phase, then just using a stage link will do.
+
+If an application is intended for production release then multisig is crucial to practices, resilience and machine independence.
+
+In order to reach a multisig deployment there are some bootstrapping steps involved. Once completed, a remaining subset of these steps is the standard [Release Cycle](#release-cycle).
 
 Follow the foundational steps at a pace suitable to the project until the [Release Cycle](#release-cycle) is established:
 
@@ -270,16 +369,17 @@ Follow the foundational steps at a pace suitable to the project until the [Relea
 - [1. Set upgrade link](#set-upgrade-link)
 - [2. Version](#version)
 - [3. Make Distributables](#make-distributables)
-- [4. Build Deploy Directory](#build-deploy-directory)
+- [4. Build Deployment Directory](#build-deploy-directory)
 - [5. Stage](#stage)
 - [6. Provision](#provision)
-- [7a. Create Signing Keys](#create-signing-keys)
-- [7b. Create Multisig Config](#create-multisig-config)
-- [7c. Set `upgrade` field to Multisig Link](#set-multisig-link)
-- [7d. Prepare Multisig Request](#prepare-multisig-request)
-- [7e. Sign](#sign)
-- [7f. Verify](#verify)
-- [7g. Commit](#commit)
+- [7. Multisig](#multisig)
+  - [7a. Create Signing Keys](#create-signing-keys)
+  - [7b. Create Multisig Config](#create-multisig-config)
+  - [7c. Set `upgrade` field to Multisig Link](#set-multisig-link)
+  - [7d. Prepare Multisig Request](#prepare-multisig-request)
+  - [7e. Sign](#sign)
+  - [7f. Verify](#verify)
+  - [7g. Commit](#commit)
 
 #### 0. Touch and Seed <a name="touch-and-seed"></a>
 
@@ -408,12 +508,24 @@ Build distributables with:
 npm run make:linux
 ```
 
-#### 4. Build Deploy Directory <a name="build-deploy-directory"></a>
+#### 4. Build Deployment Directory <a name="build-deploy-directory"></a>
 
-Each make runs on a different OS and architecture. Each must be moved to a single build machine,
-this assumes that they've all been moved into the same project `./out` folder.
+Each make runs on a different OS and architecture.
 
-Use [`pear-build`][pear-build] to move all the `package.json` and architectures into a single build target directory. The resulting directory is the Deploy Directory.
+Use [`pear-build`][pear-build] to assemble all architecture builds into a single multi-architecture directory, referred to as the **Deployment Directory**.
+
+```mermaid
+graph BT
+    V([Version]) -->|make| MakeWin[/Windows/]
+    V -->|make| MakeMac[/macOS/]
+    V -->|make| MakeLinux[/Linux/]
+
+    MakeWin --> Build([Build])
+    MakeMac --> Build
+    MakeLinux --> Build
+
+    Build --> DF[(Deployment Directory)]
+```
 
 From above the project root run `pear-build` for each arch, for example Mac x64 + arm64, Linux x64 + arm64 and Windows x64 would be:
 
@@ -421,11 +533,13 @@ From above the project root run `pear-build` for each arch, for example Mac x64 
 pear-build --package=./hello-pear-electron/package.json --darwin-arm64-app ./hello-pear-electron/out/HelloPear-darwin-arm64/HelloPear.app --darwin-x64-app ./hello-pear-electron/out/HelloPear-darwin-x64/HelloPear.app --linux-arm64-app ./hello-pear-electron/out/HelloPear-linux-arm64/HelloPear.AppImage --linux-x64-app ./hello-pear-electron/out/HelloPear-linux-x64/HelloPear.AppImage --win32-x64-app ./hello-pear-electron/out/HelloPear-win32-x64/HelloPear.msix --target hello-pear-electron-1.0.0
 ```
 
+NOTE: Since building occurs on other machines, they need to be transferred to the build machine first, and then assembled into a Deployment Directory with pear-build.
+
 If the `--target` flag is omitted, then target folder is in the current working directory named `{name}-{version}` per `package.json` fields.
 
 Once the `<target>/by-arch` folder is hydrated with builds for all required target architectures it's ready to move on to be staged, provisioned and multisigned.
 
-The resulting Deploy Directory should (and must) have the following structure at minimum:
+The resulting Deployment Directory should (and must) have the following structure at minimum:
 
 ```
 /package.json
@@ -434,9 +548,49 @@ The resulting Deploy Directory should (and must) have the following structure at
     /app
 ```
 
+Once a Deployment Directory has been assembled it can be synchronized into Pear Hyperdrives using `pear stage`, `pear provision` and `pear multisig` to create a full deployment flow.
+
+```mermaid
+graph BT
+    V([Version]) -->|make| MakeWin[/Windows/]
+    V -->|make| MakeMac[/macOS/]
+    V -->|make| MakeLinux[/Linux/]
+
+    MakeWin --> Build([Build])
+    MakeMac --> Build
+    MakeLinux --> Build
+
+    Build --> DF[(Deployment Directory)]
+
+    DF -->|"pear://‹dev-key›"| Dev[development]
+    DF -->|"pear://‹staging-key›"| Stg[staging]
+    DF ==>|"pear://‹PROD-KEY›"| RC[rc]
+
+    subgraph "    STAGE"
+        Dev
+        Stg
+        RC
+    end
+
+    subgraph PROVISION
+        Pre[prerelease]
+    end
+
+    subgraph MULTISIG
+        Prod[production]
+    end
+
+    RC ==>|source| Pre
+    Pre ==>|source| Prod
+
+    linkStyle 9 stroke:#3fb950,color:#3fb950
+    linkStyle 10 stroke:#3fb950
+    linkStyle 11 stroke:#3fb950
+```
+
 #### 5. Stage <a name="stage"></a>
 
-Use Pear to synchronize the Deploy Directory from disk to [hypercore][hypercore] within Pear by executing `pear stage <upgrade-link> <deploy-directory>`.
+Use Pear to synchronize the Deployment Directory from disk to [hypercore][hypercore] within Pear by executing `pear stage <upgrade-link> <deploy-directory>`.
 
 First perform a dry run:
 
@@ -460,7 +614,7 @@ Make a change, save it and repeat steps:
 
 - [2. Version](#version) (do `npm version patch`)
 - [3. Make Distributables](#make-distributables)
-- [4. Build Deploy Directory](#build-deploy-directory)
+- [4. Build Deployment Directory](#build-deploy-directory)
 
 As long as the `upgrade` field is pointing to the staged link, then this should trigger an update in every application on every machine it was run on, if so the steps were completed successfully. Restart the application to see the latest update.
 
@@ -521,7 +675,7 @@ The source link for the provisioned drive has to be updated with the new `packag
 Make a new build that contains the new `package.json` with the new `upgrade` field, following steps:
 
 - [3. Make Distributables](#make-distributables)
-- [4. Build Deploy Directory](#build-deploy-directory)
+- [4. Build Deployment Directory](#build-deploy-directory)
 
 Stage again to the stage link, following:
 
@@ -562,13 +716,35 @@ Requiring a quorum of signers before a release can go out distributes production
 
 A malicious build cannot be published without multiple signers being compromised, enough signers to establish quorum.
 
-Multiple signers, enough to break quorum would have to lose their signing keys to be unable to update a production build.
+An amount of signers sufficient to break quorum would have to lose their signing keys to be unable to update a production build.
 
 A multisig'd application drive is not machine-bound. Write access is determined by signing capability.
 
 A multisig key is defined by a `namespace` (an arbitrary string), a list of signing keys, and a quorum.
 
-To setup a new key follow:
+There are three setups steps, and then four release steps.
+
+Release flow once setup is:
+
+- [7d. Prepare Multisig Request](#prepare-multisig-request)
+- [7e. Sign](#sign)
+- [7f. Verify](#verify)
+- [7g. Commit](#commit)
+
+```mermaid
+graph TD
+    Prov[Provisioned Drive] --> Req[7d. Prepare Request]
+    Req -->|signing request| S1[Signer 1 ✓]
+    Req -->|signing request| S2[Signer 2 ✓]
+    Req -->|signing request| S3[Signer ...]
+    S1 -->|response| Q{Quorum met?}
+    S2 -->|response| Q
+    Q -->|2 of ...| Ver[7f. Verify]
+    Ver --> Com[7g. Commit]
+    Com --> Live[Production Live]
+```
+
+To setup a new key use the entire flow.
 
 - [7a. Create Signing Keys](#create-signing-keys)
 - [7b. Create Multisig Config](#create-multisig-config)
@@ -578,12 +754,24 @@ To setup a new key follow:
 - [7f. Verify](#verify)
 - [7g. Commit](#commit)
 
-To make a multisig request on an existing drive follow:
+```mermaid
+graph TD
+    subgraph Multisig Setup
+        K[7a. Create Signing Keys] --> C[7b. Create Multisig Config]
+        C --> L[7c. Set upgrade field to Multisig link]
+    end
 
-- [7d. Prepare Multisig Request](#prepare-multisig-request)
-- [7e. Sign](#sign)
-- [7f. Verify](#verify)
-- [7g. Commit](#commit)
+    L -->|"1 → 2 → 3 → 4 → 5 → 6"| Prov[Provisioned Drive]
+    Prov --> Req[7d. Prepare Request]
+    Req -->|signing request| Sg1[Signer 1 ✓]
+    Req -->|signing request| Sg2[Signer 2 ✓]
+    Req -->|signing request| Sg3[Signer ...]
+    Sg1 -->|response| Q{Quorum met?}
+    Sg2 -->|response| Q
+    Q -->|2 of ...| Ver[7f. Verify]
+    Ver --> Com[7g. Commit]
+    Com --> Live[Production Live]
+```
 
 #### 7a. Create Signing Keys <a name="create-signing-keys"></a>
 
@@ -642,7 +830,7 @@ Go through the update flow steps:
 
 - [2. Version](#version)
 - [3. Make Distributables](#make-distributables)
-- [4. Build Deploy Directory](#build-deploy-directory)
+- [4. Build Deployment Directory](#build-deploy-directory)
 - [5. Stage](#stage)
 
 When provisioning, the production link argument should be the multisig link, for example:
@@ -724,7 +912,7 @@ Note: starting from the second commit, it is technically possible to corrupt the
 
 ### Release Lines <a name="release-lines"></a>
 
-Depending on team scale, it can be worth having three stage drives, one provision drive and one multisig drive
+A reasonable target deployment is three stage drives, one provision drive and one multisig drive.
 
 - **development** - staged for developer team experimentation
 - **staging** - staged for wider developer and technical stakeholders, more stable than development,
@@ -732,13 +920,40 @@ Depending on team scale, it can be worth having three stage drives, one provisio
 - **prerelease** - provisioned from rc source
 - **production** - multisig'd from prerelease source
 
+Besides these ephemeral release lines, additional internal lines can be staged and seeded at-will for experiments, hotfixes, feature spikes, forks and instrumented builds for shared debugging. Whether ephmeral or longlived these can all be categorized as custom lines.
+
+```mermaid
+graph LR
+    subgraph "STAGED"
+        Dev[development]
+        Stg[staging]
+        RC[rc]
+        subgraph " "
+          Cst[custom...]
+        end
+    end
+
+    subgraph "PROVISIONED"
+        Pre[prerelease]
+    end
+
+    subgraph "MULTISIG'D"
+        Prod[production]
+    end
+
+    RC ~~~ Pre
+    Pre ~~~ Prod
+```
+
 For each of these lines:
 
 - [0. Touch and Seed](#touch-and-seed)
 - [1. Set upgrade link](#set-upgrade-link)
 - [3. Make Distributables](#make-distributables)
 
-Note: No need to version since this creates an initial application build for a release line
+Note: No need to version since this creates an initial application build for a release line.
+
+For small teams/lean projects just rc, prerelease and production lines can work, but a staging key is good for checking update flow first.
 
 ### Release Line Builds <a name="release-line-builds"></a>
 
@@ -746,7 +961,7 @@ Create a build that points to each link for each release line.
 
 - [1. Set upgrade link](#set-upgrade-link)
 - [3. Make Distributables](#make-distributables)
-- [4. Build Deploy Directory](#build-deploy-directory)
+- [4. Build Deployment Directory](#build-deploy-directory)
 
 Share the stage build with developer collaborators.
 
@@ -762,7 +977,7 @@ The `upgrade` field can be set to one link only. Share alternative builds intern
 - [1. Set upgrade link](#set-upgrade-link)
 - [2. Version](#version)
 - [3. Make Distributables](#make-distributables)
-- [4. Build Deploy Directory](#build-deploy-directory)
+- [4. Build Deployment Directory](#build-deploy-directory)
 - [5. Stage](#stage)
 
 ## Scripts <a name="scripts"></a>
