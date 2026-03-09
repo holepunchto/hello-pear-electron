@@ -723,9 +723,9 @@ A multisig'd application drive is not machine-bound. Write access is determined 
 
 A multisig key is defined by a `namespace` (an arbitrary string), a list of signing keys, and a quorum.
 
-There are three setups steps, and then four release steps.
+There are three setups steps and four common release steps.
 
-Release flow once setup is:
+Once a Multisig Drive has been setup the release flow is:
 
 - [7d. Prepare Multisig Request](#prepare-multisig-request)
 - [7e. Sign](#sign)
