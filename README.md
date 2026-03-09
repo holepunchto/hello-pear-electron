@@ -725,6 +725,28 @@ A multisig key is defined by a `namespace` (an arbitrary string), a list of sign
 
 There are three setups steps and four common release steps.
 
+To setup a Multisig drive follow:
+
+- [7a. Create Signing Keys](#create-signing-keys)
+- [7b. Create Multisig Config](#create-multisig-config)
+- [7c. Set `upgrade` field to Multisig Link](#set-multisig-link)
+
+```mermaid
+graph TD
+    subgraph Multisig Setup
+        K[7a. Create Signing Keys] --> C[7b. Create Multisig Config]
+        C --> L[7c. Set upgrade field to Multisig link]
+    end
+
+    L .-> R([Release Flow<br>1→2→3→4→5→6])
+    R --> Prov[Provisioned Drive]
+    Prov --> M([MULTISIG<br>7d→7e→7f→7g])
+    PL[[Provision Link]] .-> C
+    PL <-.-> Prov
+    PL ~~~ R
+
+```
+
 Once a Multisig Drive has been setup the release flow is:
 
 - [7d. Prepare Multisig Request](#prepare-multisig-request)
@@ -734,9 +756,9 @@ Once a Multisig Drive has been setup the release flow is:
 
 ```mermaid
 graph TD
-    Prov[Provisioned Drive] --> Req[7d. Prepare Request]
+    Prov[Source Drive] --> Req[7d. Prepare Request]
     Req -->|signing request| S1[Signer 1 ✓]
-    Req -->|signing request| S2[Signer 2 ✓]
+    Req -->|signing request| S2[Signer N ✓]
     Req -->|signing request| S3[Signer ...]
     S1 -->|response| Q{Quorum met?}
     S2 -->|response| Q
@@ -745,7 +767,7 @@ graph TD
     Com --> Live[Production Live]
 ```
 
-To setup a new key use the entire flow.
+For a first-time release follow the full flow:
 
 - [7a. Create Signing Keys](#create-signing-keys)
 - [7b. Create Multisig Config](#create-multisig-config)
@@ -754,25 +776,6 @@ To setup a new key use the entire flow.
 - [7e. Sign](#sign)
 - [7f. Verify](#verify)
 - [7g. Commit](#commit)
-
-```mermaid
-graph TD
-    subgraph Multisig Setup
-        K[7a. Create Signing Keys] --> C[7b. Create Multisig Config]
-        C --> L[7c. Set upgrade field to Multisig link]
-    end
-
-    L -->|"1 → 2 → 3 → 4 → 5 → 6"| Prov[Provisioned Drive]
-    Prov --> Req[7d. Prepare Request]
-    Req -->|signing request| Sg1[Signer 1 ✓]
-    Req -->|signing request| Sg2[Signer 2 ✓]
-    Req -->|signing request| Sg3[Signer ...]
-    Sg1 -->|response| Q{Quorum met?}
-    Sg2 -->|response| Q
-    Q -->|2 of ...| Ver[7f. Verify]
-    Ver --> Com[7g. Commit]
-    Com --> Live[Production Live]
-```
 
 #### 7a. Create Signing Keys <a name="create-signing-keys"></a>
 
