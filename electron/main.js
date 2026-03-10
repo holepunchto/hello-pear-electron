@@ -47,6 +47,7 @@ function getPear() {
         : path.join(os.homedir(), 'AppData', 'Local', appName)
   }
   pear = new PearRuntime({ dir, app: appPath, updates, version, upgrade, win32: { restart: true } })
+  pear.updater.on('error', console.error)
   return pear
 }
 
@@ -113,10 +114,6 @@ async function createWindow() {
 
   const pear = getPear()
 
-  const onError = (err) => {
-    console.error('updater error:', err)
-  }
-
   const onUpdating = () => {
     if (!win.isDestroyed()) win.webContents.send('pear:event:updating')
   }
@@ -125,7 +122,6 @@ async function createWindow() {
     if (!win.isDestroyed()) win.webContents.send('pear:event:updated')
   }
 
-  pear.updater.on('error', onError)
   pear.updater.on('updating', onUpdating)
   pear.updater.on('updated', onUpdated)
 
