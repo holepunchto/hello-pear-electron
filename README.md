@@ -784,42 +784,35 @@ Each signer needs to generate a signing key.
 The same person can use the same key to sign many different builds.
 
 ```sh
-npm i -g hypercore-sign
-hypercore-sign-generate-keys
+pear keygen
 ```
 
-Take note of the public key.
-
-The public key is stored in `~/.hypercore-sign/default.public`.
+Each signer should take note of the public key and provide it as their signing key.
 
 #### 7b. Create Multisig Config <a name="create-multisig-config"></a>
 
-Set the public keys of each signer on `publicKey` and use the key of the provision link as the `srcKey`:
+Set a `multisig` field on the `package.json`. 
+Set the public keys of each signer on `publicKey` and use the key of the provision link as the `source`:
 
 ```json
 {
-  "type": "drive",
-  "publicKeys": ["pubkey-signer-1", "pubkey-signer-2", "pubkey-signer-3"],
-  "namespace": "hello-pear-electron",
-  "quorum": 2,
-  "srcKey": "q9sopzoqgas9usoiq7uzkkwngm5pzj4zo3n4esjwwbmw6offis8o"
+  "multisig": {
+    "publicKeys": ["pubkey-signer-1", "pubkey-signer-2", "pubkey-signer-3"],
+    "namespace": "hello-pear-electron",
+    "quorum": 2,
+    "source": "pear://q9sopzoqgas9usoiq7uzkkwngm5pzj4zo3n4esjwwbmw6offis8o" // <-- TODO, need this??
+  }
 }
 ```
 
 This configuration has three signers with a quorum of 2. Which means two signers out of three can trigger a production release.
 
-Store it as `multisig.json`.
-
 #### 7c. Set `upgrade` field to Multisig Link <a name="set-multisig-link"></a>
 
-```sh
-npm i -g hyper-multisig-cli
-```
-
-In the current working directory as `multisig.json` run the following to get the multisig link:
+In the current working directory as `package.json` run the following to get the multisig link:
 
 ```sh
-hyper-multisig link
+pear multisig link
 ```
 
 This will output a pear link, example: `pear://69qwbihxj4c8te15wt3skj4j1g3ufmbo3mperedjqr1hb55mspoo`.
@@ -850,48 +843,44 @@ The `upgrade` field in the source drive (the provision drive) now points to the 
 #### 7d. Prepare Multisig Request <a name="prepare-multisig-request"></a>
 
 ```sh
-hyper-multisig request <length>
+pear multisig request <length>
 ```
 
 Where `<length>` is the current length of the provision key. This will return a signing request.
 
-Note: `hyper-multisig` performs several checks before requesting and committing multisig requests, to protect against accidentally corrupting the production build.
+Note: `pear multisig` performs several checks before requesting and committing multisig requests, to protect against accidentally corrupting the production build.
 
-One of the checks ensures the source drive is healthily seeded. If this is not the case, `hyper-multisig` refuses to make the signing request. Solve it by reseeding the provision on other peers.
+One of the checks ensures the source drive is healthily seeded. If this is not the case, `pear multisig` refuses to make the signing request. Solve it by reseeding the provision on other peers.
 
 #### 7e. Sign <a name="sign"></a>
 
-`hyper-multisig` offers protection from formal mistakes that corrupt the production build, but it is up to the signers to verify that they are signing the correct build.
-
-To check for formal mistakes before signing, run the `hyper-multisig verify` command (next section). Do not sign a build when it fails those checks.
+`pear multisig` offers protection from formal mistakes that corrupt the production build, but it is up to the signers to verify that they are signing the correct build.
 
 To sign a request, run
 
 ```sh
-hypercore-sign <signing request>
+pear sign <signing request>
 ```
 
 Then share the response. Once a quorum of signers (2 in the example) share their response, the build is ready to go out.
 
 #### 7f. Verify <a name="verify"></a>
 
+To check for formal mistakes before signing be sure to verify. Do not sign a build if verification fails.
+
 ```sh
-hyper-multisig verify [--first-commit] <signing request>
+pear multisig verify <signing request> [...responses]
 ```
 
-Use the `--first-commit` flag if this is the first commit to this drive.
-
-If responses are already available, pass those in as additional parameters after the `<signing request>`.
+Run the command without responses to verify the request, then once reponses are provided run the command again passing responses in as additional parameters after the `<signing request>`.
 
 #### 7g. Commit <a name="commit"></a>
 
 Only commit after verifying the request and all responses.
 
 ```sh
-hyper-multisig commit [--first-commit] <signing request>
+pear multisig commit <signing request>
 ```
-
-Use the `--first-commit` flag if this is the first commit to this drive.
 
 The commit is not safely finished until that drive's key is seeded by peers.
 
@@ -910,7 +899,7 @@ Never abort a commit while it is running. If a commit does get aborted while run
 
 It does not matter on which machine the commit is run. So in case of a computer crash, just ask someone else to run the commit.
 
-It need not be a signer who commits as the request and the responses suffice to generate the build. This is the reason why `hyper-multisig` verifies that the source drive is well seeded.
+It need not be a signer who commits as the request and the responses suffice to generate the build. This is the reason why `pear multisig` verifies that the source drive is well seeded.
 
 Note: starting from the second commit, it is technically possible to corrupt the production build. So if a command ever errors with an `INCOMPATIBLE_SOURCE_AND_TARGET` error, never try to work around it, the only safe way to proceed is by creating reseeding the provision on other peers.
 
