@@ -57,6 +57,7 @@ function getPear() {
     win32: { restart: true },
     name: productName + extension
   })
+  pear.on('error', console.error) // print network errors, etc.
   return pear
 }
 
