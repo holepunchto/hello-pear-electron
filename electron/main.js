@@ -46,7 +46,17 @@ function getPear() {
         ? path.join(os.homedir(), '.config', appName)
         : path.join(os.homedir(), 'AppData', 'Local', appName)
   }
-  pear = new PearRuntime({ dir, app: appPath, updates, version, upgrade, win32: { restart: true } })
+
+  const extension = isLinux ? '.AppImage' : isMac ? '.app' : '.msix'
+  pear = new PearRuntime({
+    dir,
+    app: appPath,
+    updates,
+    version,
+    upgrade,
+    win32: { restart: true },
+    name: productName + extension
+  })
   pear.on('error', console.error) // print network errors, etc.
   return pear
 }
