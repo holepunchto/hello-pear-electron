@@ -47,7 +47,7 @@ function getPear() {
         : path.join(os.homedir(), 'AppData', 'Local', appName)
   }
   pear = new PearRuntime({ dir, app: appPath, updates, version, upgrade, win32: { restart: true } })
-  pear.updater.on('error', console.error)
+  pear.on('error', console.error)
   return pear
 }
 
