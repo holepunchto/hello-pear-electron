@@ -168,7 +168,7 @@ ipcMain.handle('app:restart', () => {
   } else {
     app.relaunch()
   }
-  app.exit(0)
+  app.quit()
 })
 
 function handleDeepLink(url) {
