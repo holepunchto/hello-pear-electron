@@ -484,7 +484,7 @@ Note `APPLE_PASSWORD` is not the sign-in password, it's an [app-specific passwor
 - `cs.allow-jit` — required for V8/Bare JIT compilation
 - `cs.allow-unsigned-executable-memory` — required for the Bare runtime
 
-Add or remove entitlements here  (e.g. camera, microphone, location). 
+Add or remove entitlements here (e.g. camera, microphone, location). 
 
 To load third-party native addons that dynamically link shared libraries built by a different developer use `cs.disable-library-validation`.
 
