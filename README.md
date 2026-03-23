@@ -788,28 +788,26 @@ Each signer needs to generate a signing key.
 The same person can use the same key to sign many different builds.
 
 ```sh
-pear keygen
+pear multisig keygen
 ```
 
 Each signer should take note of the public key and provide it as their signing key.
 
 #### 7b. Create Multisig Config <a name="create-multisig-config"></a>
 
-Set a `multisig` field on the `package.json`. 
-Set the public keys of each signer on `publicKey` and use the key of the provision link as the `source`:
+Set a `multisig` property on the `package.json` with a `namespace` string, `quorom` number and the public key strings of each signer on the `signers` array property:
 
 ```json
 {
   "multisig": {
-    "publicKeys": ["pubkey-signer-1", "pubkey-signer-2", "pubkey-signer-3"],
+    "signers": ["pubkey-signer-1", "pubkey-signer-2", "pubkey-signer-3"],
     "namespace": "hello-pear-electron",
-    "quorum": 2,
-    "source": "pear://q9sopzoqgas9usoiq7uzkkwngm5pzj4zo3n4esjwwbmw6offis8o" // <-- TODO, need this??
+    "quorum": 2
   }
 }
 ```
 
-This configuration has three signers with a quorum of 2. Which means two signers out of three can trigger a production release.
+This configuration has three signers with a quorum of 2. So two signers out of three can trigger a production release.
 
 #### 7c. Set `upgrade` field to Multisig Link <a name="set-multisig-link"></a>
 
@@ -863,7 +861,7 @@ One of the checks ensures the source drive is healthily seeded. If this is not t
 To sign a request, run
 
 ```sh
-pear sign <signing request>
+pear multisig sign <signing request>
 ```
 
 Then share the response. Once a quorum of signers (2 in the example) share their response, the build is ready to go out.
