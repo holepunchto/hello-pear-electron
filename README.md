@@ -801,7 +801,7 @@ Set a `multisig` property on the `package.json` with a `namespace` string, `quor
 {
   "multisig": {
     "signers": ["pubkey-signer-1", "pubkey-signer-2", "pubkey-signer-3"],
-    "namespace": "hello-pear-electron",
+    "namespace": "holepunchto/hello-pear-electron",
     "quorum": 2
   }
 }
