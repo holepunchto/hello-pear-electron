@@ -788,7 +788,7 @@ Each signer needs to generate a signing key.
 The same person can use the same key to sign many different builds.
 
 ```sh
-pear multisig keygen
+pear multisig keys
 ```
 
 Each signer should take note of the public key and provide it as their signing key.
@@ -847,14 +847,20 @@ The `upgrade` field in the source drive (the provision drive) now points to the 
 #### 7d. Prepare Multisig Request <a name="prepare-multisig-request"></a>
 
 ```sh
-pear multisig request <length>
+pear multisig request <versioned link>
 ```
 
-Where `<length>` is the current length of the provision key. This will return a signing request.
+Where `<versioned link>` is a seeded provision link, described per `pear://<fork>.<length>.<key>`. For example:
 
-Note: `pear multisig` performs several checks before requesting and committing multisig requests, to protect against accidentally corrupting the production build.
+```sh
+pear multisig request pear://0.856.q9sopzoqgas9usoiq7uzkkwngm5pzj4zo3n4esjwwbmw6offis8o
+```
 
-One of the checks ensures the source drive is healthily seeded. If this is not the case, `pear multisig` refuses to make the signing request. Solve it by reseeding the provision on other peers.
+This will return a signing request.
+
+Note: `pear multisig request` performs several checks before requesting and committing multisig requests, to protect against accidentally corrupting the production build.
+
+One of the checks ensures the source drive is healthily seeded. If this is not the case, `pear multisig request` refuses to make the signing request. Solve it by reseeding the provision link on other peers.
 
 #### 7e. Sign <a name="sign"></a>
 
