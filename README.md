@@ -795,14 +795,16 @@ Each signer should take note of the public key and provide it as their signing k
 
 #### 7b. Create Multisig Config <a name="create-multisig-config"></a>
 
-Set a `multisig` property on the `package.json` with a `namespace` string, `quorom` number and the public key strings of each signer on the `signers` array property:
+Set the `pear.multisig` property in `package.json` to an object with a `namespace` string, `quorom` number and the public key strings of each signer on the `signers` array property:
 
 ```json
 {
-  "multisig": {
-    "signers": ["pubkey-signer-1", "pubkey-signer-2", "pubkey-signer-3"],
-    "namespace": "holepunchto/hello-pear-electron",
-    "quorum": 2
+  "pear": {
+    "multisig": {
+      "signers": ["<pubkey1>", "<pubkey2>", "<pubkey3>"],
+      "namespace": "holepunchto/hello-pear-electron",
+      "quorum": 2
+    }
   }
 }
 ```
