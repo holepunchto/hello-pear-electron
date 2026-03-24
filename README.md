@@ -721,7 +721,7 @@ An amount of signers sufficient to break quorum would have to lose their signing
 
 A multisig'd application drive is not machine-bound. Write access is determined by signing capability.
 
-A multisig key is defined by a `namespace` (an arbitrary string), a list of signing keys, and a quorum.
+A multisig link holds a key generated from a namespace string, a list of signing keys, and a quorum.
 
 There are three setups steps and four common release steps.
 
