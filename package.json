@@ -2,15 +2,16 @@
   "name": "hello-pear-electron",
   "productName": "HelloPear",
   "version": "1.0.0",
-  "upgrade": "pear://qxenz5wmspmryjc13m9yzsqj1conqotn8fb4ocbufwtz9mtbqq5o",
+  "upgrade": "pear://69qwbihxj4c8te15wt3skj4j1g3ufmbo3mperedjqr1hb55mspoo",
   "pear": {
     "multisig": {
       "signers": [
-        "1p8n9ifcrxrdo8amyodmzhu6wcrys4e68wp9e1inhs7b9ryimy8o",
-        "cny97ayusre8icq5bp9h5s9j99k4j53co48iufc3xkzn3un5r3no"
+        "<SIGNING KEY HERE>",
+        "<SIGNING KEY HERE>",
+        "<SIGNING KEY HERE>"
       ],
       "namespace": "holepunchto/hello-pear-electron",
-      "quorum": 1
+      "quorum": 2
     }
   },
   "description": "",

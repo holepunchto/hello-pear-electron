@@ -538,7 +538,7 @@ NOTE: Since building occurs on other machines, they need to be transferred to th
 
 If the `--target` flag is omitted, then target folder is in the current working directory named `{name}-{version}` per `package.json` fields.
 
-Once the `<target>/by-arch` folder is hydrated with builds for all required target architectures it's ready to move on to be staged, provisioned and multisigned.
+Once the `<target>/by-arch` folder is hydrated with builds for all required target architectures it's ready to move on to be staged, provisioned and multisig'd.
 
 The resulting Deployment Directory should (and must) have the following structure at minimum:
 
@@ -788,7 +788,7 @@ Each signer needs to generate a signing key.
 The same person can use the same key to sign many different builds.
 
 ```sh
-pear multisig keys
+pear multisig keys get
 ```
 
 Each signer should take note of the public key and provide it as their signing key.
