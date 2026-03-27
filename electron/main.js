@@ -51,6 +51,8 @@ async function getPear() {
 
   const extension = isLinux ? '.AppImage' : isMac ? '.app' : '.msix'
   const store = new Corestore(path.join(dir, 'pear-runtime/corestore'))
+  const keyPair = await store.createKeyPair('pear-runtime')
+  const swarm = new Hyperswarm({ keyPair })
   pear = new PearRuntime({
     dir,
     app: appPath,
@@ -59,15 +61,14 @@ async function getPear() {
     upgrade,
     win32: { restart: true },
     name: productName + extension,
-    store
+    store,
+    swarm
   })
-  const keyPair = await store.createKeyPair('pear-runtime')
-const swarm = new Hyperswarm({ keyPair })
-swarm.on('connection', (connection) => store.replicate(connection))
-swarm.join(pear.updater.drive.core.discoveryKey, {
-  client: true,
-  server: false
-})
+  swarm.on('connection', (connection) => store.replicate(connection))
+  swarm.join(pear.updater.drive.core.discoveryKey, {
+    client: true,
+    server: false
+  })
   pear.on('error', console.error) // print network errors, etc.
   return pear
 }
