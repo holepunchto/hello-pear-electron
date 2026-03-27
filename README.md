@@ -479,6 +479,15 @@ Instructions for obtaining credentials can be found [here][electron-forge-macos-
 
 Note `APPLE_PASSWORD` is not the sign-in password, it's an [app-specific password][apple-app-specific-password].
 
+`build/entitlements.mac.plist` declares the permissions required by the app under macOS Hardened Runtime, which is mandatory for notarized apps. The defaults cover Bare native addon compatibility:
+
+- `cs.allow-jit` — required for V8/Bare JIT compilation
+- `cs.allow-unsigned-executable-memory` — required for the Bare runtime
+
+Add or remove entitlements here (e.g. camera, microphone, location).
+
+To load third-party native addons that dynamically link shared libraries built by a different developer use `cs.disable-library-validation`.
+
 ##### Windows <a name="make-windows"></a>
 
 Requires [Windows SDK][windows-sdk] (the build auto-detects the installed version) and [PowerShell 7+][powershell-install] (`winget install Microsoft.PowerShell`).

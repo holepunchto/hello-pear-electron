@@ -34,7 +34,10 @@ if (process.env.MAC_CODESIGN_IDENTITY) {
   packagerConfig = {
     ...packagerConfig,
     osxSign: {
-      identity: process.env.MAC_CODESIGN_IDENTITY
+      identity: process.env.MAC_CODESIGN_IDENTITY,
+      optionsForFile: () => ({
+        entitlements: path.join(__dirname, 'build', 'entitlements.mac.plist')
+      })
     },
     osxNotarize: {
       appleId: process.env.APPLE_ID,
