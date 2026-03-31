@@ -128,8 +128,8 @@ To disable updates as an application default, ensure that the package.json is sp
 
 #### Runtime Update Flow <a name="runtime-update-flow"></a>
 
-A running application will receive `updating` and `update` events, which are sent to the electron renderer
-process via `bridge.onPearEvent()`. After receiving the `update` event, the `bridge.applyUpdate()` method is called. This swaps the current application path with a path to the updated application build and then removes the old application from disk. So once the application is restarted, the application path contains the new build therefore the updated application is executed on restart.
+A running application will receive `updating` and `updated` events, which are sent to the electron renderer
+process via `bridge.onPearEvent()`. After receiving the `updated` event, the `bridge.applyUpdate()` method is called. This swaps the current application path with a path to the updated application build and then removes the old application from disk. So once the application is restarted, the application path contains the new build therefore the updated application is executed on restart.
 
 ### Storage <a name="storage"></a>
 
@@ -418,15 +418,15 @@ Set the `package.json` `upgrade` field:
 }
 ```
 
-To set the upgrade link from the command line `npm set pkg upgrade=<link>` can be used:
+To set the upgrade link from the command line `npm pkg set upgrade=<link>` can be used:
 
 ```sh
-npm set pkg upgrade=pear://qxenz5wmspmryjc13m9yzsqj1conqotn8fb4ocbufwtz9mtbqq5o
+npm pkg set upgrade=pear://qxenz5wmspmryjc13m9yzsqj1conqotn8fb4ocbufwtz9mtbqq5o
 ```
 
 #### 2. Version <a name="version"></a>
 
-If this is first time leave the version at 1.0.0 and skip to Make distributables.
+If this is the first time leave the version at 1.0.0 and skip to Make distributables.
 
 Use the `package.json` `version` field to set the version.
 
@@ -472,7 +472,7 @@ NOTE: If using pear <= v2.2.15 then `{ "pear": {"stage": {"includes": [".github"
 Supply signing and notarizing keys with `MAC_CODESIGN_IDENTITY`, `APPLE_TEAM_ID`, `APPLE_ID`, `APPLE_PASSWORD`
 
 ```sh
-MAC_CODESIGN_IDENTITY=identity APPLE_TEAM_ID=teamid APPLE_ID=id APPLE_PASSWORD=pw npm run make
+MAC_CODESIGN_IDENTITY=identity APPLE_TEAM_ID=teamid APPLE_ID=id APPLE_PASSWORD=pw npm run make:darwin
 ```
 
 Instructions for obtaining credentials can be found [here][electron-forge-macos-signing]
@@ -608,7 +608,7 @@ First perform a dry run:
 pear stage --dry-run pear://qxenz5wmspmryjc13m9yzsqj1conqotn8fb4ocbufwtz9mtbqq5o ./hello-pear-electron-1.0.0
 ```
 
-The `pear stage` command will output file diffs showing memory sizes per file for additions, deletions and changes. Since it's a dry run no updates will have occurred. It's important to go through this output and check each file change is as expected. Once satisified then run the operation for real:
+The `pear stage` command will output file diffs showing memory sizes per file for additions, deletions and changes. Since it's a dry run no updates will have occurred. It's important to go through this output and check each file change is as expected. Once satisfied then run the operation for real:
 
 ```sh
 pear stage pear://qxenz5wmspmryjc13m9yzsqj1conqotn8fb4ocbufwtz9mtbqq5o ./hello-pear-electron-1.0.0
@@ -664,7 +664,7 @@ First execute a provision dry run:
 pear provision --dry-run pear://0.1079.qxenz5wmspmryjc13m9yzsqj1conqotn8fb4ocbufwtz9mtbqq5o pear://q9sopzoqgas9usoiq7uzkkwngm5pzj4zo3n4esjwwbmw6offis8o pear://0.0.q9sopzoqgas9usoiq7uzkkwngm5pzj4zo3n4esjwwbmw6offis8o
 ```
 
-The `pear provision` command will output file diffs showing memory sizes per file for additions, deletions and changes. Since it's a dry run no updates will have occurred. It's important to go through this output and check each file change is as expected. Once satisified then run the operation for real:
+The `pear provision` command will output file diffs showing memory sizes per file for additions, deletions and changes. Since it's a dry run no updates will have occurred. It's important to go through this output and check each file change is as expected. Once satisfied then run the operation for real:
 
 ```sh
 pear provision pear://0.1079.qxenz5wmspmryjc13m9yzsqj1conqotn8fb4ocbufwtz9mtbqq5o pear://q9sopzoqgas9usoiq7uzkkwngm5pzj4zo3n4esjwwbmw6offis8o pear://0.0.q9sopzoqgas9usoiq7uzkkwngm5pzj4zo3n4esjwwbmw6offis8o
@@ -676,7 +676,7 @@ The `package.json` `upgrade` field determines where the app updates from, so to 
 
 - [1. Set upgrade link](#set-upgrade-link)
 
-Since this an update, it should be versioned:
+Since this is an update, it should be versioned:
 
 - [2. Version](#version)
 
@@ -732,7 +732,7 @@ A multisig'd application drive is not machine-bound. Write access is determined 
 
 A multisig key is defined by a `namespace` (an arbitrary string), a list of signing keys, and a quorum.
 
-There are three setups steps and four common release steps.
+There are three setup steps and four common release steps.
 
 To setup a Multisig drive follow:
 
@@ -934,12 +934,12 @@ Note: starting from the second commit, it is technically possible to corrupt the
 A reasonable target deployment is three stage drives, one provision drive and one multisig drive.
 
 - **development** - staged for developer team experimentation
-- **staging** - staged for wider developer and technical stakeholders, more stable than development,
+- **staging** - staged for wider developer and technical stakeholders, more stable than development
 - **rc** - staged release candidate, ultra stable
 - **prerelease** - provisioned from rc source
 - **production** - multisig'd from prerelease source
 
-Besides these ephemeral release lines, additional internal lines can be staged and seeded at-will for experiments, hotfixes, feature spikes, forks and instrumented builds for shared debugging. Whether ephmeral or longlived these can all be categorized as custom lines.
+Besides these ephemeral release lines, additional internal lines can be staged and seeded at-will for experiments, hotfixes, feature spikes, forks and instrumented builds for shared debugging. Whether ephemeral or long-lived these can all be categorized as custom lines.
 
 ```mermaid
 graph LR
@@ -1009,7 +1009,7 @@ Start app in development mode.
 npm start
 ```
 
-Uses: `electron-forge start`
+Uses: `electron-forge start -- --no-updates`
 
 ---
 
@@ -1023,7 +1023,7 @@ npm run lint
 
 Runs:
 
-- `prettier --check`
+- `prettier --check .`
 - `lunte`
 
 ---
@@ -1051,7 +1051,7 @@ Package app without creating distributables.
 npm run package
 ```
 
-Uses: `electron-forge package`
+Runs: `electron-forge package`
 
 ---
 
@@ -1063,6 +1063,8 @@ Create distributables on Linux.
 npm run make:linux
 ```
 
+Runs: `electron-forge package && ./scripts/build-app-image.sh`
+
 ---
 
 ### `npm run make:darwin` <a name="script-make-darwin"></a>
@@ -1072,6 +1074,8 @@ Create distributables on macOS.
 ```sh
 npm run make:darwin
 ```
+
+Runs: `electron-forge make --platform=darwin`
 
 ---
 
@@ -1083,7 +1087,7 @@ Create distributables on Windows.
 npm run make:win32
 ```
 
-Uses: `electron-forge make`
+Runs: `electron-forge make --platform=win32`
 
 ---
 
