@@ -128,8 +128,8 @@ To disable updates as an application default, ensure that the package.json is sp
 
 #### Runtime Update Flow <a name="runtime-update-flow"></a>
 
-A running application will receive `updating` and `update` events, which are sent to the electron renderer
-process via `bridge.onPearEvent()`. After receiving the `update` event, the `bridge.applyUpdate()` method is called. This swaps the current application path with a path to the updated application build and then removes the old application from disk. So once the application is restarted, the application path contains the new build therefore the updated application is executed on restart.
+A running application will receive `updating` and `updated` events, which are sent to the electron renderer
+process via `bridge.onPearEvent()`. After receiving the `updated` event, the `bridge.applyUpdate()` method is called. This swaps the current application path with a path to the updated application build and then removes the old application from disk. So once the application is restarted, the application path contains the new build therefore the updated application is executed on restart.
 
 ### Storage <a name="storage"></a>
 
@@ -418,10 +418,10 @@ Set the `package.json` `upgrade` field:
 }
 ```
 
-To set the upgrade link from the command line `npm set pkg upgrade=<link>` can be used:
+To set the upgrade link from the command line `npm pkg set upgrade=<link>` can be used:
 
 ```sh
-npm set pkg upgrade=pear://qxenz5wmspmryjc13m9yzsqj1conqotn8fb4ocbufwtz9mtbqq5o
+npm pkg set upgrade=pear://qxenz5wmspmryjc13m9yzsqj1conqotn8fb4ocbufwtz9mtbqq5o
 ```
 
 #### 2. Version <a name="version"></a>
@@ -472,7 +472,7 @@ NOTE: If using pear <= v2.2.15 then `{ "pear": {"stage": {"includes": [".github"
 Supply signing and notarizing keys with `MAC_CODESIGN_IDENTITY`, `APPLE_TEAM_ID`, `APPLE_ID`, `APPLE_PASSWORD`
 
 ```sh
-MAC_CODESIGN_IDENTITY=identity APPLE_TEAM_ID=teamid APPLE_ID=id APPLE_PASSWORD=pw npm run make
+MAC_CODESIGN_IDENTITY=identity APPLE_TEAM_ID=teamid APPLE_ID=id APPLE_PASSWORD=pw npm run make:darwin
 ```
 
 Instructions for obtaining credentials can be found [here][electron-forge-macos-signing]
@@ -1009,7 +1009,7 @@ Start app in development mode.
 npm start
 ```
 
-Uses: `electron-forge start`
+Uses: `electron-forge start -- --no-updates`
 
 ---
 
@@ -1023,7 +1023,7 @@ npm run lint
 
 Runs:
 
-- `prettier --check`
+- `prettier --check .`
 - `lunte`
 
 ---
@@ -1051,7 +1051,7 @@ Package app without creating distributables.
 npm run package
 ```
 
-Uses: `electron-forge package`
+Runs: `electron-forge package`
 
 ---
 
@@ -1063,6 +1063,8 @@ Create distributables on Linux.
 npm run make:linux
 ```
 
+Runs: `electron-forge package && ./scripts/build-app-image.sh`
+
 ---
 
 ### `npm run make:darwin` <a name="script-make-darwin"></a>
@@ -1072,6 +1074,8 @@ Create distributables on macOS.
 ```sh
 npm run make:darwin
 ```
+
+Runs: `electron-forge make --platform=darwin`
 
 ---
 
@@ -1083,7 +1087,7 @@ Create distributables on Windows.
 npm run make:win32
 ```
 
-Uses: `electron-forge make`
+Runs: `electron-forge make --platform=win32`
 
 ---
 
