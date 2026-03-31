@@ -426,7 +426,7 @@ npm set pkg upgrade=pear://qxenz5wmspmryjc13m9yzsqj1conqotn8fb4ocbufwtz9mtbqq5o
 
 #### 2. Version <a name="version"></a>
 
-If this is first time leave the version at 1.0.0 and skip to Make distributables.
+If this is the first time leave the version at 1.0.0 and skip to Make distributables.
 
 Use the `package.json` `version` field to set the version.
 
@@ -608,7 +608,7 @@ First perform a dry run:
 pear stage --dry-run pear://qxenz5wmspmryjc13m9yzsqj1conqotn8fb4ocbufwtz9mtbqq5o ./hello-pear-electron-1.0.0
 ```
 
-The `pear stage` command will output file diffs showing memory sizes per file for additions, deletions and changes. Since it's a dry run no updates will have occurred. It's important to go through this output and check each file change is as expected. Once satisified then run the operation for real:
+The `pear stage` command will output file diffs showing memory sizes per file for additions, deletions and changes. Since it's a dry run no updates will have occurred. It's important to go through this output and check each file change is as expected. Once satisfied then run the operation for real:
 
 ```sh
 pear stage pear://qxenz5wmspmryjc13m9yzsqj1conqotn8fb4ocbufwtz9mtbqq5o ./hello-pear-electron-1.0.0
@@ -664,7 +664,7 @@ First execute a provision dry run:
 pear provision --dry-run pear://0.1079.qxenz5wmspmryjc13m9yzsqj1conqotn8fb4ocbufwtz9mtbqq5o pear://q9sopzoqgas9usoiq7uzkkwngm5pzj4zo3n4esjwwbmw6offis8o pear://0.0.q9sopzoqgas9usoiq7uzkkwngm5pzj4zo3n4esjwwbmw6offis8o
 ```
 
-The `pear provision` command will output file diffs showing memory sizes per file for additions, deletions and changes. Since it's a dry run no updates will have occurred. It's important to go through this output and check each file change is as expected. Once satisified then run the operation for real:
+The `pear provision` command will output file diffs showing memory sizes per file for additions, deletions and changes. Since it's a dry run no updates will have occurred. It's important to go through this output and check each file change is as expected. Once satisfied then run the operation for real:
 
 ```sh
 pear provision pear://0.1079.qxenz5wmspmryjc13m9yzsqj1conqotn8fb4ocbufwtz9mtbqq5o pear://q9sopzoqgas9usoiq7uzkkwngm5pzj4zo3n4esjwwbmw6offis8o pear://0.0.q9sopzoqgas9usoiq7uzkkwngm5pzj4zo3n4esjwwbmw6offis8o
@@ -676,7 +676,7 @@ The `package.json` `upgrade` field determines where the app updates from, so to 
 
 - [1. Set upgrade link](#set-upgrade-link)
 
-Since this an update, it should be versioned:
+Since this is an update, it should be versioned:
 
 - [2. Version](#version)
 
@@ -732,7 +732,7 @@ A multisig'd application drive is not machine-bound. Write access is determined 
 
 A multisig key is defined by a `namespace` (an arbitrary string), a list of signing keys, and a quorum.
 
-There are three setups steps and four common release steps.
+There are three setup steps and four common release steps.
 
 To setup a Multisig drive follow:
 
@@ -934,12 +934,12 @@ Note: starting from the second commit, it is technically possible to corrupt the
 A reasonable target deployment is three stage drives, one provision drive and one multisig drive.
 
 - **development** - staged for developer team experimentation
-- **staging** - staged for wider developer and technical stakeholders, more stable than development,
+- **staging** - staged for wider developer and technical stakeholders, more stable than development
 - **rc** - staged release candidate, ultra stable
 - **prerelease** - provisioned from rc source
 - **production** - multisig'd from prerelease source
 
-Besides these ephemeral release lines, additional internal lines can be staged and seeded at-will for experiments, hotfixes, feature spikes, forks and instrumented builds for shared debugging. Whether ephmeral or longlived these can all be categorized as custom lines.
+Besides these ephemeral release lines, additional internal lines can be staged and seeded at-will for experiments, hotfixes, feature spikes, forks and instrumented builds for shared debugging. Whether ephemeral or long-lived these can all be categorized as custom lines.
 
 ```mermaid
 graph LR
