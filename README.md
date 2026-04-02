@@ -795,7 +795,7 @@ Each signer should take note of the public key and provide it as their signing k
 
 #### 7b. Create Multisig Config <a name="create-multisig-config"></a>
 
-Set the `pear.multisig` property in `package.json` to an object with a `namespace` string, `quorom` number and the public key strings of each signer on the `signers` array property:
+Set the `pear.multisig` property in `package.json` to an object with a `namespace` string, `quorum` number and the public key strings of each signer on the `signers` array property:
 
 ```json
 {
@@ -882,7 +882,7 @@ To check for formal mistakes before signing be sure to verify. Do not sign a bui
 pear multisig verify <signing request> [...responses]
 ```
 
-Run the command without responses to verify the request, then once reponses are provided run the command again passing responses in as additional parameters after the `<signing request>`.
+Run the command without responses to verify the request, then once responses are provided run the command again passing responses in as additional parameters after the `<signing request>`.
 
 #### 7g. Commit <a name="commit"></a>
 
