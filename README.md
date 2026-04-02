@@ -522,7 +522,7 @@ npm run make:linux
 
 Each make runs on a different OS and architecture.
 
-Use [`pear build`][pear build] to assemble all architecture builds into a single multi-architecture directory, referred to as the **Deployment Directory**.
+Use `pear build` to assemble all architecture builds into a single multi-architecture directory, referred to as the **Deployment Directory**.
 
 ```mermaid
 graph BT
