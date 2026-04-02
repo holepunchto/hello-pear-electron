@@ -17,7 +17,7 @@ const appName = productName ?? name
 
 const cmd = command(
   appName,
-  flag('--storage', 'pass custom storage to pear-runtime'),
+  flag('--storage <dir>', 'use a custom Pear runtime data directory'),
   flag('--no-updates', 'start without OTA updates')
 )
 
