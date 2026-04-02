@@ -1,0 +1,11 @@
+{
+  "multisig": {
+    "publicKeys": [
+      "<pubkey1>",
+      "<pubkey2>",
+      "<pubkey3>"
+    ],
+    "namespace": "holepunchto/hello-pear-electron",
+    "quorum": 2
+  }
+}

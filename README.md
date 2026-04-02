@@ -316,7 +316,7 @@ Stakeholders can open a [Release Line Build](#release-line-builds) pointing to t
 Once a multisig link exists, the provision command is always:
 
 ```sh
-pear provision <pear://<fork>.<length>.<stage-key> <pear://<provision-key>> <pear://<fork>.<length>.<multisig-key>
+pear provision <pear://<fork>.<length>.<stage-key> <pear://<provision-key> <pear://<fork>.<length>.<multisig-key>
 ```
 
 - [6. Provision](#provision)
@@ -795,21 +795,19 @@ Each signer should take note of the public key and provide it as their signing k
 
 #### 7b. Create Multisig Config <a name="create-multisig-config"></a>
 
-Set the `pear.multisig` property in `package.json` to an object with a `namespace` string, `quorum` number and the public key strings of each signer on the `signers` array property:
+Create/edit a `pear.json` file and set the `multisig` property to an object with a `namespace` string, `quorom` number and the public key strings of each signer on the `publicKeys` array property:
 
 ```json
 {
-  "pear": {
-    "multisig": {
-      "signers": ["<pubkey1>", "<pubkey2>", "<pubkey3>"],
-      "namespace": "holepunchto/hello-pear-electron",
-      "quorum": 2
-    }
+  "multisig": {
+    "publicKeys": ["<pubkey1>", "<pubkey2>", "<pubkey3>"],
+    "namespace": "holepunchto/hello-pear-electron",
+    "quorum": 2
   }
 }
 ```
 
-This configuration has three signers with a quorum of 2. So two signers out of three can trigger a production release.
+This example configuration has three signers with a quorum of two. So 2/3 signers can trigger a production release.
 
 #### 7c. Set `upgrade` field to Multisig Link <a name="set-multisig-link"></a>
 
@@ -879,39 +877,40 @@ Then share the response. Once a quorum of signers (2 in the example) share their
 To check for formal mistakes before signing be sure to verify. Do not sign a build if verification fails.
 
 ```sh
-pear multisig verify <signing request> [...responses]
+pear multisig verify <source-link> <signing request> [...responses]
 ```
 
-Run the command without responses to verify the request, then once responses are provided run the command again passing responses in as additional parameters after the `<signing request>`.
+For multisigging a production release the `<source-link>` should be a provisioned link, but a staged link will also work.
+
+Run the command without responses to verify the request, then once reponses are provided run the command again passing responses in as additional parameters after the `<signing request>`.
 
 #### 7g. Commit <a name="commit"></a>
+
+It does not matter on which machine the commit is run.
 
 Only commit after verifying the request and all responses.
 
 ```sh
-pear multisig commit <signing request>
+pear multisig commit <source-link> <signing request>
 ```
+
+For multisigging a production release the `<source-link>` should be a provisioned link, but a staged link will also work.
 
 The commit is not safely finished until that drive's key is seeded by peers.
 
-The logs indicate when to verify reseeding:
-
-```
-Committing the core...
-Committed the core (key <target key>)
-Waiting for remote seeders to pick up the changes...
-Please add this key to the seeders now. The logs here will notify you when it is picked up by them. Do not shut down until that happens.
-```
+Make sure it's seeding with `pear seed <multisig-link>`, the output will show the same.
 
 Once the program detects at least 2 seeders have fully downloaded the multisig drive, it is safe to shut it down (ctrl-c).
 
 Never abort a commit while it is running. If a commit does get aborted while running, run the commit again as soon as possible, since the production build is then stuck in an intermediate state.
 
-It does not matter on which machine the commit is run. So in case of a computer crash, just ask someone else to run the commit.
-
 It need not be a signer who commits as the request and the responses suffice to generate the build. This is the reason why `pear multisig` verifies that the source drive is well seeded.
 
-Note: starting from the second commit, it is technically possible to corrupt the production build. So if a command ever errors with an `INCOMPATIBLE_SOURCE_AND_TARGET` error, never try to work around it, the only safe way to proceed is by creating reseeding the provision on other peers.
+Any multisig'd link can be queried for public signing keys and quorom with:
+
+```sh
+pear info --multisig <link>
+```
 
 ### Practices <a name="practices"></a>
 
@@ -1135,9 +1134,7 @@ Then provision to the new prerelease key with stage key as source.
 pear provision <versioned-stage-key> <target-key> <versioned-production-key>
 ```
 
-Then set the new provision link key as the `srcKey` of the `multisig.json` config.
-
-- [7b. Create Multisig Config](#create-multisig-config)
+Then pass this new provision link to `pear multisig verify` and `pear multisig commit` commands.
 
 ### `pear stage` is showing unexpected size increases <a name="stage-size-increases"></a>
 
@@ -1171,6 +1168,27 @@ pear-build ... --package ./my-app/package.json # <-- do this
 ```
 
 That will output a build folder per version e.g. `hello-pear-electron-v1.2.3` creating a deploy folder per deploy. This can be very useful for reviewing any deployment issues and for quickly rolling back to a prior version (i.e. stage -> provision -> multisig from an older build folder).
+
+### `pear multisig commit` errors with `INCOMPATIBLE_SOURCE_AND_TARGET` error
+
+Starting from the second commit, it is technically possible to corrupt the production build e.g. due to accidental interuption. So if a command ever errors with an `INCOMPATIBLE_SOURCE_AND_TARGET` error, never try to work around it. The only safe way to proceed is by creating a new source link using `pear provision`.
+
+```sh
+pear touch
+```
+
+```sh
+pear provision <source-verlink> <touched-link> <production-multisig-link>
+```
+
+Where source-verlink is the link used as the source of the original provisioned drive.
+
+Then commit with 
+
+```sh
+pear multisig commit <touched-link> <request> ...responses
+```
+
 
 <!-- Reference Links -->
 

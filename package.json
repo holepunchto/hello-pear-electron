@@ -2,18 +2,7 @@
   "name": "hello-pear-electron",
   "productName": "HelloPear",
   "version": "1.0.0",
-  "upgrade": "pear://69qwbihxj4c8te15wt3skj4j1g3ufmbo3mperedjqr1hb55mspoo",
-  "pear": {
-    "multisig": {
-      "signers": [
-        "<SIGNING KEY HERE>",
-        "<SIGNING KEY HERE>",
-        "<SIGNING KEY HERE>"
-      ],
-      "namespace": "holepunchto/hello-pear-electron",
-      "quorum": 2
-    }
-  },
+  "upgrade": "pear://bsy1bp4xwcbpmatumwhouhtzd9mbqjzj731by5ruz8ismq8ry5yy",
   "description": "",
   "license": "",
   "author": "",
