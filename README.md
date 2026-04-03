@@ -795,7 +795,7 @@ Each signer should take note of the public key and provide it as their signing k
 
 #### 7b. Create Multisig Config <a name="create-multisig-config"></a>
 
-Create/edit a `pear.json` file and set the `multisig` property to an object with a `namespace` string, `quorom` number and the public key strings of each signer on the `publicKeys` array property:
+Create/edit a `pear.json` file and set the `multisig` property to an object with a `namespace` string, `quorum` number and the public key strings of each signer on the `publicKeys` array property:
 
 ```json
 {
@@ -906,7 +906,7 @@ Never abort a commit while it is running. If a commit does get aborted while run
 
 It need not be a signer who commits as the request and the responses suffice to generate the build. This is the reason why `pear multisig` verifies that the source drive is well seeded.
 
-Any multisig'd link can be queried for public signing keys and quorom with:
+Any multisig'd link can be queried for public signing keys and quorum with:
 
 ```sh
 pear info --multisig <link>
