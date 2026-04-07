@@ -1183,12 +1183,11 @@ pear provision <source-verlink> <touched-link> <production-multisig-link>
 
 Where source-verlink is the link used as the source of the original provisioned drive.
 
-Then commit with 
+Then commit with
 
 ```sh
 pear multisig commit <touched-link> <request> ...responses
 ```
-
 
 <!-- Reference Links -->
 
