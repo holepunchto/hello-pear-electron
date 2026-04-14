@@ -1,6 +1,8 @@
 const { app, BrowserWindow, ipcMain } = require('electron')
 const os = require('os')
 const path = require('path')
+const Hyperswarm = require('hyperswarm')
+const Corestore = require('corestore')
 const PearRuntime = require('pear-runtime')
 
 const { isMac, isLinux, isWindows } = require('which-runtime')
@@ -30,7 +32,7 @@ ipcMain.on('pkg', (evt) => {
   evt.returnValue = pkg
 })
 
-function getPear() {
+async function getPear() {
   if (pear) return pear
   const appPath = getAppPath()
   let dir = null
@@ -48,13 +50,24 @@ function getPear() {
   }
 
   const extension = isLinux ? '.AppImage' : isMac ? '.app' : '.msix'
+  const store = new Corestore(path.join(dir, 'pear-runtime/corestore'))
+  const keyPair = await store.createKeyPair('pear-runtime')
+  const swarm = new Hyperswarm({ keyPair })
   pear = new PearRuntime({
     dir,
     app: appPath,
     updates,
     version,
     upgrade,
-    name: productName + extension
+    win32: { restart: true },
+    name: productName + extension,
+    store,
+    swarm
+  })
+  swarm.on('connection', (connection) => store.replicate(connection))
+  swarm.join(pear.updater.drive.core.discoveryKey, {
+    client: true,
+    server: false
   })
   pear.on('error', console.error) // print network errors, etc.
   return pear
@@ -73,9 +86,9 @@ function sendToAll(name, data) {
   }
 }
 
-function getWorker(specifier) {
+async function getWorker(specifier) {
   if (workers.has(specifier)) return workers.get(specifier)
-  const pear = getPear()
+  const pear = await getPear()
   const worker = pear.run(require.resolve('..' + specifier), [pear.storage])
   function sendWorkerStdout(data) {
     sendToAll('pear:worker:stdout:' + specifier, data)
@@ -121,7 +134,7 @@ async function createWindow() {
     }
   })
 
-  const pear = getPear()
+  const pear = await getPear()
 
   const onUpdating = () => {
     if (!win.isDestroyed()) win.webContents.send('pear:event:updating')
@@ -150,9 +163,12 @@ async function createWindow() {
   await win.loadFile(path.join(__dirname, '..', 'renderer', 'index.html'))
 }
 
-ipcMain.handle('pear:applyUpdate', () => getPear().updater.applyUpdate())
-ipcMain.handle('pear:startWorker', (evt, filename) => {
-  getWorker(filename)
+ipcMain.handle('pear:applyUpdate', async () => {
+  const pear = await getPear()
+  pear.updater.applyUpdate()
+})
+ipcMain.handle('pear:startWorker', async (evt, filename) => {
+  await getWorker(filename)
   return true
 })
 ipcMain.handle('app:restart', () => {
