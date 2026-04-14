@@ -1,0 +1,169 @@
+name: Build Release
+
+on:
+  workflow_call:
+    inputs:
+      channel:
+        type: string
+        default: ''
+      version:
+        type: string
+        default: ''
+      run-stage:
+        type: boolean
+        default: false
+
+  workflow_dispatch:
+    inputs:
+      channel:
+        type: choice
+        description: Select the channel
+        default: nightly
+        options:
+          - nightly
+          - internal
+          - production
+        required: true
+      upgrade-key:
+        description: Value for package.json upgrade field
+        required: false
+      run-stage:
+        type: boolean
+        description: Stage the build
+        default: false
+
+env:
+  CHANNEL: ${{ inputs.channel || github.event.inputs.channel || 'nightly' }}
+
+jobs:
+  build-linux-x64:
+    permissions:
+      contents: write # to upload artifacts
+      packages: read
+    runs-on: ubuntu-latest
+    environment: release
+    outputs:
+      artifact-links: ${{ steps.build.outputs.artifact-links }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: holepunchto/actions/make-pear-app@v1
+        id: build
+        with:
+          channel: ${{ env.CHANNEL }}
+          upgrade_key: >-
+            ${{ github.event.inputs['upgrade-key']
+              || (env.CHANNEL == 'nightly' && secrets.NIGHTLY_KEY)
+              || (env.CHANNEL == 'internal' && secrets.INTERNAL_KEY) }}
+
+  build-linux-arm:
+    permissions:
+      contents: write # to upload artifacts
+      packages: read
+    runs-on: ubuntu-24.04-arm
+    environment: release
+    outputs:
+      artifact-links: ${{ steps.build.outputs.artifact-links }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: holepunchto/actions/make-pear-app@v1
+        id: build
+        with:
+          channel: ${{ env.CHANNEL }}
+          upgrade_key: >-
+            ${{ github.event.inputs['upgrade-key']
+              || (env.CHANNEL == 'nightly' && secrets.NIGHTLY_KEY)
+              || (env.CHANNEL == 'internal' && secrets.INTERNAL_KEY) }}
+
+  build-macos:
+    permissions:
+      contents: write # to upload artifacts
+      packages: read
+    runs-on: macos-latest
+    environment: release
+    outputs:
+      artifact-links: ${{ steps.build.outputs.artifact-links }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: holepunchto/actions/make-pear-app@v1
+        id: build
+        with:
+          channel: ${{ env.CHANNEL }}
+          upgrade_key: >-
+            ${{ github.event.inputs['upgrade-key']
+              || (env.CHANNEL == 'nightly' && secrets.NIGHTLY_KEY)
+              || (env.CHANNEL == 'internal' && secrets.INTERNAL_KEY) }}
+          macos_certificate_base64: ${{ secrets.CERTIFICATE_P12 }}
+          macos_p12_password: ${{ secrets.CERTIFICATE_PASSWORD }}
+          macos_codesign_identity: ${{ secrets.MAC_CODESIGN_IDENTITY }}
+          macos_notarization_method: apple_id_password
+          macos_apple_id: ${{ secrets.APPLE_ID }}
+          macos_apple_password: ${{ secrets.APPLE_PASSWORD }}
+          macos_apple_team_id: ${{ secrets.APPLE_TEAM_ID }}
+
+  build-win32:
+    permissions:
+      contents: write # to upload artifacts
+      packages: read
+    runs-on: windows-signer
+    environment: release
+    outputs:
+      artifact-links: ${{ steps.build.outputs.artifact-links }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: holepunchto/actions/make-pear-app@v1
+        id: build
+        with:
+          channel: ${{ env.CHANNEL }}
+          upgrade_key: >-
+            ${{ github.event.inputs['upgrade-key']
+              || (env.CHANNEL == 'nightly' && secrets.NIGHTLY_KEY)
+              || (env.CHANNEL == 'internal' && secrets.INTERNAL_KEY) }}
+          windows_cert_sha1: E890AF027C9C83F7427BCEEBE7AC533579DFE549
+
+  stage:
+    needs: [build-linux-x64, build-linux-arm, build-macos, build-win32]
+    if: >-
+      ${{ !cancelled()
+        && (inputs.run-stage == true || github.event.inputs['run-stage'] == 'true')
+        && needs.build-linux-x64.result == 'success'
+        && needs.build-linux-arm.result == 'success'
+        && needs.build-macos.result == 'success'
+        && needs.build-win32.result == 'success' }}
+    runs-on: macos-latest
+    environment: release
+    outputs:
+      source-verlink: ${{ steps.stage.outputs.source-verlink }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 'latest'
+
+      - uses: actions/download-artifact@v4
+        with:
+          path: out/artifacts
+
+      - name: Build stage artifact
+        env:
+          CHANNEL: ${{ env.CHANNEL }}
+          BUILD_VERSION: ${{ inputs.version }}
+        run: |
+          ./scripts/build-stage-artifact.sh out/artifacts out/keet-desktop-stage
+
+      - name: Install tools
+        run: npm install -g corestore-snapshot pear-stage-next
+
+      - name: Open Snapshot
+        run: corestore-snapshot --open --snapshot=./ci/snapshot.json --storage=/tmp/store --primary-key=${{ secrets.PEAR_PRIMARY_KEY }}
+
+      - name: Stage next
+        id: stage
+        run: |
+          VERLINK=$(pear-stage-next --storage=/tmp/store --target=./out/keet-desktop-stage --primary-key=${{ secrets.PEAR_PRIMARY_KEY }} --name=${{ env.CHANNEL }}-v4)
+          echo "$VERLINK"
+          echo "source-verlink=$VERLINK" >> "$GITHUB_OUTPUT"
+
+      - name: Close Snapshot
+        run: corestore-snapshot --close --snapshot=./ci/snapshot.json --storage=/tmp/store --primary-key=${{ secrets.PEAR_PRIMARY_KEY }}
