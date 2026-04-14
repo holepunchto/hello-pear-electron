@@ -9,15 +9,9 @@ on:
       version:
         type: string
         default: ''
-      notify:
-        type: boolean
-        default: true
       run-stage:
         type: boolean
         default: false
-
-  repository_dispatch:
-    types: [multisig-requested, multisig-committed]
 
   workflow_dispatch:
     inputs:
@@ -37,17 +31,12 @@ on:
         type: boolean
         description: Stage the build
         default: false
-      notify:
-        type: boolean
-        description: Notify to Slack
-        default: true
 
 env:
   CHANNEL: ${{ inputs.channel || github.event.inputs.channel || 'nightly' }}
 
 jobs:
   build-linux-x64:
-    if: github.event_name != 'repository_dispatch' || github.event.action == 'multisig-committed'
     permissions:
       contents: write # to upload artifacts
       packages: read
@@ -62,13 +51,11 @@ jobs:
         with:
           channel: ${{ env.CHANNEL }}
           upgrade_key: >-
-            ${{ github.event.client_payload.multisig_verlink
-              || github.event.inputs['upgrade-key']
-              || ((inputs.channel || github.event.inputs.channel) == 'nightly' && secrets.NIGHTLY_KEY)
-              || ((inputs.channel || github.event.inputs.channel) == 'internal' && secrets.INTERNAL_KEY) }}
+            ${{ github.event.inputs['upgrade-key']
+              || (env.CHANNEL == 'nightly' && secrets.NIGHTLY_KEY)
+              || (env.CHANNEL == 'internal' && secrets.INTERNAL_KEY) }}
 
   build-linux-arm:
-    if: github.event_name != 'repository_dispatch' || github.event.action == 'multisig-committed'
     permissions:
       contents: write # to upload artifacts
       packages: read
@@ -83,13 +70,11 @@ jobs:
         with:
           channel: ${{ env.CHANNEL }}
           upgrade_key: >-
-            ${{ github.event.client_payload.multisig_verlink
-              || github.event.inputs['upgrade-key']
-              || ((inputs.channel || github.event.inputs.channel) == 'nightly' && secrets.NIGHTLY_KEY)
-              || ((inputs.channel || github.event.inputs.channel) == 'internal' && secrets.INTERNAL_KEY) }}
+            ${{ github.event.inputs['upgrade-key']
+              || (env.CHANNEL == 'nightly' && secrets.NIGHTLY_KEY)
+              || (env.CHANNEL == 'internal' && secrets.INTERNAL_KEY) }}
 
   build-macos:
-    if: github.event_name != 'repository_dispatch' || github.event.action == 'multisig-committed'
     permissions:
       contents: write # to upload artifacts
       packages: read
@@ -104,10 +89,9 @@ jobs:
         with:
           channel: ${{ env.CHANNEL }}
           upgrade_key: >-
-            ${{ github.event.client_payload.multisig_verlink
-              || github.event.inputs['upgrade-key']
-              || ((inputs.channel || github.event.inputs.channel) == 'nightly' && secrets.NIGHTLY_KEY)
-              || ((inputs.channel || github.event.inputs.channel) == 'internal' && secrets.INTERNAL_KEY) }}
+            ${{ github.event.inputs['upgrade-key']
+              || (env.CHANNEL == 'nightly' && secrets.NIGHTLY_KEY)
+              || (env.CHANNEL == 'internal' && secrets.INTERNAL_KEY) }}
           macos_certificate_base64: ${{ secrets.CERTIFICATE_P12 }}
           macos_p12_password: ${{ secrets.CERTIFICATE_PASSWORD }}
           macos_codesign_identity: ${{ secrets.MAC_CODESIGN_IDENTITY }}
@@ -117,7 +101,6 @@ jobs:
           macos_apple_team_id: ${{ secrets.APPLE_TEAM_ID }}
 
   build-win32:
-    if: github.event_name != 'repository_dispatch' || github.event.action == 'multisig-committed'
     permissions:
       contents: write # to upload artifacts
       packages: read
@@ -132,17 +115,15 @@ jobs:
         with:
           channel: ${{ env.CHANNEL }}
           upgrade_key: >-
-            ${{ github.event.client_payload.multisig_verlink
-              || github.event.inputs['upgrade-key']
-              || ((inputs.channel || github.event.inputs.channel) == 'nightly' && secrets.NIGHTLY_KEY)
-              || ((inputs.channel || github.event.inputs.channel) == 'internal' && secrets.INTERNAL_KEY) }}
+            ${{ github.event.inputs['upgrade-key']
+              || (env.CHANNEL == 'nightly' && secrets.NIGHTLY_KEY)
+              || (env.CHANNEL == 'internal' && secrets.INTERNAL_KEY) }}
           windows_cert_sha1: E890AF027C9C83F7427BCEEBE7AC533579DFE549
 
   stage:
     needs: [build-linux-x64, build-linux-arm, build-macos, build-win32]
     if: >-
       ${{ !cancelled()
-        && github.event_name != 'repository_dispatch'
         && (inputs.run-stage == true || github.event.inputs['run-stage'] == 'true')
         && needs.build-linux-x64.result == 'success'
         && needs.build-linux-arm.result == 'success'
@@ -158,7 +139,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "latest"
+          node-version: 'latest'
 
       - uses: actions/download-artifact@v4
         with:
@@ -180,156 +161,9 @@ jobs:
       - name: Stage next
         id: stage
         run: |
-          VERLINK=$(pear-stage-next --storage=/tmp/store --target=./out/keet-desktop-stage --primary-key=${{ secrets.PEAR_PRIMARY_KEY }} --name=${{ inputs.channel }}-v4)
+          VERLINK=$(pear-stage-next --storage=/tmp/store --target=./out/keet-desktop-stage --primary-key=${{ secrets.PEAR_PRIMARY_KEY }} --name=${{ env.CHANNEL }}-v4)
           echo "$VERLINK"
           echo "source-verlink=$VERLINK" >> "$GITHUB_OUTPUT"
 
       - name: Close Snapshot
         run: corestore-snapshot --close --snapshot=./ci/snapshot.json --storage=/tmp/store --primary-key=${{ secrets.PEAR_PRIMARY_KEY }}
-
-      - name: Create PR with snapshot
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          BRANCH="snapshot/update-${{ github.run_number }}"
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git fetch origin main
-          git checkout -b "$BRANCH" origin/main
-          git add ci/snapshot.json
-          git commit -m "ci: update snapshot.json with new stage"
-          git push origin "$BRANCH"
-          gh pr create \
-            --title "ci: update snapshot.json" \
-            --body "Automated snapshot update from workflow run #${{ github.run_number }}." \
-            --base "main" \
-            --head "$BRANCH"
-
-  notify:
-    needs: [build-linux-x64, build-linux-arm, build-macos, build-win32, stage]
-    if: ${{ !cancelled() && always() && (inputs.notify || github.event_name == 'repository_dispatch') }}
-    runs-on: ubuntu-latest
-    environment: release
-    env:
-      SOURCE_VERLINK: ${{ needs.stage.outputs.source-verlink }}
-      UPGRADE_KEY: >-
-        ${{ github.event.inputs['upgrade-key']
-          || ((inputs.channel || github.event.inputs.channel) == 'nightly' && secrets.NIGHTLY_KEY)
-          || ((inputs.channel || github.event.inputs.channel) == 'internal' && secrets.INTERNAL_KEY) }}
-    steps:
-      - uses: actions/checkout@v4
-        if: inputs.notify
-        with:
-          fetch-depth: 500
-
-      - name: Install node
-        uses: actions/setup-node@v3
-        with:
-          node-version: lts/*
-          registry-url: 'https://npm.pkg.github.com'
-          scope: '@holepunchto'
-
-      - name: Build Message
-        id: message
-        env:
-          CHANNEL: ${{ env.CHANNEL }}
-          SOURCE_VERLINK: ${{ env.SOURCE_VERLINK }}
-          UPGRADE_KEY: ${{ env.UPGRADE_KEY }}
-          MULTISIG_VERLINK: ${{ github.event.client_payload.multisig_verlink }}
-          MULTISIG_MESSAGE: ${{ github.event.client_payload.message }}
-          BUILD_LINUX_X64_RESULT: ${{ needs.build-linux-x64.result }}
-          BUILD_LINUX_ARM_RESULT: ${{ needs.build-linux-arm.result }}
-          BUILD_MACOS_RESULT: ${{ needs.build-macos.result }}
-          BUILD_WINDOWS_RESULT: ${{ needs.build-win32.result }}
-          BUILD_LINUX_X64_ARTIFACT_LINKS: ${{ needs.build-linux-x64.outputs.artifact-links }}
-          BUILD_LINUX_ARM_ARTIFACT_LINKS: ${{ needs.build-linux-arm.outputs.artifact-links }}
-          BUILD_MACOS_ARTIFACT_LINKS: ${{ needs.build-macos.outputs.artifact-links }}
-          BUILD_WINDOWS_ARTIFACT_LINKS: ${{ needs.build-win32.outputs.artifact-links }}
-          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
-        run: |
-          if [[ "${{ github.event.action }}" == "multisig-requested" ]]; then
-            message="$MULTISIG_MESSAGE"
-          elif [[ "${{ github.event.action }}" == "multisig-committed" ]]; then
-            if [[ "$BUILD_LINUX_X64_RESULT" == "success" && "$BUILD_LINUX_ARM_RESULT" == "success" && "$BUILD_MACOS_RESULT" == "success" && "$BUILD_WINDOWS_RESULT" == "success" ]]; then
-              printf -v message ':keet2: Desktop update live\n\nUpgrade key: `%s`\n\n:linux: %s\n:linux: %s\n:apple-mac: %s\n:windows: %s' \
-                "$MULTISIG_VERLINK" \
-                "$BUILD_LINUX_X64_ARTIFACT_LINKS" "$BUILD_LINUX_ARM_ARTIFACT_LINKS" "$BUILD_MACOS_ARTIFACT_LINKS" "$BUILD_WINDOWS_ARTIFACT_LINKS"
-            else
-              printf -v message ':ga-failed: Desktop multisig build failed\n\n%s' "$RUN_URL"
-            fi
-          else
-            emoji=":package:"
-            case "$CHANNEL" in
-              nightly) emoji=":experimental-bird:" ;;
-              internal) emoji=":internal-bird:" ;;
-              production) emoji=":keet2:" ;;
-            esac
-            if [[ "$BUILD_LINUX_X64_RESULT" == "success" && "$BUILD_LINUX_ARM_RESULT" == "success" && "$BUILD_MACOS_RESULT" == "success" && "$BUILD_WINDOWS_RESULT" == "success" ]]; then
-              if [ -n "$SOURCE_VERLINK" ]; then
-                printf -v message '%s New desktop `%s` build ready\n\nUpgrade key: `%s`\n\n:linux: %s\n:linux: %s\n:apple-mac: %s\n:windows: %s\n\nTo request signatures:\n`git commit --allow-empty -m '"'"'%s multisig request: %s'"'"'`' \
-                  "$emoji" "$CHANNEL" "$UPGRADE_KEY" \
-                  "$BUILD_LINUX_X64_ARTIFACT_LINKS" "$BUILD_LINUX_ARM_ARTIFACT_LINKS" "$BUILD_MACOS_ARTIFACT_LINKS" "$BUILD_WINDOWS_ARTIFACT_LINKS" \
-                  "$CHANNEL" "$SOURCE_VERLINK"
-              else
-                printf -v message '%s New desktop `%s` build ready\n\nUpgrade key: `%s`\n\n:linux: %s\n:linux: %s\n:apple-mac: %s\n:windows: %s' \
-                  "$emoji" "$CHANNEL" "$UPGRADE_KEY" \
-                  "$BUILD_LINUX_X64_ARTIFACT_LINKS" "$BUILD_LINUX_ARM_ARTIFACT_LINKS" "$BUILD_MACOS_ARTIFACT_LINKS" "$BUILD_WINDOWS_ARTIFACT_LINKS"
-              fi
-            else
-              printf -v message ':ga-failed: New desktop `%s` build failed\n\nUpgrade key: `%s`\n\n:linux: %s\n:linux: %s\n:apple-mac: %s\n:windows: %s\n\n%s' \
-                "$CHANNEL" "$UPGRADE_KEY" \
-                "$BUILD_LINUX_X64_RESULT" "$BUILD_LINUX_ARM_RESULT" "$BUILD_MACOS_RESULT" "$BUILD_WINDOWS_RESULT" \
-                "$RUN_URL"
-            fi
-          fi
-
-          {
-            echo "message<<EOF"
-            echo "$message"
-            echo "EOF"
-          } >> "$GITHUB_OUTPUT"
-
-      - name: Resolve build commit variable
-        id: build_commit_var
-        if: inputs.notify
-        run: |
-          case "${{ env.CHANNEL }}" in
-            nightly) variable=BUILD_COMMIT_NIGHTLY ;;
-            internal) variable=BUILD_COMMIT_INTERNAL ;;
-            production) variable=BUILD_COMMIT_PRODUCTION ;;
-            *)
-              echo "Unsupported channel: ${{ env.CHANNEL }}"
-              exit 1
-              ;;
-          esac
-          echo "variable=$variable" >> $GITHUB_OUTPUT
-
-      - name: Read last build commit
-        id: last_commit
-        if: inputs.notify
-        env:
-          GH_TOKEN: ${{ secrets.REPO_VARIABLES_TOKEN }}
-        run: |
-          commit=$(gh variable get "${{ steps.build_commit_var.outputs.variable }}" --json value --jq .value)
-          echo "commit=$commit" >> $GITHUB_OUTPUT
-
-      - name: Slack Notification
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          SLACK_TOKEN: ${{ secrets.SLACK_TOKEN }}
-          SLACK_CHANNEL_ID: ${{ secrets.SLACK_CHANNEL_ID }}
-          SLACK_MESSAGE: ${{ steps.message.outputs.message }}
-        run: |
-          npm install -g bare @holepunchto/ci-tooling
-          if [[ "${{ inputs.notify }}" == "true" ]]; then
-            ci slack --token "$SLACK_TOKEN" --channel "$SLACK_CHANNEL_ID" --message "$SLACK_MESSAGE" --changelog "$(ci changelog --from "${{ steps.last_commit.outputs.commit }}" --slack)"
-          else
-            ci slack --token "$SLACK_TOKEN" --channel "$SLACK_CHANNEL_ID" --message "$SLACK_MESSAGE"
-          fi
-
-      - name: Update build commit
-        if: inputs.notify
-        env:
-          GH_TOKEN: ${{ secrets.REPO_VARIABLES_TOKEN }}
-        run: |
-          gh variable set "${{ steps.build_commit_var.outputs.variable }}" --body "$(git rev-parse HEAD)"

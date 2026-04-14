@@ -39,8 +39,6 @@ jobs:
     if: github.event_name == 'push' && contains(github.event.head_commit.message, 'multisig request:')
     runs-on: ubuntu-latest
     environment: ${{ split(github.event.head_commit.message, ' ')[0] }}
-    permissions:
-      contents: write
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -48,7 +46,6 @@ jobs:
           node-version: lts/*
       - name: Create signing request
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           MULTISIG_QUORUM: ${{ secrets.MULTISIG_QUORUM }}
           MULTISIG_NAMESPACE: ${{ secrets.MULTISIG_NAMESPACE }}
           MULTISIG_PUBKEYS: ${{ secrets.MULTISIG_PUBKEYS }}
@@ -58,70 +55,14 @@ jobs:
           ENV=$(echo "$LINE" | awk '{print $1}')
           ARGS=${LINE#$ENV multisig request: }
           read -ra ARGS <<< "$ARGS"
-          SOURCE_VERLINK=${ARGS[0]}
           ARGS=(--quorum "$MULTISIG_QUORUM" --namespace "$MULTISIG_NAMESPACE" --pubkey ${MULTISIG_PUBKEYS// / --pubkey } "${ARGS[@]}")
-          TMPFILE=$(mktemp)
           REQUEST=$(npx pear-ci-multisig request "${ARGS[@]}" | tee -a "$GITHUB_STEP_SUMMARY")
           {
             echo "Signing request for $ENV multisig. Please gather signatures from the following pubkeys:"
             for KEY in $MULTISIG_PUBKEYS; do echo "  - $KEY"; done
             echo ""
             echo "Each signer runs:"
-            echo "  pear multisig sign $REQUEST"
+            echo "  hypercore-sign $REQUEST"
             echo ""
-            echo "Once a quorum of signers have provided responses, run:"
-            echo "  git commit --allow-empty -m '$ENV multisig commit: $SOURCE_VERLINK $REQUEST <resp1> <resp2>...'"
-          } | tee "$TMPFILE"
-          gh api repos/${{ github.repository }}/dispatches \
-            --method POST \
-            -f event_type=multisig-requested \
-            -f "client_payload[env]=$ENV" \
-            -f "client_payload[source_verlink]=$SOURCE_VERLINK" \
-            -f "client_payload[message]=$(cat "$TMPFILE")"
-
-  commit:
-    if: github.event_name == 'push' && contains(github.event.head_commit.message, 'multisig commit:')
-    runs-on: ubuntu-latest
-    environment: ${{ split(github.event.head_commit.message, ' ')[0] }}
-    permissions:
-      contents: write
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 2
-      - uses: actions/setup-node@v4
-        with:
-          node-version: lts/*
-      - name: Run commit
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          MULTISIG_QUORUM: ${{ secrets.MULTISIG_QUORUM }}
-          MULTISIG_NAMESPACE: ${{ secrets.MULTISIG_NAMESPACE }}
-          MULTISIG_PUBKEYS: ${{ secrets.MULTISIG_PUBKEYS }}
-        run: |
-          set -euo pipefail # stop pipe failures being swallowed by tee
-          LINE=$(git log -1 --format=%B | grep 'multisig commit:')
-
-          PREV_BODY=$(git log HEAD~1 -1 --format=%B)
-          PREV_LINE=$(echo "$PREV_BODY" | grep 'multisig request:')
-          if [ -z "$PREV_LINE" ]; then
-            echo "Error: preceding commit must be a 'multisig request:' commit."
-            exit 1
-          fi
-
-          ENV=$(echo "$LINE" | awk '{print $1}')
-          ARGS=${LINE#$ENV multisig commit: }
-          read -ra ARGS <<< "$ARGS"
-          ARGS=(--quorum "$MULTISIG_QUORUM" --namespace "$MULTISIG_NAMESPACE" --pubkey ${MULTISIG_PUBKEYS// / --pubkey } "${ARGS[@]}")
-          TMPFILE=$(mktemp)
-
-          npx pear-ci-multisig commit "${ARGS[@]}" | tee "$TMPFILE" | tee -a "$GITHUB_STEP_SUMMARY"
-
-          MULTISIG_VERLINK=$(grep '^verlink: ' "$TMPFILE" | awk '{print $2}')
-
-          gh api repos/${{ github.repository }}/dispatches \
-            --method POST \
-            -f event_type=multisig-committed \
-            -f "client_payload[env]=$ENV" \
-            -f "client_payload[multisig_verlink]=$MULTISIG_VERLINK" \
-            -f "client_payload[message]=$(cat "$TMPFILE")"
+            echo "Collect signer responses out-of-band after this request is created."
+          } | tee -a "$GITHUB_STEP_SUMMARY"
