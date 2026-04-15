@@ -155,7 +155,7 @@ ipcMain.handle('pear:startWorker', (evt, filename) => {
   getWorker(filename)
   return true
 })
-ipcMain.handle('app:restart', () => {
+ipcMain.handle('app:afterUpdate', () => {
   if (isLinux && process.env.APPIMAGE) {
     app.relaunch({
       execPath: process.env.APPIMAGE,
@@ -164,7 +164,7 @@ ipcMain.handle('app:restart', () => {
         ...process.argv.slice(1).filter((arg) => arg !== '--appimage-extract-and-run')
       ]
     })
-  } else {
+  } else if (!isWindows) {
     app.relaunch()
   }
   app.exit(0)
