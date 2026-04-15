@@ -5,7 +5,6 @@ contextBridge.exposeInMainWorld('bridge', {
   },
   applyUpdate: () => ipcRenderer.invoke('pear:applyUpdate'),
   appAfterUpdate: () => ipcRenderer.invoke('app:afterUpdate'),
-  appShutdown: () => ipcRenderer.invoke('app:shutdown'),
   onPearEvent: (name, listener) => {
     const wrap = (evt, eventName) => listener(eventName)
     ipcRenderer.on('pear:event:' + name, wrap)
