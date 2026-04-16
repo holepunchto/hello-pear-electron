@@ -26,6 +26,8 @@ cmd.parse(app.isPackaged ? process.argv.slice(1) : process.argv.slice(2))
 const pearStore = cmd.flags.storage
 const updates = cmd.flags.updates
 
+if (pearStore) app.setPath('userData', pearStore)
+
 ipcMain.on('pkg', (evt) => {
   evt.returnValue = pkg
 })
