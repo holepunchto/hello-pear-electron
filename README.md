@@ -54,20 +54,21 @@ End-to-end boilerplate for embedding [pear-runtime][pear-runtime] into [Electron
 
 ## CI Configuration <a name="ci-configuration"></a>
 
-| Name                    | Type   | Used by             | What it is                                                                                    | Example value                                         |
-| ----------------------- | ------ | ------------------- | --------------------------------------------------------------------------------------------- | ----------------------------------------------------- |
-| `NIGHTLY_KEY`           | Secret | `build-release.yml` | Default upgrade key for nightly builds when no manual `upgrade-key` input is provided.        | `pear://a1b2c3d4...`                                  |
-| `INTERNAL_KEY`          | Secret | `build-release.yml` | Default upgrade key for internal builds when no manual `upgrade-key` input is provided.       | `pear://e5f6g7h8...`                                  |
-| `CERTIFICATE_P12`       | Secret | `build-release.yml` | Base64-encoded macOS signing certificate bundle passed to both macOS build jobs.              | `MIIK...base64-p12...`                                |
-| `CERTIFICATE_PASSWORD`  | Secret | `build-release.yml` | Password for the macOS `.p12` signing certificate used by both macOS build jobs.              | `correct-horse-battery-staple`                        |
-| `MAC_CODESIGN_IDENTITY` | Secret | `build-release.yml` | macOS code signing identity name used by both macOS build jobs.                               | `Developer ID Application: Example Corp (ABCDE12345)` |
-| `APPLE_ID`              | Secret | `build-release.yml` | Apple account email used for notarization in both macOS build jobs.                           | `build-bot@example.com`                               |
-| `APPLE_PASSWORD`        | Secret | `build-release.yml` | Apple app-specific password for notarization in both macOS build jobs.                        | `abcd-efgh-ijkl-mnop`                                 |
-| `APPLE_TEAM_ID`         | Secret | `build-release.yml` | Apple developer team ID for notarization in both macOS build jobs.                            | `ABCDE12345`                                          |
-| `PEAR_PRIMARY_KEY`      | Secret | `build-release.yml` | Primary key used to open the snapshot store and stage the next release artifact.              | `6f4e3d2c1b...`                                       |
-| `MULTISIG_QUORUM`       | Secret | `multisig.yml`      | Number of signer responses required for the multisig request configuration.                   | `2`                                                   |
-| `MULTISIG_NAMESPACE`    | Secret | `multisig.yml`      | Stable multisig namespace shared by all signers for this app.                                 | `holepunchto/hello-pear-electron`                     |
-| `MULTISIG_PUBKEYS`      | Secret | `multisig.yml`      | Space-separated signer public keys. The workflow expands this into repeated `--pubkey` flags. | `pubkey1 pubkey2 pubkey3`                             |
+Create an environment (Settings -> Environments) named `release`. The workflows use these secrets:
+
+| Secret | Platform |
+| ------ | -------- |
+| `CERTIFICATE_P12` | `darwin` |
+| `CERTIFICATE_PASSWORD` | `darwin` |
+| `MAC_CODESIGN_IDENTITY` | `darwin` |
+| `APPLE_ID` | `darwin` |
+| `APPLE_PASSWORD` | `darwin` |
+| `APPLE_TEAM_ID` | `darwin` |
+| `WINDOWS_CERT_SHA1` | `win32` |
+| `PEAR_PRIMARY_KEY` | *all* |
+| `MULTISIG_QUORUM` | *all* |
+| `MULTISIG_NAMESPACE` | *all* |
+| `MULTISIG_PUBKEYS` | *all* |
 
 ## Terminology <a name="terminology"></a>
 

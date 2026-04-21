@@ -2,21 +2,10 @@
 set -euo pipefail
 
 ARTIFACTS_DIR="${1:-out/artifacts}"
-OUTPUT_DIR="${2:-out/keet-desktop-stage}"
+OUTPUT_DIR="${2:-out/hello-pear-stage}"
 PACKAGE_JSON_PATH="${PACKAGE_JSON_PATH:-package.json}"
-CHANNEL="${CHANNEL:?CHANNEL is required}"
-BUILD_VERSION="${BUILD_VERSION:-}"
 UPGRADE_KEY="${UPGRADE_KEY:-}"
-
-case "$CHANNEL" in
-nightly) PRODUCT_NAME="Keet-Nightly" ;;
-internal) PRODUCT_NAME="Keet-Internal" ;;
-production) PRODUCT_NAME="Keet" ;;
-*)
-  echo "Unsupported CHANNEL: $CHANNEL" >&2
-  exit 1
-  ;;
-esac
+PRODUCT_NAME='HelloPear'
 
 TMP_DIR="$(mktemp -d)"
 MOUNT_DIR="$TMP_DIR/mount"
@@ -91,8 +80,8 @@ hdiutil detach "$MOUNT_DIR_X64" -quiet
 
 cp "$PACKAGE_JSON_PATH" "$PACKAGE_OUT"
 npm pkg set --prefix "$TMP_DIR" "productName=$PRODUCT_NAME" >/dev/null
-if [ -n "$BUILD_VERSION" ]; then
-  npm pkg set --prefix "$TMP_DIR" "version=$BUILD_VERSION" >/dev/null
+if [ -n "$UPGRADE_KEY" ]; then
+  npm pkg set --prefix "$TMP_DIR" "upgrade=$UPGRADE_KEY" >/dev/null
 fi
 
 chmod +x "$NORMALIZED_DIR/$PRODUCT_NAME.AppImage"

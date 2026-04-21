@@ -3,10 +3,7 @@ name: Build Release
 on:
   workflow_call:
     inputs:
-      channel:
-        type: string
-        default: ''
-      version:
+      upgrade-key:
         type: string
         default: ''
       run-stage:
@@ -15,15 +12,6 @@ on:
 
   workflow_dispatch:
     inputs:
-      channel:
-        type: choice
-        description: Select the channel
-        default: nightly
-        options:
-          - nightly
-          - internal
-          - production
-        required: true
       upgrade-key:
         description: Value for package.json upgrade field
         required: false
@@ -31,9 +19,6 @@ on:
         type: boolean
         description: Stage the build
         default: false
-
-env:
-  CHANNEL: ${{ inputs.channel || github.event.inputs.channel || 'nightly' }}
 
 jobs:
   build-linux-x64:
@@ -49,11 +34,8 @@ jobs:
       - uses: holepunchto/actions/make-pear-app@v1
         id: build
         with:
-          channel: ${{ env.CHANNEL }}
-          upgrade_key: >-
-            ${{ github.event.inputs['upgrade-key']
-              || (env.CHANNEL == 'nightly' && secrets.NIGHTLY_KEY)
-              || (env.CHANNEL == 'internal' && secrets.INTERNAL_KEY) }}
+          channel: production
+          upgrade_key: ${{ inputs['upgrade-key'] || github.event.inputs['upgrade-key'] }}
 
   build-linux-arm:
     permissions:
@@ -68,11 +50,8 @@ jobs:
       - uses: holepunchto/actions/make-pear-app@v1
         id: build
         with:
-          channel: ${{ env.CHANNEL }}
-          upgrade_key: >-
-            ${{ github.event.inputs['upgrade-key']
-              || (env.CHANNEL == 'nightly' && secrets.NIGHTLY_KEY)
-              || (env.CHANNEL == 'internal' && secrets.INTERNAL_KEY) }}
+          channel: production
+          upgrade_key: ${{ inputs['upgrade-key'] || github.event.inputs['upgrade-key'] }}
 
   build-macos:
     permissions:
@@ -87,11 +66,8 @@ jobs:
       - uses: holepunchto/actions/make-pear-app@v1
         id: build
         with:
-          channel: ${{ env.CHANNEL }}
-          upgrade_key: >-
-            ${{ github.event.inputs['upgrade-key']
-              || (env.CHANNEL == 'nightly' && secrets.NIGHTLY_KEY)
-              || (env.CHANNEL == 'internal' && secrets.INTERNAL_KEY) }}
+          channel: production
+          upgrade_key: ${{ inputs['upgrade-key'] || github.event.inputs['upgrade-key'] }}
           macos_certificate_base64: ${{ secrets.CERTIFICATE_P12 }}
           macos_p12_password: ${{ secrets.CERTIFICATE_PASSWORD }}
           macos_codesign_identity: ${{ secrets.MAC_CODESIGN_IDENTITY }}
@@ -113,11 +89,8 @@ jobs:
       - uses: holepunchto/actions/make-pear-app@v1
         id: build
         with:
-          channel: ${{ env.CHANNEL }}
-          upgrade_key: >-
-            ${{ github.event.inputs['upgrade-key']
-              || (env.CHANNEL == 'nightly' && secrets.NIGHTLY_KEY)
-              || (env.CHANNEL == 'internal' && secrets.INTERNAL_KEY) }}
+          channel: production
+          upgrade_key: ${{ inputs['upgrade-key'] || github.event.inputs['upgrade-key'] }}
           macos_certificate_base64: ${{ secrets.CERTIFICATE_P12 }}
           macos_p12_password: ${{ secrets.CERTIFICATE_PASSWORD }}
           macos_codesign_identity: ${{ secrets.MAC_CODESIGN_IDENTITY }}
@@ -139,12 +112,9 @@ jobs:
       - uses: holepunchto/actions/make-pear-app@v1
         id: build
         with:
-          channel: ${{ env.CHANNEL }}
-          upgrade_key: >-
-            ${{ github.event.inputs['upgrade-key']
-              || (env.CHANNEL == 'nightly' && secrets.NIGHTLY_KEY)
-              || (env.CHANNEL == 'internal' && secrets.INTERNAL_KEY) }}
-          windows_cert_sha1: E890AF027C9C83F7427BCEEBE7AC533579DFE549
+          channel: production
+          upgrade_key: ${{ inputs['upgrade-key'] || github.event.inputs['upgrade-key'] }}
+          windows_cert_sha1: ${{ secrets.WINDOWS_CERT_SHA1 }}
 
   stage:
     needs: [build-linux-x64, build-linux-arm, build-macos, build-macos-x64, build-win32]
@@ -174,10 +144,9 @@ jobs:
 
       - name: Build stage artifact
         env:
-          CHANNEL: ${{ env.CHANNEL }}
-          BUILD_VERSION: ${{ inputs.version }}
+          UPGRADE_KEY: ${{ inputs['upgrade-key'] || github.event.inputs['upgrade-key'] }}
         run: |
-          ./scripts/build-stage-artifact.sh out/artifacts out/keet-desktop-stage
+          ./scripts/build-stage-artifact.sh out/artifacts out/hello-pear-stage
 
       - name: Install tools
         run: npm install -g corestore-snapshot pear-stage-next
@@ -188,7 +157,8 @@ jobs:
       - name: Stage next
         id: stage
         run: |
-          VERLINK=$(pear-stage-next --storage=/tmp/store --target=./out/keet-desktop-stage --primary-key=${{ secrets.PEAR_PRIMARY_KEY }} --name=${{ env.CHANNEL }}-v4)
+          STAGE_NAME=$(node -p "require('./package.json').name + '-v4'")
+          VERLINK=$(pear-stage-next --storage=/tmp/store --target=./out/hello-pear-stage --primary-key=${{ secrets.PEAR_PRIMARY_KEY }} --name="$STAGE_NAME")
           echo "$VERLINK"
           echo "source-verlink=$VERLINK" >> "$GITHUB_OUTPUT"
 
