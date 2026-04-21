@@ -421,7 +421,7 @@ Set the `package.json` `upgrade` field:
 To set the upgrade link from the command line `npm set pkg upgrade=<link>` can be used:
 
 ```sh
-npm set pkg upgrade=pear://qxenz5wmspmryjc13m9yzsqj1conqotn8fb4ocbufwtz9mtbqq5o
+npm pkg set upgrade=pear://qxenz5wmspmryjc13m9yzsqj1conqotn8fb4ocbufwtz9mtbqq5o
 ```
 
 #### 2. Version <a name="version"></a>
