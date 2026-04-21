@@ -90,6 +90,10 @@ To enable updates for testing update flow in local development use
 npm start -- --updates
 ```
 
+### Packaging
+
+By default macOS packaging keeps only the Electron `en` locale to reduce bundle size. To keep all locales set `"electronLocales": "all"` in `package.json` or package with `ELECTRON_LOCALES=all`. To keep a subset, set `"electronLocales": ["en", "fr"]`.
+
 ## Architecture
 
 The application architecture is tightly scoped to handling P2P OTA Updates, running embedded [Bare][bare] workers and facilitating [Peer-to-Peer Deployment](#deployments) flows.

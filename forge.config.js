@@ -4,6 +4,35 @@ const pkg = require('./package.json')
 const appName = pkg.productName ?? pkg.name
 const { isWindows } = require('which-runtime')
 
+function getElectronLocales() {
+  if (process.env.ELECTRON_LOCALES === 'all') return null
+  if (pkg.electronLocales === 'all') return null
+  if (Array.isArray(pkg.electronLocales)) return new Set(pkg.electronLocales)
+  return new Set(['en'])
+}
+
+function pruneElectronLocales(appPath) {
+  const locales = getElectronLocales()
+  if (locales === null) return
+
+  const resourcesDir = path.join(
+    appPath,
+    'Contents',
+    'Frameworks',
+    'Electron Framework.framework',
+    'Versions',
+    'A',
+    'Resources'
+  )
+
+  for (const entry of fs.readdirSync(resourcesDir, { withFileTypes: true })) {
+    if (!entry.isDirectory() || !entry.name.endsWith('.lproj')) continue
+    const locale = entry.name.slice(0, -'.lproj'.length)
+    if (locales.has(locale)) continue
+    fs.rmSync(path.join(resourcesDir, entry.name), { recursive: true, force: true })
+  }
+}
+
 function getWindowsKitVersion() {
   const programFiles = process.env['PROGRAMFILES(X86)'] || process.env.PROGRAMFILES
   if (!programFiles) return undefined
@@ -82,6 +111,12 @@ module.exports = {
       const msixVersion = pkg.version.replace(/^(\d+\.\d+\.\d+)$/, '$1.0')
       const xml = fs.readFileSync(manifest, 'utf-8')
       fs.writeFileSync(manifest, xml.replace(/Version="[^"]*"/, `Version="${msixVersion}"`))
+    },
+    postPackage: async (forgeConfig, { outputPaths, platform }) => {
+      if (platform !== 'darwin') return
+      for (const outputPath of outputPaths) {
+        pruneElectronLocales(path.join(outputPath, `${appName}.app`))
+      }
     },
     postMake: async (forgeConfig, results) => {
       for (const result of results) {
