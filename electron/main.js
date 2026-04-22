@@ -32,7 +32,7 @@ ipcMain.on('pkg', (evt) => {
   evt.returnValue = pkg
 })
 
-async function getPear() {
+function getPear() {
   if (pear) return pear
   const appPath = getAppPath()
   let dir = null
@@ -51,8 +51,7 @@ async function getPear() {
 
   const extension = isLinux ? '.AppImage' : isMac ? '.app' : '.msix'
   const store = new Corestore(path.join(dir, 'pear-runtime/corestore'))
-  const keyPair = await store.createKeyPair('pear-runtime')
-  const swarm = new Hyperswarm({ keyPair })
+  const swarm = new Hyperswarm()
   pear = new PearRuntime({
     dir,
     app: appPath,
@@ -86,9 +85,9 @@ function sendToAll(name, data) {
   }
 }
 
-async function getWorker(specifier) {
+function getWorker(specifier) {
   if (workers.has(specifier)) return workers.get(specifier)
-  const pear = await getPear()
+  const pear = getPear()
   const worker = pear.run(require.resolve('..' + specifier), [pear.storage])
   function sendWorkerStdout(data) {
     sendToAll('pear:worker:stdout:' + specifier, data)
@@ -134,7 +133,7 @@ async function createWindow() {
     }
   })
 
-  const pear = await getPear()
+  const pear = getPear()
 
   const onUpdating = () => {
     if (!win.isDestroyed()) win.webContents.send('pear:event:updating')
@@ -163,12 +162,12 @@ async function createWindow() {
   await win.loadFile(path.join(__dirname, '..', 'renderer', 'index.html'))
 }
 
-ipcMain.handle('pear:applyUpdate', async () => {
-  const pear = await getPear()
+ipcMain.handle('pear:applyUpdate', () => {
+  const pear = getPear()
   pear.updater.applyUpdate()
 })
-ipcMain.handle('pear:startWorker', async (evt, filename) => {
-  await getWorker(filename)
+ipcMain.handle('pear:startWorker', (evt, filename) => {
+  getWorker(filename)
   return true
 })
 ipcMain.handle('app:restart', () => {
