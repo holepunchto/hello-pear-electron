@@ -1,6 +1,8 @@
 const { app, BrowserWindow, ipcMain } = require('electron')
 const os = require('os')
 const path = require('path')
+const Hyperswarm = require('hyperswarm')
+const Corestore = require('corestore')
 const PearRuntime = require('pear-runtime')
 
 const { isMac, isLinux, isWindows } = require('which-runtime')
@@ -50,13 +52,22 @@ function getPear() {
   }
 
   const extension = isLinux ? '.AppImage' : isMac ? '.app' : '.msix'
+  const store = new Corestore(path.join(dir, 'pear-runtime/corestore'))
+  const swarm = new Hyperswarm()
   pear = new PearRuntime({
     dir,
     app: appPath,
     updates,
     version,
     upgrade,
-    name: productName + extension
+    name: productName + extension,
+    store,
+    swarm
+  })
+  swarm.on('connection', (connection) => store.replicate(connection))
+  swarm.join(pear.updater.drive.core.discoveryKey, {
+    client: true,
+    server: false
   })
   pear.on('error', console.error) // print network errors, etc.
   return pear
@@ -152,7 +163,10 @@ async function createWindow() {
   await win.loadFile(path.join(__dirname, '..', 'renderer', 'index.html'))
 }
 
-ipcMain.handle('pear:applyUpdate', () => getPear().updater.applyUpdate())
+ipcMain.handle('pear:applyUpdate', () => {
+  const pear = getPear()
+  pear.updater.applyUpdate()
+})
 ipcMain.handle('pear:startWorker', (evt, filename) => {
   getWorker(filename)
   return true
