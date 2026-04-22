@@ -71,6 +71,21 @@ module.exports = {
             }
           : {})
       }
+    },
+    {
+      name: '@holepunchto/electron-forge-maker-snap',
+      platforms: ['linux'],
+      config: {
+        snapcraftYamlPath: 'build/snapcraft.yaml',
+        summary: 'Integrating Pear into a hello world electron desktop app',
+        description:
+          'End-to-end boilerplate for embedding pear-runtime into Electron apps and deploying peer-to-peer application updates.',
+        contact: 'hello@holepunchto.to',
+        license: 'Apache-2.0',
+        issues: 'https://github.com/holepunchto/hello-pear-electron/issues',
+        website: 'https://github.com/holepunchto/hello-pear-electron',
+        icon: `${packagerConfig.icon}.png`
+      }
     }
   ],
 
