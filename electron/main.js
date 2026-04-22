@@ -45,11 +45,14 @@ function getPear() {
   } else if (appPath === null) {
     dir = path.join(os.tmpdir(), 'pear', appName)
   } else {
+    const isSnap = !!process.env.SNAP_USER_COMMON
     const linuxConfigHome = process.env.XDG_CONFIG_HOME || path.join(os.homedir(), '.config')
     dir = isMac
       ? path.join(os.homedir(), 'Library', 'Application Support', appName)
       : isLinux
-        ? path.join(linuxConfigHome, appName)
+        ? isSnap
+          ? path.join(process.env.SNAP_USER_COMMON, appName)
+          : path.join(linuxConfigHome, appName)
         : path.join(os.homedir(), 'AppData', 'Local', appName)
   }
 
