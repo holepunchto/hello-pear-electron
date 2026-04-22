@@ -58,7 +58,6 @@ function getPear() {
     updates,
     version,
     upgrade,
-    win32: { restart: true },
     name: productName + extension,
     store,
     swarm
