@@ -185,7 +185,7 @@ ipcMain.handle('app:afterUpdate', () => {
   } else if (!isWindows) {
     app.relaunch()
   }
-  app.exit(0)
+  app.quit()
 })
 
 function handleDeepLink(url) {
