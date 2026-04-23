@@ -2,7 +2,7 @@
   "name": "hello-pear-electron",
   "productName": "HelloPear",
   "version": "1.0.0",
-  "upgrade": "pear://qxenz5wmspmryjc13m9yzsqj1conqotn8fb4ocbufwtz9mtbqq5o",
+  "upgrade": "pear://<YOUR_KEY_HERE>",
   "description": "",
   "license": "",
   "author": "",
