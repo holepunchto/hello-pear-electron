@@ -64,7 +64,7 @@ function getPear() {
     store,
     swarm
   })
-  if (updates) {
+  if (updates !== false) {
     swarm.on('connection', (connection) => store.replicate(connection))
     swarm.join(pear.updater.drive.core.discoveryKey, {
       client: true,
