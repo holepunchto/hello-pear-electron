@@ -1,0 +1,68 @@
+name: Multisig
+
+on:
+  workflow_call:
+    inputs:
+      environment:
+        type: string
+        default: release
+    outputs:
+      link:
+        value: ${{ jobs.link.outputs.link }}
+  push:
+
+jobs:
+  link:
+    if: github.event_name == 'workflow_call'
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+    outputs:
+      link: ${{ steps.link.outputs.link }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+      - name: Get multisig link
+        id: link
+        env:
+          MULTISIG_QUORUM: ${{ secrets.MULTISIG_QUORUM }}
+          MULTISIG_NAMESPACE: ${{ secrets.MULTISIG_NAMESPACE }}
+          MULTISIG_PUBKEYS: ${{ secrets.MULTISIG_PUBKEYS }}
+        run: |
+          if [ -n "$MULTISIG_PUBKEYS" ]; then
+            PUBKEY_FLAGS="--pubkey ${MULTISIG_PUBKEYS// / --pubkey }"
+            echo "link=$(npx pear-ci-multisig link --quorum "$MULTISIG_QUORUM" --namespace "$MULTISIG_NAMESPACE" $PUBKEY_FLAGS)" >> "$GITHUB_OUTPUT"
+          fi
+
+  request:
+    if: github.event_name == 'push' && contains(github.event.head_commit.message, 'multisig request:')
+    runs-on: ubuntu-latest
+    environment: ${{ split(github.event.head_commit.message, ' ')[0] }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+      - name: Create signing request
+        env:
+          MULTISIG_QUORUM: ${{ secrets.MULTISIG_QUORUM }}
+          MULTISIG_NAMESPACE: ${{ secrets.MULTISIG_NAMESPACE }}
+          MULTISIG_PUBKEYS: ${{ secrets.MULTISIG_PUBKEYS }}
+        run: |
+          set -euo pipefail # stop pipe failures being swallowed by tee
+          LINE=$(git log -1 --format=%B | grep 'multisig request:')
+          ENV=$(echo "$LINE" | awk '{print $1}')
+          ARGS=${LINE#$ENV multisig request: }
+          read -ra ARGS <<< "$ARGS"
+          ARGS=(--quorum "$MULTISIG_QUORUM" --namespace "$MULTISIG_NAMESPACE" --pubkey ${MULTISIG_PUBKEYS// / --pubkey } "${ARGS[@]}")
+          REQUEST=$(npx pear-ci-multisig request "${ARGS[@]}" | tee -a "$GITHUB_STEP_SUMMARY")
+          {
+            echo "Signing request for $ENV multisig. Please gather signatures from the following pubkeys:"
+            for KEY in $MULTISIG_PUBKEYS; do echo "  - $KEY"; done
+            echo ""
+            echo "Each signer runs:"
+            echo "  hypercore-sign $REQUEST"
+            echo ""
+            echo "Collect signer responses out-of-band after this request is created."
+          } | tee -a "$GITHUB_STEP_SUMMARY"

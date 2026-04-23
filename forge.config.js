@@ -40,9 +40,8 @@ if (process.env.MAC_CODESIGN_IDENTITY) {
       })
     },
     osxNotarize: {
-      appleId: process.env.APPLE_ID,
-      appleIdPassword: process.env.APPLE_PASSWORD,
-      teamId: process.env.APPLE_TEAM_ID
+      tool: 'notarytool',
+      keychainProfile: process.env.KEYCHAIN_PROFILE
     }
   }
 }
@@ -62,11 +61,10 @@ module.exports = {
       config: {
         appManifest: path.join(__dirname, 'build', 'AppxManifest.xml'),
         windowsKitVersion: getWindowsKitVersion(),
-        ...(process.env.WINDOWS_CERTIFICATE_FILE
+        ...(process.env.WINDOWS_SIGN_HOOK
           ? {
               windowsSignOptions: {
-                certificateFile: process.env.WINDOWS_CERTIFICATE_FILE,
-                certificatePassword: process.env.WINDOWS_CERTIFICATE_PASSWORD
+                hookModulePath: process.env.WINDOWS_SIGN_HOOK
               }
             }
           : {})
@@ -75,6 +73,13 @@ module.exports = {
   ],
 
   hooks: {
+    readPackageJson: async (forgeConfig, packageJson) => {
+      if (process.env.UPGRADE_KEY) {
+        packageJson.upgrade = process.env.UPGRADE_KEY
+      }
+
+      return packageJson
+    },
     preMake: async () => {
       fs.rmSync(path.join(__dirname, 'out', 'make'), { recursive: true, force: true })
 

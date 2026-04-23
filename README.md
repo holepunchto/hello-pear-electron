@@ -37,6 +37,7 @@ End-to-end boilerplate for embedding [pear-runtime][pear-runtime] into [Electron
     - [Release Lines](#release-lines)
     - [Release Line Builds](#release-line-builds)
     - [Custom Builds](#custom-builds)
+- [CI Configuration](#ci-configuration)
 - [Scripts](#scripts)
 - [Troubleshooting](#troubleshooting)
 
@@ -50,6 +51,24 @@ End-to-end boilerplate for embedding [pear-runtime][pear-runtime] into [Electron
 
 - `npm` via [Node.js][nodejs]
 - [`pear`][pear-docs] - `npx pear`
+
+## CI Configuration <a name="ci-configuration"></a>
+
+Create an environment (Settings -> Environments) named `release`. The workflows use these secrets:
+
+| Secret                  | Platform |
+| ----------------------- | -------- |
+| `CERTIFICATE_P12`       | `darwin` |
+| `CERTIFICATE_PASSWORD`  | `darwin` |
+| `MAC_CODESIGN_IDENTITY` | `darwin` |
+| `APPLE_ID`              | `darwin` |
+| `APPLE_PASSWORD`        | `darwin` |
+| `APPLE_TEAM_ID`         | `darwin` |
+| `WINDOWS_CERT_SHA1`     | `win32`  |
+| `PEAR_PRIMARY_KEY`      | _all_    |
+| `MULTISIG_QUORUM`       | _all_    |
+| `MULTISIG_NAMESPACE`    | _all_    |
+| `MULTISIG_PUBKEYS`      | _all_    |
 
 ## Terminology <a name="terminology"></a>
 
