@@ -64,11 +64,13 @@ function getPear() {
     store,
     swarm
   })
-  swarm.on('connection', (connection) => store.replicate(connection))
-  swarm.join(pear.updater.drive.core.discoveryKey, {
-    client: true,
-    server: false
-  })
+  if (updates) {
+    swarm.on('connection', (connection) => store.replicate(connection))
+    swarm.join(pear.updater.drive.core.discoveryKey, {
+      client: true,
+      server: false
+    })
+  }
   pear.on('error', console.error) // print network errors, etc.
   return pear
 }
@@ -88,8 +90,7 @@ function sendToAll(name, data) {
 
 function getWorker(specifier) {
   if (workers.has(specifier)) return workers.get(specifier)
-  const pear = getPear()
-  const worker = pear.run(require.resolve('..' + specifier), [pear.storage])
+  const worker = PearRuntime.run(require.resolve('..' + specifier))
   function sendWorkerStdout(data) {
     sendToAll('pear:worker:stdout:' + specifier, data)
   }
