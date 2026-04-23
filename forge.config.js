@@ -81,6 +81,18 @@ module.exports = {
           { file: 'build/icon/icon-256x256.png', size: 256 }
         ]
       }
+    },
+    {
+      name: 'pear-electron-forge-maker-flatpak',
+      platforms: ['linux'],
+      config: {
+        appId: 'com.pears.HelloPear',
+        icon: `${packagerConfig.icon}.png`,
+        metainfo: 'build/metainfo.xml',
+        entrypoint: 'build/entrypoint.sh',
+        comment: 'Integrating Pear into a hello world electron desktop app',
+        categories: ['Development']
+      }
     }
   ],
 
