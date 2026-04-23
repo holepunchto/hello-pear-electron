@@ -64,11 +64,13 @@ function getPear() {
     store,
     swarm
   })
-  swarm.on('connection', (connection) => store.replicate(connection))
-  swarm.join(pear.updater.drive.core.discoveryKey, {
-    client: true,
-    server: false
-  })
+  if (updates) {
+    swarm.on('connection', (connection) => store.replicate(connection))
+    swarm.join(pear.updater.drive.core.discoveryKey, {
+      client: true,
+      server: false
+    })
+  }
   pear.on('error', console.error) // print network errors, etc.
   return pear
 }
