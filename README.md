@@ -57,7 +57,7 @@ End-to-end boilerplate for embedding [pear-runtime][pear-runtime] into [Electron
 - **OTA Updates** - Direct software updates to running applications without manual reinstallation
 - **P2P** - Peer-to-Peer. Direct point-to-point communication between machines/devices without central servers
 - **application drive** - the [Hyperdrive][hyperdrive] behind a Pear application
-- **deployment folder** - the build directory output by `pear-build` which is then staged
+- **deployment folder** - the build directory output by `pear build` which is then staged
 - **multisig** - a co-signing protocol requiring a quorum of signers before writes can be committed. This cryptographically binds project integrity to collective sign-off
 - **pear link** - a [link format][pear-link-format] for addressing peer-to-peer applications
 - **quorum** - the minimum number of signers needed to commit a multisig write
@@ -522,7 +522,7 @@ npm run make:linux
 
 Each make runs on a different OS and architecture.
 
-Use [`pear-build`][pear-build] to assemble all architecture builds into a single multi-architecture directory, referred to as the **Deployment Directory**.
+Use `pear build` to assemble all architecture builds into a single multi-architecture directory, referred to as the **Deployment Directory**.
 
 ```mermaid
 graph BT
@@ -537,13 +537,13 @@ graph BT
     Build --> DF[(Deployment Directory)]
 ```
 
-From above the project root run `pear-build` for each arch, for example Mac x64 + arm64, Linux x64 + arm64 and Windows x64 would be:
+From above the project root run `pear build` for each arch, for example Mac x64 + arm64, Linux x64 + arm64 and Windows x64 would be:
 
 ```sh
-pear-build --package=./hello-pear-electron/package.json --darwin-arm64-app ./hello-pear-electron/out/HelloPear-darwin-arm64/HelloPear.app --darwin-x64-app ./hello-pear-electron/out/HelloPear-darwin-x64/HelloPear.app --linux-arm64-app ./hello-pear-electron/out/HelloPear-linux-arm64/HelloPear.AppImage --linux-x64-app ./hello-pear-electron/out/HelloPear-linux-x64/HelloPear.AppImage --win32-x64-app ./hello-pear-electron/out/HelloPear-win32-x64/HelloPear.msix --target hello-pear-electron-1.0.0
+pear build --package=./hello-pear-electron/package.json --darwin-arm64-app ./hello-pear-electron/out/HelloPear-darwin-arm64/HelloPear.app --darwin-x64-app ./hello-pear-electron/out/HelloPear-darwin-x64/HelloPear.app --linux-arm64-app ./hello-pear-electron/out/HelloPear-linux-arm64/HelloPear.AppImage --linux-x64-app ./hello-pear-electron/out/HelloPear-linux-x64/HelloPear.AppImage --win32-x64-app ./hello-pear-electron/out/HelloPear-win32-x64/HelloPear.msix --target hello-pear-electron-1.0.0
 ```
 
-NOTE: Since building occurs on other machines, they need to be transferred to the build machine first, and then assembled into a Deployment Directory with pear-build.
+NOTE: Since building occurs on other machines, they need to be transferred to the build machine first, and then assembled into a Deployment Directory with pear build.
 
 If the `--target` flag is omitted, then target folder is in the current working directory named `{name}-{version}` per `package.json` fields.
 
@@ -1159,33 +1159,33 @@ Then set the new provision link key as the `srcKey` of the `multisig.json` confi
 
 ### `pear stage` is showing unexpected size increases <a name="stage-size-increases"></a>
 
-#### Is the `pear-build` deployment folder inside the app folder? <a name="check-deployment-folder-inside-app"></a>
+#### Is the `pear build` deployment folder inside the app folder? <a name="check-deployment-folder-inside-app"></a>
 
 If the deployment folder ends up in the build and then that ends up in the deployment folder the build inflates each time. When it comes to running `pear stage` it will show file sizes that are unexpectedly large.
 
 Avoid this by never putting the deployment folder into the application folder.
 
-The deployment folder output by `pear-build` can be considered as a sort of multi-architecture container.
+The deployment folder output by `pear build` can be considered as a sort of multi-architecture container.
 Think about it as above, external to the project as a deployment artifact instead of inside the project.
 
 Never make deployment folders inside applications:
 
 ```sh
-pear-build ... --package ./my-app/package.json --target ./my-app/my-build # <-- DON'T DO THIS
+pear build ... --package ./my-app/package.json --target ./my-app/my-build # <-- DON'T DO THIS
 
-cd my-app && pear-build ... --package ./package.json --target ./my-build # <-- DON'T DO THIS
+cd my-app && pear build ... --package ./package.json --target ./my-build # <-- DON'T DO THIS
 ```
 
 Always make the deployment folder outside of the app-dir:
 
 ```sh
-pear-build ... --package ./my-app/package.json --target ./my-build # <-- do this
+pear build ... --package ./my-app/package.json --target ./my-build # <-- do this
 ```
 
-Or don't use target at all and always run pear-build outside of the app folder:
+Or don't use target at all and always run pear build outside of the app folder:
 
 ```sh
-pear-build ... --package ./my-app/package.json # <-- do this
+pear build ... --package ./my-app/package.json # <-- do this
 ```
 
 That will output a build folder per version e.g. `hello-pear-electron-v1.2.3` creating a deploy folder per deploy. This can be very useful for reviewing any deployment issues and for quickly rolling back to a prior version (i.e. stage -> provision -> multisig from an older build folder).
@@ -1204,7 +1204,7 @@ That will output a build folder per version e.g. `hello-pear-electron-v1.2.3` cr
 [hypercore-key]: https://github.com/holepunchto/hypercore?tab=readme-ov-file#corekey
 [pear-link-format]: https://github.com/holepunchto/pear-link?tab=readme-ov-file#pear-link-format
 [corestore]: https://github.com/holepunchto/corestore
-[pear-build]: https://npm.im/pear-build
+[pear-build]: https://github.com/holepunchto/pear-build
 [electron-forge-macos-signing]: https://www.electronforge.io/guides/code-signing/code-signing-macos#option-1-using-an-app-specific-password
 [apple-app-specific-password]: https://support.apple.com/en-us/102654
 [windows-sdk]: https://developer.microsoft.com/en-us/windows/downloads/windows-sdk/
