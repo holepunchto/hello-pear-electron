@@ -4,15 +4,15 @@ set -euo pipefail
 ROOT="$(pwd)"
 PKG="$ROOT/package.json"
 
-[ -f "$PKG" ] || { echo "package.json not found in $ROOT"; exit 1; }
-command -v jq >/dev/null 2>&1 || { echo "jq is required"; exit 1; }
+[ -f "$PKG" ] || { echo "ERROR: package.json not found in $ROOT"; exit 1; }
+command -v jq >/dev/null 2>&1 || { echo "ERROR: jq is required"; exit 1; }
 
 # Detect architecture dynamically
 UNAME_ARCH=$(uname -m)
 case "$UNAME_ARCH" in
   x86_64) ARCH="x64" ;;
   aarch64 | arm64) ARCH="arm64" ;;
-  *) echo "Unsupported architecture: $UNAME_ARCH"; exit 1 ;;
+  *) echo "ERROR: Unsupported architecture: $UNAME_ARCH"; exit 1 ;;
 esac
 
 APP_BUILDER="$(node -e "
