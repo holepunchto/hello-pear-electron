@@ -96,7 +96,7 @@ CONFIG_JSON=$(jq -n \
   }'
 )
 
-CUSTOM_APPRUN="$ROOT/scripts/linux/AppRun"
+CUSTOM_APPRUN="$ROOT/build/AppRun"
 
 if [ -f "$CUSTOM_APPRUN" ]; then
   echo "→ Using custom AppRun $CUSTOM_APPRUN"
