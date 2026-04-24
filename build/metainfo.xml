@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>com.pears.HelloPear</id>
+
+  <name>HelloPear</name>
+  <summary>Integrating Pear into a hello world electron desktop app</summary>
+
+  <metadata_license>MIT</metadata_license>
+  <project_license>Apache-2.0</project_license>
+
+  <developer id="io.tether">
+    <name>Tether Data S.A. de C.V.</name>
+  </developer>
+
+  <content_rating type="oars-1.1" />
+
+  <url type="homepage">
+    https://github.com/holepunchto/hello-pear-electron
+  </url>
+
+  <releases>
+    <release date="2026-04-23" version="1.0.0"/>
+  </releases>
+
+  <recommends>
+    <display_length compare="ge">600</display_length>
+  </recommends>
+  <supports>
+    <control>pointing</control>
+    <control>keyboard</control>
+    <control>touch</control>
+  </supports>
+
+  <description>
+    <p>End-to-end boilerplate for embedding pear-runtime into Electron apps and deploying peer-to-peer application updates.</p>
+  </description>
+
+  <launchable type="desktop-id">com.pears.HelloPear.desktop</launchable>
+</component>
