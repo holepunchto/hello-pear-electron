@@ -100,8 +100,8 @@ CUSTOM_APPRUN="$ROOT/build/AppRun"
 
 if [ -f "$CUSTOM_APPRUN" ]; then
   echo "→ Using custom AppRun $CUSTOM_APPRUN"
-  cp "$CUSTOM_APPRUN" "$STAGE_DIR/AppRun"
-  chmod +x "$STAGE_DIR/AppRun"
+  sed "s/{{.ExecutableName}}/$APP_NAME/g" "$CUSTOM_APPRUN" > "$APP_DIR/AppRun"
+  chmod +x "$APP_DIR/AppRun"
 fi
 
 echo "→ Running app-builder with the following command:"
