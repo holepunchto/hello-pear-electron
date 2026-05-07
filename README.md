@@ -67,6 +67,8 @@ Create an environment (Settings -> Environments) named `release`. The workflows 
 | `WINDOWS_CERT_PFX_BASE64` | `win32`  |
 | `WINDOWS_CERT_PASSWORD`   | `win32`  |
 
+* Windows certificate subject must match the `Publisher` in `build/AppxManifest.xml`.
+
 ## Terminology <a name="terminology"></a>
 
 - **OTA** - Over-the-Air. Data delivery without manual intervention
