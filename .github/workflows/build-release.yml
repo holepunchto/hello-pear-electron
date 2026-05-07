@@ -101,7 +101,7 @@ jobs:
     permissions:
       contents: write # to upload artifacts
       packages: read
-    runs-on: windows-signer
+    runs-on: windows-latest
     environment: release
     outputs:
       artifact-links: ${{ steps.build.outputs.artifact-links }}
@@ -112,4 +112,6 @@ jobs:
         with:
           channel: production
           upgrade_key: ${{ inputs['upgrade-key'] }}
-          windows_cert_sha1: ${{ secrets.WINDOWS_CERT_SHA1 }}
+          windows_signing_method: windows_cert_pfx
+          windows_cert_pfx_base64: ${{ secrets.WINDOWS_CERT_PFX_BASE64 }}
+          windows_cert_password: ${{ secrets.WINDOWS_CERT_PASSWORD }}
