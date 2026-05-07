@@ -67,7 +67,9 @@ Create an environment (Settings -> Environments) named `release`. The workflows 
 | `WINDOWS_CERT_PFX_BASE64` | `win32`  |
 | `WINDOWS_CERT_PASSWORD`   | `win32`  |
 
-* Windows certificate subject must match the `Publisher` in `build/AppxManifest.xml`.
+- Windows certificate subject must match the `Publisher` in `build/AppxManifest.xml`.
+- macOS signing require an Apple Developer Program membership
+- Linux builds are not signed.
 
 ## Terminology <a name="terminology"></a>
 
