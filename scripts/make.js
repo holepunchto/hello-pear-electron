@@ -15,8 +15,10 @@ if (!script) {
   process.exit(1)
 }
 
-const npmCmd = process.platform === 'win32' ? 'npm.cmd' : 'npm'
-const result = spawnSync(npmCmd, ['run', script], { stdio: 'inherit' })
+const result = spawnSync('npm', ['run', script], {
+  stdio: 'inherit',
+  shell: process.platform === 'win32'
+})
 
 if (result.error) throw result.error
 process.exit(result.status ?? 1)
