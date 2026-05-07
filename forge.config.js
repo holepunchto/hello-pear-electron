@@ -95,7 +95,9 @@ module.exports = {
           const standardDir = path.join(__dirname, 'out', `${appName}-win32-${result.arch}`)
           fs.mkdirSync(standardDir, { recursive: true })
           const dest = path.join(standardDir, path.basename(artifact))
-          fs.copyFileSync(artifact, dest)
+          fs.renameSync(artifact, dest)
+          fs.mkdirSync(path.dirname(artifact), { recursive: true })
+          fs.copyFileSync(dest, artifact)
           result.artifacts[result.artifacts.indexOf(artifact)] = dest
         }
       }
