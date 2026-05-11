@@ -1015,8 +1015,8 @@ Create a GitHub environment (Settings -> Environments) named `release`. The work
 | `WINDOWS_CERT_PFX_BASE64` | `win32`  |
 | `WINDOWS_CERT_PASSWORD`   | `win32`  |
 
-- macOS signing require an Apple Developer Program membership.
-- Windows certificate 'subject' must match the `Publisher` in `build/AppxManifest.xml`.
+- macOS signing require an [Apple Developer Program](https://developer.apple.com) membership.
+- Windows certificate 'subject' must match the `Publisher` in [AppxManifest.xml](build/AppxManifest.xml).
 - Linux builds are not signed, no configuration needed.
 
 ## Scripts <a name="scripts"></a>
