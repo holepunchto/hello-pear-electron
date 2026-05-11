@@ -1,6 +1,8 @@
 const { app, BrowserWindow, ipcMain } = require('electron')
 const os = require('os')
 const path = require('path')
+const Hyperswarm = require('hyperswarm')
+const Corestore = require('corestore')
 const PearRuntime = require('pear-runtime')
 
 const { isMac, isLinux, isWindows } = require('which-runtime')
@@ -17,14 +19,17 @@ const appName = productName ?? name
 
 const cmd = command(
   appName,
-  flag('--storage', 'pass custom storage to pear-runtime'),
-  flag('--no-updates', 'start without OTA updates')
+  flag('--storage <dir>', 'pass custom storage to pear-runtime'),
+  flag('--no-updates', 'start without OTA updates'),
+  flag('--no-sandbox', 'start without Chromium sandbox').hide()
 )
 
 cmd.parse(app.isPackaged ? process.argv.slice(1) : process.argv.slice(2))
 
 const pearStore = cmd.flags.storage
 const updates = cmd.flags.updates
+
+if (pearStore) app.setPath('userData', pearStore)
 
 ipcMain.on('pkg', (evt) => {
   evt.returnValue = pkg
@@ -48,14 +53,25 @@ function getPear() {
   }
 
   const extension = isLinux ? '.AppImage' : isMac ? '.app' : '.msix'
+  const store = new Corestore(path.join(dir, 'pear-runtime/corestore'))
+  const swarm = new Hyperswarm()
   pear = new PearRuntime({
     dir,
     app: appPath,
     updates,
     version,
     upgrade,
-    name: productName + extension
+    name: productName + extension,
+    store,
+    swarm
   })
+  if (updates !== false) {
+    swarm.on('connection', (connection) => store.replicate(connection))
+    swarm.join(pear.updater.drive.core.discoveryKey, {
+      client: true,
+      server: false
+    })
+  }
   pear.on('error', console.error) // print network errors, etc.
   return pear
 }
@@ -150,12 +166,15 @@ async function createWindow() {
   await win.loadFile(path.join(__dirname, '..', 'renderer', 'index.html'))
 }
 
-ipcMain.handle('pear:applyUpdate', () => getPear().updater.applyUpdate())
+ipcMain.handle('pear:applyUpdate', () => {
+  const pear = getPear()
+  pear.updater.applyUpdate()
+})
 ipcMain.handle('pear:startWorker', (evt, filename) => {
   getWorker(filename)
   return true
 })
-ipcMain.handle('app:restart', () => {
+ipcMain.handle('app:afterUpdate', () => {
   if (isLinux && process.env.APPIMAGE) {
     app.relaunch({
       execPath: process.env.APPIMAGE,
@@ -164,7 +183,7 @@ ipcMain.handle('app:restart', () => {
         ...process.argv.slice(1).filter((arg) => arg !== '--appimage-extract-and-run')
       ]
     })
-  } else {
+  } else if (!isWindows) {
     app.relaunch()
   }
   app.exit(0)
