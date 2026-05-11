@@ -14,9 +14,7 @@
     "format": "prettier --write . && lunte --fix",
     "start": "electron-forge start -- --no-updates",
     "package": "electron-forge package",
-    "make:darwin": "electron-forge make --platform=darwin",
-    "make:win32": "electron-forge make --platform=win32",
-    "make:linux": "electron-forge package && ./scripts/build-app-image.sh"
+    "make": "electron-forge make"
   },
   "dependencies": {
     "corestore": "^7.9.1",
@@ -37,6 +35,7 @@
     "electron-forge-plugin-prune-prebuilds": "^1.0.0",
     "electron-forge-plugin-universal-prebuilds": "^1.0.0",
     "lunte": "^1.6.0",
+    "pear-electron-forge-maker-appimage": "^1.0.3",
     "prettier": "^3.8.1",
     "prettier-config-holepunch": "^2.0.0"
   }

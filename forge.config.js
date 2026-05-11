@@ -71,6 +71,19 @@ module.exports = {
             }
           : {})
       }
+    },
+    {
+      name: 'pear-electron-forge-maker-appimage',
+      platforms: ['linux'],
+      config: {
+        icons: [
+          { file: 'build/icon/icon-16x16.png', size: 16 },
+          { file: 'build/icon/icon-32x32.png', size: 32 },
+          { file: 'build/icon/icon-64x64.png', size: 64 },
+          { file: 'build/icon/icon-128x128.png', size: 128 },
+          { file: 'build/icon/icon-256x256.png', size: 256 }
+        ]
+      }
     }
   ],
 
@@ -97,6 +110,18 @@ module.exports = {
       }
       if (isWindows) {
         fs.rmSync(path.join(__dirname, 'out', 'make'), { recursive: true, force: true })
+      }
+    },
+    packageAfterCopy: async (forgeConfig, buildPath) => {
+      if (process.platform === 'linux') {
+        const path = await import('path')
+        const fs = await import('fs')
+
+        let appRun = fs.readFileSync(path.resolve('build/AppRun'), 'utf8')
+        appRun = appRun.replaceAll('{{.ExecutableName}}', appName)
+
+        const appRunPath = path.join(buildPath, '..', '..', 'AppRun')
+        fs.writeFileSync(appRunPath, appRun, { mode: 0o755 })
       }
     }
   },
