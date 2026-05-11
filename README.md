@@ -52,25 +52,6 @@ End-to-end boilerplate for embedding [pear-runtime][pear-runtime] into [Electron
 - `npm` via [Node.js][nodejs]
 - [`pear`][pear-docs] - `npx pear`
 
-## CI Configuration <a name="ci-configuration"></a>
-
-Create an environment (Settings -> Environments) named `release`. The workflows use these secrets:
-
-| Secret                    | Platform |
-| ------------------------- | -------- |
-| `CERTIFICATE_P12`         | `darwin` |
-| `CERTIFICATE_PASSWORD`    | `darwin` |
-| `MAC_CODESIGN_IDENTITY`   | `darwin` |
-| `APPLE_ID`                | `darwin` |
-| `APPLE_PASSWORD`          | `darwin` |
-| `APPLE_TEAM_ID`           | `darwin` |
-| `WINDOWS_CERT_PFX_BASE64` | `win32`  |
-| `WINDOWS_CERT_PASSWORD`   | `win32`  |
-
-- Windows certificate subject must match the `Publisher` in `build/AppxManifest.xml`.
-- macOS signing require an Apple Developer Program membership
-- Linux builds are not signed.
-
 ## Terminology <a name="terminology"></a>
 
 - **OTA** - Over-the-Air. Data delivery without manual intervention
@@ -1018,6 +999,25 @@ The `upgrade` field can be set to one link only. Share alternative builds intern
 - [3. Make Distributables](#make-distributables)
 - [4. Build Deployment Directory](#build-deploy-directory)
 - [5. Stage](#stage)
+
+## CI Configuration <a name="ci-configuration"></a>
+
+Create a GitHub environment (Settings -> Environments) named `release`. The workflows require these secrets for signed builds:
+
+| Secret                    | Platform |
+| ------------------------- | -------- |
+| `CERTIFICATE_P12`         | `darwin` |
+| `CERTIFICATE_PASSWORD`    | `darwin` |
+| `MAC_CODESIGN_IDENTITY`   | `darwin` |
+| `APPLE_ID`                | `darwin` |
+| `APPLE_PASSWORD`          | `darwin` |
+| `APPLE_TEAM_ID`           | `darwin` |
+| `WINDOWS_CERT_PFX_BASE64` | `win32`  |
+| `WINDOWS_CERT_PASSWORD`   | `win32`  |
+
+- macOS signing require an Apple Developer Program membership.
+- Windows certificate 'subject' must match the `Publisher` in `build/AppxManifest.xml`.
+- Linux builds are not signed, no configuration needed.
 
 ## Scripts <a name="scripts"></a>
 
