@@ -1015,6 +1015,7 @@ Create a GitHub environment (Settings -> Environments) named `release`. The work
 | `WINDOWS_CERT_PFX_BASE64` | `win32`  | Base64 export of Windows `.pfx`                             |
 | `WINDOWS_CERT_PASSWORD`   | `win32`  | Password for the Windows `.pfx`                             |
 
+- macOS signing requires an [Apple Developer Program](https://developer.apple.com) membership.
 - Windows certificate 'subject' must match the `Publisher` in [AppxManifest.xml](build/AppxManifest.xml).
 - Linux builds are not signed, no configuration needed.
 
