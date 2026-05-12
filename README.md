@@ -1002,7 +1002,7 @@ The `upgrade` field can be set to one link only. Share alternative builds intern
 
 ## CI Configuration <a name="ci-configuration"></a>
 
-Create a GitHub environment (Settings -> Environments) named `release`. The workflows require these secrets for signed builds:
+Create a GitHub environment (Settings -> Environments) named `release`. Run the `Build Release` workflow to build in CI. This workflow requires these secrets for signed builds:
 
 | Secret                    | Platform | Notes                                                       |
 | ------------------------- | -------- | ----------------------------------------------------------- |
