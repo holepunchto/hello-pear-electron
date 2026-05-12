@@ -33,6 +33,10 @@ APP_DIR="$ROOT/out/${APP_NAME}-linux-${ARCH}"
 STAGE_DIR="$ROOT/out/make/__appImage-${ARCH}"
 OUTPUT="$ROOT/out/make/${APP_NAME}.AppImage"
 
+if [ "${FILENAME_VERSION_ARCH:-}" = "true" ]; then
+  OUTPUT="$ROOT/out/make/${APP_NAME}-${VERSION}-${ARCH}.AppImage"
+fi
+
 echo "→ Using app dir: $APP_DIR"
 
 # use icons in build-assets and fallback to app-builder-lib icons for missing icons

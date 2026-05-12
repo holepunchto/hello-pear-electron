@@ -27,6 +27,8 @@ jobs:
       - uses: actions/checkout@v4
       - uses: holepunchto/actions/make-pear-app@v1
         id: build
+        env:
+          FILENAME_VERSION_ARCH: true
         with:
           channel: production
           upgrade_key: ${{ inputs['upgrade-key'] }}
@@ -44,6 +46,8 @@ jobs:
       - uses: actions/checkout@v4
       - uses: holepunchto/actions/make-pear-app@v1
         id: build
+        env:
+          FILENAME_VERSION_ARCH: true
         with:
           channel: production
           upgrade_key: ${{ inputs['upgrade-key'] }}
