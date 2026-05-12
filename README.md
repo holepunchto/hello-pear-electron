@@ -1004,18 +1004,17 @@ The `upgrade` field can be set to one link only. Share alternative builds intern
 
 Create a GitHub environment (Settings -> Environments) named `release`. The workflows require these secrets for signed builds:
 
-| Secret                    | Platform |
-| ------------------------- | -------- |
-| `CERTIFICATE_P12`         | `darwin` |
-| `CERTIFICATE_PASSWORD`    | `darwin` |
-| `MAC_CODESIGN_IDENTITY`   | `darwin` |
-| `APPLE_ID`                | `darwin` |
-| `APPLE_PASSWORD`          | `darwin` |
-| `APPLE_TEAM_ID`           | `darwin` |
-| `WINDOWS_CERT_PFX_BASE64` | `win32`  |
-| `WINDOWS_CERT_PASSWORD`   | `win32`  |
+| Secret                    | Platform | Notes                                                       |
+| ------------------------- | -------- | ----------------------------------------------------------- |
+| `CERTIFICATE_P12`         | `darwin` | Base64 export of Developer ID Application `.p12`            |
+| `CERTIFICATE_PASSWORD`    | `darwin` | Password used to export the `.p12`                          |
+| `MAC_CODESIGN_IDENTITY`   | `darwin` | Developer ID identity from `security find-identity`         |
+| `APPLE_ID`                | `darwin` | Email used for Apple Developer                              |
+| `APPLE_PASSWORD`          | `darwin` | App-specific password (not the account password)            |
+| `APPLE_TEAM_ID`           | `darwin` | Membership details at <https://developer.apple.com/account> |
+| `WINDOWS_CERT_PFX_BASE64` | `win32`  | Base64 export of Windows `.pfx`                             |
+| `WINDOWS_CERT_PASSWORD`   | `win32`  | Password for the Windows `.pfx`                             |
 
-- macOS signing require an [Apple Developer Program](https://developer.apple.com) membership.
 - Windows certificate 'subject' must match the `Publisher` in [AppxManifest.xml](build/AppxManifest.xml).
 - Linux builds are not signed, no configuration needed.
 
