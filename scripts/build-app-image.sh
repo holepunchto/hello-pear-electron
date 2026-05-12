@@ -31,7 +31,7 @@ echo "→ Description: $DESCRIPTION"
 
 APP_DIR="$ROOT/out/${APP_NAME}-linux-${ARCH}"
 STAGE_DIR="$ROOT/out/make/__appImage-${ARCH}"
-OUTPUT="$ROOT/out/make/${APP_NAME}.AppImage"
+OUTPUT="$ROOT/out/make/${APP_NAME}-${VERSION}-${ARCH}.AppImage"
 
 echo "→ Using app dir: $APP_DIR"
 
@@ -72,9 +72,9 @@ EOF
 )
 
 MIME_TYPES=$(jq -r '
-  (.build?.protocols // .protocols // []) 
-  | map(.schemes[]) 
-  | map("x-scheme-handler/" + ascii_downcase) 
+  (.build?.protocols // .protocols // [])
+  | map(.schemes[])
+  | map("x-scheme-handler/" + ascii_downcase)
   | join(";")
 ' "$PKG")
 
