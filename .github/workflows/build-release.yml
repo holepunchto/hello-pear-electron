@@ -3,15 +3,37 @@ name: Build Release
 on:
   workflow_call:
     inputs:
+      channel:
+        type: string
+        default: production
       upgrade-key:
         type: string
         default: ''
+      run-stage:
+        type: boolean
+        default: false
 
   workflow_dispatch:
     inputs:
+      channel:
+        type: choice
+        description: Select the channel
+        default: production
+        options:
+          - internal
+          - production
+        required: true
       upgrade-key:
         description: Value for package.json upgrade field
         required: false
+      run-stage:
+        type: boolean
+        description: Stage the build and create a multisig request
+        default: false
+
+env:
+  CHANNEL: ${{ inputs.channel || 'production' }}
+  UPGRADE_KEY: ${{ inputs['upgrade-key'] || '' }}
 
 jobs:
   build-linux-x64:
@@ -28,8 +50,8 @@ jobs:
       - uses: holepunchto/actions/make-pear-app@v1
         id: build
         with:
-          channel: production
-          upgrade_key: ${{ inputs['upgrade-key'] }}
+          channel: ${{ env.CHANNEL }}
+          upgrade_key: ${{ env.UPGRADE_KEY }}
 
   build-linux-arm:
     timeout-minutes: 20
@@ -45,8 +67,8 @@ jobs:
       - uses: holepunchto/actions/make-pear-app@v1
         id: build
         with:
-          channel: production
-          upgrade_key: ${{ inputs['upgrade-key'] }}
+          channel: ${{ env.CHANNEL }}
+          upgrade_key: ${{ env.UPGRADE_KEY }}
 
   build-macos:
     timeout-minutes: 20
@@ -62,8 +84,8 @@ jobs:
       - uses: holepunchto/actions/make-pear-app@v1
         id: build
         with:
-          channel: production
-          upgrade_key: ${{ inputs['upgrade-key'] }}
+          channel: ${{ env.CHANNEL }}
+          upgrade_key: ${{ env.UPGRADE_KEY }}
           macos_certificate_base64: ${{ secrets.CERTIFICATE_P12 }}
           macos_p12_password: ${{ secrets.CERTIFICATE_PASSWORD }}
           macos_codesign_identity: ${{ secrets.MAC_CODESIGN_IDENTITY }}
@@ -86,8 +108,8 @@ jobs:
       - uses: holepunchto/actions/make-pear-app@v1
         id: build
         with:
-          channel: production
-          upgrade_key: ${{ inputs['upgrade-key'] }}
+          channel: ${{ env.CHANNEL }}
+          upgrade_key: ${{ env.UPGRADE_KEY }}
           macos_certificate_base64: ${{ secrets.CERTIFICATE_P12 }}
           macos_p12_password: ${{ secrets.CERTIFICATE_PASSWORD }}
           macos_codesign_identity: ${{ secrets.MAC_CODESIGN_IDENTITY }}
@@ -110,8 +132,181 @@ jobs:
       - uses: holepunchto/actions/make-pear-app@v1
         id: build
         with:
-          channel: production
-          upgrade_key: ${{ inputs['upgrade-key'] }}
+          channel: ${{ env.CHANNEL }}
+          upgrade_key: ${{ env.UPGRADE_KEY }}
           windows_signing_method: windows_cert_pfx
           windows_cert_pfx_base64: ${{ secrets.WINDOWS_CERT_PFX_BASE64 }}
           windows_cert_password: ${{ secrets.WINDOWS_CERT_PASSWORD }}
+
+  stage:
+    needs: [build-linux-x64, build-linux-arm, build-macos, build-macos-x64, build-win32]
+    if: >-
+      ${{
+        !cancelled()
+        && !failure()
+        && inputs['run-stage'] == true
+        && needs.build-linux-x64.result == 'success'
+        && needs.build-linux-arm.result == 'success'
+        && needs.build-macos.result == 'success'
+        && needs.build-macos-x64.result == 'success'
+        && needs.build-win32.result == 'success'
+      }}
+    runs-on: macos-latest
+    environment: ${{ inputs.channel || 'production' }}
+    outputs:
+      source-verlink: ${{ steps.stage.outputs.source-verlink }}
+    env:
+      STAGE_STORAGE: /tmp/pear-stage-store
+      STAGE_TARGET: out/hello-pear-electron-stage
+      STAGE_NAME: ${{ github.repository }}-${{ inputs.channel || 'production' }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+
+      - uses: actions/download-artifact@v4
+        with:
+          path: out/artifacts
+
+      - name: Install staging tools
+        run: |
+          npm install --no-save --no-package-lock corestore-snapshot pear-stage-next pear-ci-multisig
+          echo "$PWD/node_modules/.bin" >> "$GITHUB_PATH"
+
+      - name: Build stage directory
+        env:
+          CHANNEL: ${{ env.CHANNEL }}
+        run: ./scripts/build-stage-artifact.sh out/artifacts "$STAGE_TARGET"
+
+      - name: Open stage snapshot
+        run: >-
+          corestore-snapshot
+          --open
+          --snapshot=./ci/snapshot.json
+          --storage="$STAGE_STORAGE"
+          --primary-key="${{ secrets.PEAR_PRIMARY_KEY }}"
+
+      - name: Stage next
+        id: stage
+        env:
+          PEAR_PRIMARY_KEY: ${{ secrets.PEAR_PRIMARY_KEY }}
+        run: |
+          set -euo pipefail
+
+          pear-stage-next \
+            --storage="$STAGE_STORAGE" \
+            --target="$STAGE_TARGET" \
+            --primary-key="$PEAR_PRIMARY_KEY" \
+            --name="$STAGE_NAME"
+
+          verlink="$(node <<'NODE'
+          const Corestore = require('corestore')
+          const Hyperdrive = require('hyperdrive')
+          const plink = require('pear-link')
+
+          async function main () {
+            const store = new Corestore(process.env.STAGE_STORAGE, {
+              primaryKey: Buffer.from(process.env.PEAR_PRIMARY_KEY, 'hex'),
+              unsafe: true
+            })
+            await store.ready()
+
+            const drive = new Hyperdrive(store.namespace(process.env.STAGE_NAME))
+            await drive.ready()
+
+            console.log(plink.serialize({
+              drive: {
+                key: drive.key,
+                fork: drive.db.core.fork,
+                length: drive.db.core.length
+              }
+            }))
+
+            await drive.close()
+            await store.close()
+          }
+
+          main().catch((err) => {
+            console.error(err)
+            process.exit(1)
+          })
+          NODE
+          )"
+
+          echo "$verlink"
+          echo "source-verlink=$verlink" >> "$GITHUB_OUTPUT"
+
+      - name: Close stage snapshot
+        run: >-
+          corestore-snapshot
+          --close
+          --snapshot=./ci/snapshot.json
+          --storage="$STAGE_STORAGE"
+          --primary-key="${{ secrets.PEAR_PRIMARY_KEY }}"
+
+      - name: Create snapshot update PR
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          BRANCH="snapshot/update-${{ github.run_number }}"
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git fetch origin main
+          git checkout -b "$BRANCH" origin/main
+          git add ci/snapshot.json
+          git commit -m "ci: update snapshot.json with new stage"
+          git push origin "$BRANCH"
+          gh pr create \
+            --title "ci: update snapshot.json" \
+            --body "Automated snapshot update from workflow run #${{ github.run_number }}." \
+            --base "main" \
+            --head "$BRANCH"
+
+      - name: Create multisig request
+        id: multisig
+        env:
+          SOURCE_VERLINK: ${{ steps.stage.outputs.source-verlink }}
+          MULTISIG_QUORUM: ${{ secrets.MULTISIG_QUORUM }}
+          MULTISIG_NAMESPACE: ${{ secrets.MULTISIG_NAMESPACE }}
+          MULTISIG_PUBKEYS: ${{ secrets.MULTISIG_PUBKEYS }}
+        run: |
+          set -euo pipefail
+
+          if [[ -z "$MULTISIG_QUORUM" || -z "$MULTISIG_NAMESPACE" || -z "$MULTISIG_PUBKEYS" ]]; then
+            echo "Missing MULTISIG_QUORUM, MULTISIG_NAMESPACE, or MULTISIG_PUBKEYS secrets" >&2
+            exit 1
+          fi
+
+          read -r -a pubkeys <<< "$MULTISIG_PUBKEYS"
+          multisig_args=(--quorum "$MULTISIG_QUORUM" --namespace "$MULTISIG_NAMESPACE")
+          for key in "${pubkeys[@]}"; do
+            multisig_args+=(--pubkey "$key")
+          done
+
+          link="$(pear-ci-multisig link "${multisig_args[@]}")"
+          request="$(pear-ci-multisig request "${multisig_args[@]}" "$SOURCE_VERLINK")"
+
+          {
+            echo "### Multisig Request"
+            echo
+            echo "Channel: \`${{ env.CHANNEL }}\`"
+            echo
+            echo "Source verlink: \`$SOURCE_VERLINK\`"
+            echo
+            echo "Multisig link: \`$link\`"
+            echo
+            echo "Request: \`$request\`"
+            echo
+            echo "Signers:"
+            for key in "${pubkeys[@]}"; do
+              echo "- \`$key\`"
+            done
+            echo
+            echo "Each signer runs:"
+            echo "\`pear multisig sign $request\`"
+            echo
+            echo "This workflow only creates the request and prints the details. It does not run \`multisig commit\`."
+          } | tee -a "$GITHUB_STEP_SUMMARY"

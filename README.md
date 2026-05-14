@@ -38,6 +38,7 @@ End-to-end boilerplate for embedding [pear-runtime][pear-runtime] into [Electron
     - [Release Line Builds](#release-line-builds)
     - [Custom Builds](#custom-builds)
 - [CI Configuration](#ci-configuration)
+  - [CI Multisig](#ci-multisig)
 - [Scripts](#scripts)
 - [Troubleshooting](#troubleshooting)
 
@@ -1018,6 +1019,39 @@ Create a GitHub environment (Settings -> Environments) named `release`. Run the 
 - macOS signing requires an [Apple Developer Program](https://developer.apple.com) membership.
 - Windows certificate 'subject' must match the `Publisher` in [AppxManifest.xml](build/AppxManifest.xml).
 - Linux builds are not signed, no configuration needed.
+
+### CI Multisig <a name="ci-multisig"></a>
+
+The `Build Release` workflow can stage a completed build and create a multisig signing request in the same run.
+
+1. Create a GitHub environment for the channel, e.g. `internal`.
+   The environment name must match the workflow `channel` input.
+
+2. Add these environment secrets:
+
+| Secret               | Notes                                                              |
+| -------------------- | ------------------------------------------------------------------ |
+| `PEAR_PRIMARY_KEY`   | Hex-encoded primary key used by CI to stage into the channel drive |
+| `MULTISIG_QUORUM`    | Required signature count, e.g. `2`                                 |
+| `MULTISIG_PUBKEYS`   | Space-separated signer public keys                                 |
+| `MULTISIG_NAMESPACE` | Multisig namespace, e.g. `holepunchto/hello-pear-electron`         |
+
+3. Run `Build Release` with the intended `channel`, the matching `upgrade-key`, and `run-stage: true`.
+   The build jobs produce OS distributables, the stage job assembles them into a Pear deployment directory, stages that directory, and prints the source verlink and multisig request in the job summary.
+
+4. Merge the automated `ci/snapshot.json` PR before the next staged build.
+   The snapshot lets future CI runs reopen the staged drive state before appending the next version.
+
+5. Keep the staged source drive seeded by release infrastructure.
+   `pear-stage-next` waits for remote peers to sync before it finishes, and `pear-ci-multisig request` validates that the source is sufficiently seeded before creating the request.
+
+6. Each signer runs:
+
+```sh
+pear multisig sign <request>
+```
+
+This flow only creates the multisig request. It does not run `multisig commit`.
 
 ## Scripts <a name="scripts"></a>
 
