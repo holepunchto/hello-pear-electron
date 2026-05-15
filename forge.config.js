@@ -111,18 +111,6 @@ module.exports = {
       if (isWindows) {
         fs.rmSync(path.join(__dirname, 'out', 'make'), { recursive: true, force: true })
       }
-    },
-    packageAfterCopy: async (forgeConfig, buildPath) => {
-      if (process.platform === 'linux') {
-        const path = await import('path')
-        const fs = await import('fs')
-
-        let appRun = fs.readFileSync(path.resolve('build/AppRun'), 'utf8')
-        appRun = appRun.replaceAll('{{.ExecutableName}}', appName)
-
-        const appRunPath = path.join(buildPath, '..', '..', 'AppRun')
-        fs.writeFileSync(appRunPath, appRun, { mode: 0o755 })
-      }
     }
   },
 

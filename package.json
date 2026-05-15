@@ -35,7 +35,7 @@
     "electron-forge-plugin-prune-prebuilds": "^1.0.0",
     "electron-forge-plugin-universal-prebuilds": "^1.0.0",
     "lunte": "^1.6.0",
-    "pear-electron-forge-maker-appimage": "^1.0.3",
+    "pear-electron-forge-maker-appimage": "^2.0.0",
     "prettier": "^3.8.1",
     "prettier-config-holepunch": "^2.0.0"
   }
