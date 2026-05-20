@@ -1,8 +1,6 @@
 const { app, BrowserWindow, ipcMain } = require('electron')
 const os = require('os')
 const path = require('path')
-const Hyperswarm = require('hyperswarm')
-const Corestore = require('corestore')
 const PearRuntime = require('pear-runtime')
 
 const { isMac, isLinux, isWindows } = require('which-runtime')
@@ -35,8 +33,21 @@ ipcMain.on('pkg', (evt) => {
   evt.returnValue = pkg
 })
 
-function getPear() {
-  if (pear) return pear
+function getAppPath() {
+  if (!app.isPackaged) return null
+  if (isLinux && process.env.APPIMAGE) return process.env.APPIMAGE
+  if (isWindows) return process.execPath
+  return path.join(process.resourcesPath, '..', '..')
+}
+
+function sendToAll(name, data) {
+  for (const win of BrowserWindow.getAllWindows()) {
+    if (!win.isDestroyed()) win.webContents.send(name, data)
+  }
+}
+
+function getWorker(specifier) {
+  if (workers.has(specifier)) return workers.get(specifier)
   const appPath = getAppPath()
   let dir = null
   if (pearStore) {
@@ -53,46 +64,16 @@ function getPear() {
   }
 
   const extension = isLinux ? '.AppImage' : isMac ? '.app' : '.msix'
-  const store = new Corestore(path.join(dir, 'pear-runtime/corestore'))
-  const swarm = new Hyperswarm()
-  pear = new PearRuntime({
+  const updaterConfig = {
     dir,
     app: appPath,
     updates,
     version,
     upgrade,
     name: productName + extension,
-    store,
-    swarm
-  })
-  if (updates !== false) {
-    swarm.on('connection', (connection) => store.replicate(connection))
-    swarm.join(pear.updater.drive.core.discoveryKey, {
-      client: true,
-      server: false
-    })
   }
-  pear.on('error', console.error) // print network errors, etc.
-  return pear
-}
+  const worker = PearRuntime.run(require.resolve('..' + specifier), [JSON.stringify(updaterConfig)])
 
-function getAppPath() {
-  if (!app.isPackaged) return null
-  if (isLinux && process.env.APPIMAGE) return process.env.APPIMAGE
-  if (isWindows) return process.execPath
-  return path.join(process.resourcesPath, '..', '..')
-}
-
-function sendToAll(name, data) {
-  for (const win of BrowserWindow.getAllWindows()) {
-    if (!win.isDestroyed()) win.webContents.send(name, data)
-  }
-}
-
-function getWorker(specifier) {
-  if (workers.has(specifier)) return workers.get(specifier)
-  const pear = getPear()
-  const worker = pear.run(require.resolve('..' + specifier), [pear.storage])
   function sendWorkerStdout(data) {
     sendToAll('pear:worker:stdout:' + specifier, data)
   }
@@ -137,8 +118,6 @@ async function createWindow() {
     }
   })
 
-  const pear = getPear()
-
   const onUpdating = () => {
     if (!win.isDestroyed()) win.webContents.send('pear:event:updating')
   }
@@ -146,14 +125,6 @@ async function createWindow() {
   const onUpdated = () => {
     if (!win.isDestroyed()) win.webContents.send('pear:event:updated')
   }
-
-  pear.updater.on('updating', onUpdating)
-  pear.updater.on('updated', onUpdated)
-
-  win.on('closed', () => {
-    pear.updater.removeListener('updating', onUpdating)
-    pear.updater.removeListener('updated', onUpdated)
-  })
 
   const devServerUrl = process.env.PEAR_DEV_SERVER_URL
 
@@ -167,8 +138,8 @@ async function createWindow() {
 }
 
 ipcMain.handle('pear:applyUpdate', () => {
-  const pear = getPear()
-  pear.updater.applyUpdate()
+  const worker = getWorker()
+  worker.write(Buffer.from('pear:applyUpdate'))
 })
 ipcMain.handle('pear:startWorker', (evt, filename) => {
   getWorker(filename)
