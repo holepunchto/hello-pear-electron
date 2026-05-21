@@ -9,6 +9,7 @@ const pkg = require('../package.json')
 const { name, productName, version, upgrade } = pkg
 
 const protocol = name
+const mainWorkerSpecifier = '/workers/main.js'
 
 const workers = new Map()
 let pear = null
@@ -138,7 +139,7 @@ async function createWindow() {
 }
 
 ipcMain.handle('pear:applyUpdate', () => {
-  const worker = getWorker()
+  const worker = getWorker(mainWorkerSpecifier)
   worker.write(Buffer.from('pear:applyUpdate'))
 })
 ipcMain.handle('pear:startWorker', (evt, filename) => {

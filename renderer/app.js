@@ -3,11 +3,7 @@ const decoder = new TextDecoder('utf-8')
 
 document.getElementById('v').innerText += bridge.pkg().version
 
-bridge.onPearEvent('updating', () => {
-  document.getElementById('v').innerText = 'UPDATING...'
-})
-
-bridge.onPearEvent('updated', () => {
+function showUpdateReady() {
   document.getElementById('v').innerText = 'Update ready!'
   const btn = document.getElementById('update-btn')
   btn.style.display = 'inline-block'
@@ -22,13 +18,22 @@ bridge.onPearEvent('updated', () => {
       btn.style.display = 'none'
     }
   }
-})
+}
+
+function onWorkerUpdaterEvent(name) {
+  if (name === 'updating') {
+    document.getElementById('v').innerText = 'UPDATING...'
+    return
+  }
+  if (name === 'updated') showUpdateReady()
+}
 
 const workers = {
   main: '/workers/main.js'
 }
 
 bridge.startWorker(workers.main)
+let sentHello = false
 
 const offWorkerStdout = bridge.onWorkerStdout(workers.main, (data) => {
   console.log('worker stdout', '[', workers.main, ']:', decoder.decode(data))
@@ -39,9 +44,14 @@ const offWorkerStderr = bridge.onWorkerStderr(workers.main, (data) => {
 })
 
 const offWorkerIpc = bridge.onWorkerIPC(workers.main, (data) => {
-  console.log('worker ipc', '[', workers.main, ']:', decoder.decode(data))
+  const message = decoder.decode(data)
+  console.log('worker ipc', '[', workers.main, ']:', message)
+  onWorkerUpdaterEvent(message)
 
-  bridge.writeWorkerIPC(workers.main, 'Hello from renderer')
+  if (!sentHello) {
+    sentHello = true
+    bridge.writeWorkerIPC(workers.main, 'Hello from renderer')
+  }
 })
 
 const offWorkerExit = bridge.onWorkerExit(workers.main, (code) => {
