@@ -12,7 +12,6 @@ const protocol = name
 const mainWorkerSpecifier = '/workers/main.js'
 
 const workers = new Map()
-let pear = null
 
 const appName = productName ?? name
 
@@ -75,7 +74,7 @@ function getWorker(specifier) {
     updates,
     version,
     upgrade,
-    name: productName + extension,
+    name: productName + extension
   }
   const worker = PearRuntime.run(require.resolve('..' + specifier), [JSON.stringify(updaterConfig)])
 
@@ -123,14 +122,6 @@ async function createWindow() {
     }
   })
 
-  const onUpdating = () => {
-    if (!win.isDestroyed()) win.webContents.send('pear:event:updating')
-  }
-
-  const onUpdated = () => {
-    if (!win.isDestroyed()) win.webContents.send('pear:event:updated')
-  }
-
   const devServerUrl = process.env.PEAR_DEV_SERVER_URL
 
   if (devServerUrl) {
@@ -162,7 +153,7 @@ ipcMain.handle('app:afterUpdate', () => {
   } else if (!isWindows) {
     app.relaunch()
   }
-  app.exit(0)
+  app.quit()
 })
 
 function handleDeepLink(url) {
