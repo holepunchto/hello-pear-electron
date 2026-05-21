@@ -1,0 +1,117 @@
+name: Build Release
+
+on:
+  workflow_call:
+    inputs:
+      upgrade-key:
+        type: string
+        default: ''
+
+  workflow_dispatch:
+    inputs:
+      upgrade-key:
+        description: Value for package.json upgrade field
+        required: false
+
+jobs:
+  build-linux-x64:
+    timeout-minutes: 20
+    permissions:
+      contents: write # to upload artifacts
+      packages: read
+    runs-on: ubuntu-latest
+    environment: release
+    outputs:
+      artifact-links: ${{ steps.build.outputs.artifact-links }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: holepunchto/actions/make-pear-app@v1
+        id: build
+        with:
+          channel: production
+          upgrade_key: ${{ inputs['upgrade-key'] }}
+
+  build-linux-arm:
+    timeout-minutes: 20
+    permissions:
+      contents: write # to upload artifacts
+      packages: read
+    runs-on: ubuntu-24.04-arm
+    environment: release
+    outputs:
+      artifact-links: ${{ steps.build.outputs.artifact-links }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: holepunchto/actions/make-pear-app@v1
+        id: build
+        with:
+          channel: production
+          upgrade_key: ${{ inputs['upgrade-key'] }}
+
+  build-macos:
+    timeout-minutes: 20
+    permissions:
+      contents: write # to upload artifacts
+      packages: read
+    runs-on: macos-latest
+    environment: release
+    outputs:
+      artifact-links: ${{ steps.build.outputs.artifact-links }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: holepunchto/actions/make-pear-app@v1
+        id: build
+        with:
+          channel: production
+          upgrade_key: ${{ inputs['upgrade-key'] }}
+          macos_certificate_base64: ${{ secrets.CERTIFICATE_P12 }}
+          macos_p12_password: ${{ secrets.CERTIFICATE_PASSWORD }}
+          macos_codesign_identity: ${{ secrets.MAC_CODESIGN_IDENTITY }}
+          macos_notarization_method: apple_id_password
+          macos_apple_id: ${{ secrets.APPLE_ID }}
+          macos_apple_password: ${{ secrets.APPLE_PASSWORD }}
+          macos_apple_team_id: ${{ secrets.APPLE_TEAM_ID }}
+
+  build-macos-x64:
+    timeout-minutes: 20
+    permissions:
+      contents: write # to upload artifacts
+      packages: read
+    runs-on: macos-26-intel
+    environment: release
+    outputs:
+      artifact-links: ${{ steps.build.outputs.artifact-links }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: holepunchto/actions/make-pear-app@v1
+        id: build
+        with:
+          channel: production
+          upgrade_key: ${{ inputs['upgrade-key'] }}
+          macos_certificate_base64: ${{ secrets.CERTIFICATE_P12 }}
+          macos_p12_password: ${{ secrets.CERTIFICATE_PASSWORD }}
+          macos_codesign_identity: ${{ secrets.MAC_CODESIGN_IDENTITY }}
+          macos_notarization_method: apple_id_password
+          macos_apple_id: ${{ secrets.APPLE_ID }}
+          macos_apple_password: ${{ secrets.APPLE_PASSWORD }}
+          macos_apple_team_id: ${{ secrets.APPLE_TEAM_ID }}
+
+  build-win32:
+    timeout-minutes: 20
+    permissions:
+      contents: write # to upload artifacts
+      packages: read
+    runs-on: windows-latest
+    environment: release
+    outputs:
+      artifact-links: ${{ steps.build.outputs.artifact-links }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: holepunchto/actions/make-pear-app@v1
+        id: build
+        with:
+          channel: production
+          upgrade_key: ${{ inputs['upgrade-key'] }}
+          windows_signing_method: windows_cert_pfx
+          windows_cert_pfx_base64: ${{ secrets.WINDOWS_CERT_PFX_BASE64 }}
+          windows_cert_password: ${{ secrets.WINDOWS_CERT_PASSWORD }}

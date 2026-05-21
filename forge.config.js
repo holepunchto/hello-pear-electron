@@ -2,7 +2,6 @@ const fs = require('fs')
 const path = require('path')
 const pkg = require('./package.json')
 const appName = pkg.productName ?? pkg.name
-const { isWindows } = require('which-runtime')
 
 function getWindowsKitVersion() {
   const programFiles = process.env['PROGRAMFILES(X86)'] || process.env.PROGRAMFILES
@@ -40,9 +39,8 @@ if (process.env.MAC_CODESIGN_IDENTITY) {
       })
     },
     osxNotarize: {
-      appleId: process.env.APPLE_ID,
-      appleIdPassword: process.env.APPLE_PASSWORD,
-      teamId: process.env.APPLE_TEAM_ID
+      tool: 'notarytool',
+      keychainProfile: process.env.KEYCHAIN_PROFILE
     }
   }
 }
@@ -62,11 +60,10 @@ module.exports = {
       config: {
         appManifest: path.join(__dirname, 'build', 'AppxManifest.xml'),
         windowsKitVersion: getWindowsKitVersion(),
-        ...(process.env.WINDOWS_CERTIFICATE_FILE
+        ...(process.env.WINDOWS_SIGN_HOOK
           ? {
               windowsSignOptions: {
-                certificateFile: process.env.WINDOWS_CERTIFICATE_FILE,
-                certificatePassword: process.env.WINDOWS_CERTIFICATE_PASSWORD
+                hookModulePath: process.env.WINDOWS_SIGN_HOOK
               }
             }
           : {})
@@ -84,10 +81,44 @@ module.exports = {
           { file: 'build/icon/icon-256x256.png', size: 256 }
         ]
       }
+    },
+    {
+      name: 'pear-electron-forge-maker-flatpak',
+      platforms: ['linux'],
+      config: {
+        appId: 'com.pears.HelloPear',
+        icon: `${packagerConfig.icon}.png`,
+        metainfo: 'build/metainfo.xml',
+        entrypoint: 'build/entrypoint.sh',
+        comment: 'Integrating Pear into a hello world electron desktop app',
+        categories: ['Development']
+      }
+    },
+    {
+      name: 'pear-electron-forge-maker-snap',
+      platforms: ['linux'],
+      config: {
+        snapcraftYamlPath: 'build/snapcraft.yaml',
+        summary: 'Integrating Pear into a hello world electron desktop app',
+        description:
+          'End-to-end boilerplate for embedding pear-runtime into Electron apps and deploying peer-to-peer application updates.',
+        contact: 'hello@holepunchto.to',
+        license: 'Apache-2.0',
+        issues: 'https://github.com/holepunchto/hello-pear-electron/issues',
+        website: 'https://github.com/holepunchto/hello-pear-electron',
+        icon: `${packagerConfig.icon}.png`
+      }
     }
   ],
 
   hooks: {
+    readPackageJson: async (forgeConfig, packageJson) => {
+      if (process.env.UPGRADE_KEY) {
+        packageJson.upgrade = process.env.UPGRADE_KEY
+      }
+
+      return packageJson
+    },
     preMake: async () => {
       fs.rmSync(path.join(__dirname, 'out', 'make'), { recursive: true, force: true })
 
@@ -105,11 +136,10 @@ module.exports = {
           fs.mkdirSync(standardDir, { recursive: true })
           const dest = path.join(standardDir, path.basename(artifact))
           fs.renameSync(artifact, dest)
+          fs.mkdirSync(path.dirname(artifact), { recursive: true })
+          fs.copyFileSync(dest, artifact)
           result.artifacts[result.artifacts.indexOf(artifact)] = dest
         }
-      }
-      if (isWindows) {
-        fs.rmSync(path.join(__dirname, 'out', 'make'), { recursive: true, force: true })
       }
     }
   },

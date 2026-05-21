@@ -37,6 +37,7 @@ End-to-end boilerplate for embedding [pear-runtime][pear-runtime] into [Electron
     - [Release Lines](#release-lines)
     - [Release Line Builds](#release-line-builds)
     - [Custom Builds](#custom-builds)
+- [CI Configuration](#ci-configuration)
 - [Scripts](#scripts)
 - [Troubleshooting](#troubleshooting)
 
@@ -990,6 +991,25 @@ The `upgrade` field can be set to one link only. Share alternative builds intern
 - [3. Make Distributables](#make-distributables)
 - [4. Build Deployment Directory](#build-deploy-directory)
 - [5. Stage](#stage)
+
+## CI Configuration <a name="ci-configuration"></a>
+
+Create a GitHub environment (Settings -> Environments) named `release`. Run the `Build Release` workflow to build in CI. This workflow requires these secrets for signed builds:
+
+| Secret                    | Platform | Notes                                                       |
+| ------------------------- | -------- | ----------------------------------------------------------- |
+| `CERTIFICATE_P12`         | `darwin` | Base64 export of Developer ID Application `.p12`            |
+| `CERTIFICATE_PASSWORD`    | `darwin` | Password used to export the `.p12`                          |
+| `MAC_CODESIGN_IDENTITY`   | `darwin` | e.g. `Developer ID Application: Name (TEAMID)`              |
+| `APPLE_ID`                | `darwin` | Apple Developer account email                               |
+| `APPLE_PASSWORD`          | `darwin` | App-specific password (not the account password)            |
+| `APPLE_TEAM_ID`           | `darwin` | Membership details at <https://developer.apple.com/account> |
+| `WINDOWS_CERT_PFX_BASE64` | `win32`  | Base64 export of Windows `.pfx`                             |
+| `WINDOWS_CERT_PASSWORD`   | `win32`  | Password for the Windows `.pfx`                             |
+
+- macOS signing requires an [Apple Developer Program](https://developer.apple.com) membership.
+- Windows certificate 'subject' must match the `Publisher` in [AppxManifest.xml](build/AppxManifest.xml).
+- Linux builds are not signed, no configuration needed.
 
 ## Scripts <a name="scripts"></a>
 
