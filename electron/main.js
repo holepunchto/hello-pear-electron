@@ -64,7 +64,7 @@ function getWorker(specifier) {
         ? isSnap
           ? path.join(process.env.SNAP_USER_COMMON, appName)
           : path.join(linuxConfigHome, appName)
-        : path.join(os.homedir(), 'AppData', 'Local', appName)
+        : path.join(os.homedir(), 'AppData', 'Roaming', appName)
   }
 
   const extension = isLinux ? '.AppImage' : isMac ? '.app' : '.msix'
@@ -133,9 +133,16 @@ async function createWindow() {
   await win.loadFile(path.join(__dirname, '..', 'renderer', 'index.html'))
 }
 
-ipcMain.handle('pear:applyUpdate', () => {
+ipcMain.handle('pear:applyUpdate', async () => {
   const worker = getWorker(mainWorkerSpecifier)
-  worker.write(Buffer.from('pear:applyUpdate'))
+  
+  await new Promise((resolve) => {
+    worker.on('data', (data) => {
+      const message = data.toString()
+      if (message === 'pear:updateApplied') resolve()
+    })
+    worker.write(Buffer.from('pear:applyUpdate'))
+  })
 })
 ipcMain.handle('pear:startWorker', (evt, filename) => {
   getWorker(filename)

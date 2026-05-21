@@ -27,9 +27,12 @@ goodbye(async () => {
   await store.close()
 })
 
-Bare.IPC.on('data', (data) => {
+Bare.IPC.on('data', async (data) => {
   const string = data.toString()
-  if (string === 'pear:applyUpdate') pear.updater.applyUpdate()
+  if (string === 'pear:applyUpdate') {
+    await pear.updater.applyUpdate()
+    Bare.IPC.write('pear:updateApplied')
+  }
   else console.log(string)
 })
 
