@@ -18,6 +18,8 @@ if (updaterConfig.updates !== false) {
   })
 }
 
+console.log('Application storage:', pear.storage)
+
 pear.updater.on('updating', () => Bare.IPC.write('updating'))
 pear.updater.on('updated', () => Bare.IPC.write('updated'))
 
@@ -28,12 +30,11 @@ goodbye(async () => {
 })
 
 Bare.IPC.on('data', async (data) => {
-  const string = data.toString()
-  if (string === 'pear:applyUpdate') {
+  const message = data.toString()
+  if (message === 'pear:applyUpdate') {
     await pear.updater.applyUpdate()
     Bare.IPC.write('pear:updateApplied')
-  }
-  else console.log(string)
+  } else console.log(message)
 })
 
 Bare.IPC.write('Hello from worker')

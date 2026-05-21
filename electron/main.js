@@ -133,10 +133,10 @@ async function createWindow() {
   await win.loadFile(path.join(__dirname, '..', 'renderer', 'index.html'))
 }
 
-ipcMain.handle('pear:applyUpdate', async () => {
+ipcMain.handle('pear:applyUpdate', () => {
   const worker = getWorker(mainWorkerSpecifier)
-  
-  await new Promise((resolve) => {
+
+  return new Promise((resolve) => {
     worker.on('data', (data) => {
       const message = data.toString()
       if (message === 'pear:updateApplied') resolve()
