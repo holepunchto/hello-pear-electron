@@ -20,6 +20,12 @@ if (updaterConfig.updates !== false) {
 pear.updater.on('updating', () => Bare.IPC.write('updating'))
 pear.updater.on('updated', () => Bare.IPC.write('updated'))
 
+Bare.on('exit', async () => {
+  await swarm.destroy()
+  await pear.close()
+  await store.close()
+})
+
 Bare.IPC.on('data', (data) => {
     const string = data.toString()
     if (string === 'pear:applyUpdate') pear.updater.applyUpdate()
