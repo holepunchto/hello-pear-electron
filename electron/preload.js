@@ -1,11 +1,8 @@
 const { contextBridge, ipcRenderer } = require('electron')
 
-function toBuffer(data) {
-  if (Buffer.isBuffer(data)) return data
-  if (ArrayBuffer.isView(data)) return Buffer.from(data.buffer, data.byteOffset, data.byteLength)
-  if (data instanceof ArrayBuffer) return Buffer.from(data)
-  if (data && Array.isArray(data.data)) return Buffer.from(data.data)
-  return Buffer.from(String(data))
+function toBuffer (data) {
+  if (data === null || data === undefined || typeof data === 'number') return data
+  return Buffer.from(data.buffer, data.byteOffset, data.byteLength)
 }
 
 contextBridge.exposeInMainWorld('bridge', {
