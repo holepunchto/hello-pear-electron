@@ -10,7 +10,7 @@ const pipe = new FramedStream(Bare.IPC)
 const updaterConfig = {
   dir: Bare.argv[2],
   app: Bare.argv[3],
-  updates: Bare.argv[4],
+  updates: Bare.argv[4] === 'true',
   version: Bare.argv[5],
   upgrade: Bare.argv[6],
   name: Bare.argv[7]
@@ -19,7 +19,8 @@ const updaterConfig = {
 const store = new Corestore(path.join(updaterConfig.dir, 'pear-runtime/corestore'))
 const swarm = new Hyperswarm()
 const pear = new PearRuntime({ ...updaterConfig, swarm, store })
-pear.on('error', console.log)
+
+pear.updater.on('error', console.error)
 if (updaterConfig.updates !== false) {
   swarm.on('connection', (connection) => store.replicate(connection))
   swarm.join(pear.updater.drive.core.discoveryKey, {

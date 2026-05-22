@@ -2,6 +2,7 @@ const { app, BrowserWindow, ipcMain } = require('electron')
 const os = require('os')
 const path = require('path')
 const PearRuntime = require('pear-runtime')
+const FramedStream = require('framed-stream')
 
 const { isMac, isLinux, isWindows } = require('which-runtime')
 const { command, flag } = require('paparam')
@@ -77,6 +78,7 @@ function getWorker(specifier) {
     upgrade,
     productName + extension
   ])
+  const pipe = new FramedStream(worker)
 
   function sendWorkerStdout(data) {
     sendToAll('pear:worker:stdout:' + specifier, data)
@@ -88,26 +90,26 @@ function getWorker(specifier) {
     sendToAll('pear:worker:ipc:' + specifier, data)
   }
   function onBeforeQuit() {
-    worker.destroy()
+    pipe.destroy()
   }
   ipcMain.handle('pear:worker:writeIPC:' + specifier, (evt, data) => {
-    return worker.write(Buffer.from(data))
+    return pipe.write(data)
   })
-  workers.set(specifier, worker)
-  worker.on('data', sendWorkerIPC)
+  workers.set(specifier, pipe)
+  pipe.on('data', sendWorkerIPC)
   worker.stdout.on('data', sendWorkerStdout)
   worker.stderr.on('data', sendWorkerStderr)
   worker.once('exit', (code) => {
     app.removeListener('before-quit', onBeforeQuit)
     ipcMain.removeHandler('pear:worker:writeIPC:' + specifier)
-    worker.removeListener('data', sendWorkerIPC)
+    pipe.removeListener('data', sendWorkerIPC)
     worker.stdout.removeListener('data', sendWorkerStdout)
     worker.stderr.removeListener('data', sendWorkerStderr)
     sendToAll('pear:worker:exit:' + specifier, code)
     workers.delete(specifier)
   })
   app.on('before-quit', onBeforeQuit)
-  return worker
+  return pipe
 }
 
 async function createWindow() {
@@ -134,21 +136,21 @@ async function createWindow() {
 }
 
 ipcMain.handle('pear:applyUpdate', () => {
-  const worker = getWorker(mainWorkerSpecifier)
+  const pipe = getWorker(mainWorkerSpecifier)
 
   return new Promise((resolve) => {
     function onData(data) {
       const message = data.toString()
 
       if (message === 'pear:updateApplied') {
-        worker.removeListener('data', onData)
+        pipe.removeListener('data', onData)
         resolve()
       }
     }
 
-    worker.on('data', onData)
+    pipe.on('data', onData)
 
-    worker.write(Buffer.from('pear:applyUpdate'))
+    pipe.write('pear:applyUpdate')
   })
 })
 ipcMain.handle('pear:startWorker', (evt, filename) => {
