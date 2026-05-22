@@ -68,15 +68,15 @@ function getWorker(specifier) {
   }
 
   const extension = isLinux ? '.AppImage' : isMac ? '.app' : '.msix'
-  const updaterConfig = {
+
+  const worker = PearRuntime.run('../' + specifier, [
     dir,
-    app: appPath,
+    appPath,
     updates,
     version,
     upgrade,
-    name: productName + extension
-  }
-  const worker = PearRuntime.run('../' + specifier, [dir, appPath, updates, version, upgrade, productName + extension])
+    productName + extension
+  ])
 
   function sendWorkerStdout(data) {
     sendToAll('pear:worker:stdout:' + specifier, data)
