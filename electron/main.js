@@ -137,10 +137,17 @@ ipcMain.handle('pear:applyUpdate', () => {
   const worker = getWorker(mainWorkerSpecifier)
 
   return new Promise((resolve) => {
-    worker.on('data', (data) => {
+    function onData(data) {
       const message = data.toString()
-      if (message === 'pear:updateApplied') resolve()
-    })
+
+      if (message === 'pear:updateApplied') {
+        worker.removeListener('data', onData)
+        resolve()
+      }
+    }
+
+    worker.on('data', onData)
+
     worker.write(Buffer.from('pear:applyUpdate'))
   })
 })
