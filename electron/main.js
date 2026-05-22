@@ -138,18 +138,23 @@ async function createWindow() {
 ipcMain.handle('pear:applyUpdate', () => {
   const pipe = getWorker(mainWorkerSpecifier)
 
-  return new Promise((resolve) => {
+  return new Promise((resolve, reject) => {
+    const timeout = setTimeout(() => {
+      pipe.removeListener('data', onData)
+      reject(new Error('Timed out waiting for pear:updateApplied'))
+    }, 30000)
+
     function onData(data) {
       const message = data.toString()
 
       if (message === 'pear:updateApplied') {
+        clearTimeout(timeout)
         pipe.removeListener('data', onData)
         resolve()
       }
     }
 
     pipe.on('data', onData)
-
     pipe.write('pear:applyUpdate')
   })
 })
