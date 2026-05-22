@@ -69,7 +69,7 @@ function getWorker(specifier) {
 
   const extension = isLinux ? '.AppImage' : isMac ? '.app' : '.msix'
 
-  const worker = PearRuntime.run('../' + specifier, [
+  const worker = PearRuntime.run(require.resolve('..' + specifier), [
     dir,
     appPath,
     updates,
