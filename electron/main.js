@@ -76,7 +76,7 @@ function getWorker(specifier) {
     upgrade,
     name: productName + extension
   }
-  const worker = PearRuntime.run(require.resolve('..' + specifier), [JSON.stringify(updaterConfig)])
+  const worker = PearRuntime.run('../' + specifier, [dir, appPath, updates, version, upgrade, productName + extension])
 
   function sendWorkerStdout(data) {
     sendToAll('pear:worker:stdout:' + specifier, data)
