@@ -10,7 +10,7 @@ const pipe = new FramedStream(Bare.IPC)
 const updaterConfig = {
   dir: Bare.argv[2],
   app: Bare.argv[3],
-  updates: Bare.argv[4] === 'true',
+  updates: Bare.argv[4] !== 'false',
   version: Bare.argv[5],
   upgrade: Bare.argv[6],
   name: Bare.argv[7]
