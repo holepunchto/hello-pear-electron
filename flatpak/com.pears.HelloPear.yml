@@ -1,0 +1,45 @@
+# Template manifest.
+# Replace all placeholder values before publishing.
+id: com.pears.HelloPear
+runtime: org.freedesktop.Platform
+runtime-version: '25.08' # TODO: Use the current supported version https://gitlab.com/freedesktop-sdk/freedesktop-sdk/-/tags
+sdk: org.freedesktop.Sdk
+base: org.electronjs.Electron2.BaseApp
+base-version: '25.08' # TODO: Use the current supported version https://gitlab.com/freedesktop-sdk/freedesktop-sdk/-/tags
+command: HelloPear # Must match the installed launcher script
+separate-locales: false
+finish-args:
+  - --share=ipc
+  - --share=network
+  - --socket=wayland
+  - --socket=fallback-x11
+  - --socket=pulseaudio
+  - --device=dri
+  - --talk-name=org.kde.StatusNotifierWatcher
+  - --env=XCURSOR_PATH=/run/host/user-share/icons:/run/host/share/icons
+  # TODO: Update according to requirements and keep only the permissions your application requires https://docs.flatpak.org/en/latest/sandbox-permissions.html
+modules:
+  - name: HelloPear
+    buildsystem: simple
+    build-commands:
+      - install -Dm644 ${FLATPAK_ID}.metainfo.xml -t /app/share/metainfo/
+      - install -Dm644 flatpak/${FLATPAK_ID}.desktop -t /app/share/applications/
+      - install -Dm644 flatpak/${FLATPAK_ID}.png -t /app/share/icons/hicolor/128x128/apps/
+      - install -Dm755 flatpak/entrypoint.sh /app/bin/HelloPear
+      - mkdir -p /app/lib/${FLATPAK_ID}
+      - cp -r ./HelloPear-*/* /app/lib/${FLATPAK_ID}
+    sources:
+      - type: archive
+        url: http://localhost:8000/hellopear_1.0.0_arm64_flatpak.tar.gz # TODO: Update to the link where the Flatpak asset is hosted
+        only-arches:
+          - aarch64
+        strip-components: 0
+        sha512: 332a858325424ed38fde74c4ebc12db932b60481c3927fca07128410e7a8de28c842246f6a0fc282327fef29000396d0022413ab38efb4b292b15fad2a1413e0 # TODO: Use sha512sum to get the value
+      - type: archive
+        url: http://localhost:8000/hellopear_1.0.0_x64_flatpak.tar.gz # TODO: Update to the link where the Flatpak asset is hosted
+        only-arches:
+          - x86_64
+        strip-components: 0
+        sha512: ea1fb6861d6d22dad2dbb58678d6617992773b281a2c9d9d1a7f111cc337a5c46a31b9ff6885fbb322f2f57d55af6df614fa75a66b615d472939a154167411f6 # TODO: Use sha512sum to get the value
+      - type: file
+        path: com.pears.HelloPear.metainfo.xml # TODO: Rename to match your app ID

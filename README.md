@@ -38,6 +38,8 @@ End-to-end boilerplate for embedding [pear-runtime][pear-runtime] into [Electron
     - [Release Line Builds](#release-line-builds)
     - [Custom Builds](#custom-builds)
 - [CI Configuration](#ci-configuration)
+- [Store Submissions](#store-submissions)
+  - [Flathub](#flathub)
 - [Scripts](#scripts)
 - [Troubleshooting](#troubleshooting)
 
@@ -1010,6 +1012,98 @@ Create a GitHub environment (Settings -> Environments) named `release`. Run the 
 - macOS signing requires an [Apple Developer Program](https://developer.apple.com) membership.
 - Windows certificate 'subject' must match the `Publisher` in [AppxManifest.xml](build/AppxManifest.xml).
 - Linux builds are not signed, no configuration needed.
+
+## Store Submissions <a name="store-submissions"></a>
+
+Applications built from this template can also be distributed through platform-specific application stores.
+
+### Flathub <a name="flathub"></a>
+
+Flathub packages applications as Flatpaks. This section covers preparing a Flatpak manifest and submitting releases for review.
+
+Fork the [flathub repository](https://github.com/flathub/flathub) in your GitHub organization, clone it and create a branch targeting the `new-pr` branch of the repository:
+
+```sh
+$ git clone git@github.com:<org>/flathub.git
+$ cd flathub
+$ git checkout -b my-app-submission -t new-pr
+```
+
+Create these files in the flathub directory:
+
+- metainfo file using the [appstream web form](https://www.freedesktop.org/software/appstream/metainfocreator/#/), like [`com.pears.HelloPear.metainfo.xml`](./flatpak/com.pears.HelloPear.metainfo.xml)
+- Flatpak YAML file, like [`com.pears.HelloPear.yml`](flatpak/com.pears.HelloPear.yml)
+
+#### Testing
+
+Install the Flatpak tools:
+
+```sh
+$ sudo apt install flatpak
+$ flatpak remote-add --if-not-exists --user flathub https://dl.flathub.org/repo/flathub.flatpakrepo
+$ flatpak install flathub org.flatpak.Builder
+```
+
+In the project directory, [build](#make-linux) the app and serve the generated Flatpak artifacts over HTTP:
+
+```sh
+$ python3 -m http.server --directory out/make/
+```
+
+In the `flatpak` directory, build and install the Flatpak:
+
+```sh
+$ flatpak run --command=flathub-build org.flatpak.Builder --disable-rofiles-fuse com.pears.HelloPear.yml
+$ flatpak install --user ./repo com.pears.HelloPear
+```
+
+Repeat the build command after making any changes to the manifest.
+
+Launch the application from your desktop environment or run it from the CLI:
+
+```sh
+$ flatpak run com.pears.HelloPear
+```
+
+Uninstall using:
+
+```sh
+$ flatpak uninstall com.pears.HelloPear
+$ rm -rf ~/.var/app/com.pears.HelloPear
+```
+
+If the builds take up too much memory, clear these build files from the `flatpak` directory:
+
+```sh
+$ rm -rf builddir repo .flatpak-builder
+```
+
+After confirming that the Flatpak works:
+
+- Upload the Flatpak artifacts to a publicly accessible location with versioned URLs like [this site](https://static.keet.io/downloads/) and update the artifact links in the Flatpak YAML.
+- For verification, upload an empty file to your app website `https://<app-website>/.well-known/org.flathub.VerifiedApps.txt`.
+- Open a PR on the [flathub repository](https://github.com/flathub/flathub) from your branch for submission, like [this PR](https://github.com/flathub/flathub/pull/8716).
+- Address all the review comments.
+- Comment `bot, build` to test building the Flatpak on the Flathub CI.
+- Once the submission is accepted, the Flathub maintainers create a repository in the flathub organization with the changes from the submission branch, like [this repository](https://github.com/flathub/io.keet.Keet).
+- Log in to the [Flathub Developer Portal](https://flathub.org/en/developer-portal) to manage the app and complete the verification by copying the token from this page to the app website `https://<app-website>/.well-known/org.flathub.VerifiedApps.txt`.
+- In a few hours, the app should be available on Flathub, like [this app](https://flathub.org/en/apps/io.keet.Keet).
+
+If the app doesn't show up on Flathub:
+
+- If the Flathub bot opens an issue on the repository containing build errors, address it.
+- If it's unrelated, comment `bot, retry` or open an issue in [Flathub](https://github.com/flathub/flathub/issues) for assistance from the maintainers.
+- Follow the build status at <https://builds.flathub.org>. App-specific build status is available at `https://builds.flathub.org/status/<app-id>`.
+
+To automate the Flathub bot to open PRs when new versions of the app are available on the website, follow [this guide](https://github.com/flathub-infra/flatpak-external-data-checker/#changes-to-flatpak-manifests) and set up the external data checker on the `type: archive` source like this depending on the format of the app site contents:
+
+```yml
+x-checker-data:
+  type: html
+  url: https://static.keet.io/downloads/
+  version-pattern: href="((?:\d+\.)+\d+)/"
+  url-template: https://static.keet.io/downloads/$version/Keet-arm64-flatpak.tar.gz
+```
 
 ## Scripts <a name="scripts"></a>
 
