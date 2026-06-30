@@ -13,57 +13,116 @@ on:
         description: Value for package.json upgrade field
         required: false
 
+env:
+  CHANNEL: production
+
 jobs:
+  prebuild:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    outputs:
+      package-name: ${{ steps.prepare_build_metadata.outputs.package_name }}
+      package-name-lower: ${{ steps.prepare_build_metadata.outputs.package_name_lower }}
+      version: ${{ steps.prepare_build_metadata.outputs.version }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Prepare build metadata
+        id: prepare_build_metadata
+        run: |
+          name=$(jq -r '.name' package.json)
+          product_name=$(jq -r '.productName // empty' package.json)
+
+          package_name="${product_name:-$name}"
+          package_name_lower=$(printf '%s' "$package_name" | tr '[:upper:]' '[:lower:]')
+
+          {
+            echo "package_name=$package_name"
+            echo "package_name_lower=$package_name_lower"
+            echo "version=$(jq -r '.version' package.json)"
+          } >> "$GITHUB_OUTPUT"
+
   build-linux-x64:
+    needs: [prebuild]
     timeout-minutes: 20
     permissions:
-      contents: write # to upload artifacts
+      contents: read
       packages: read
     runs-on: ubuntu-latest
     environment: release
-    outputs:
-      artifact-links: ${{ steps.build.outputs.artifact-links }}
     steps:
       - uses: actions/checkout@v4
       - uses: holepunchto/actions/make-pear-app@v1
-        id: build
         with:
-          channel: production
+          channel: ${{ env.CHANNEL }}
           upgrade_key: ${{ inputs['upgrade-key'] }}
+          linux_appimage: >-
+            ${{ format('{0}-{1}-{2}.AppImage',
+                needs.prebuild.outputs.package-name,
+                needs.prebuild.outputs.version,
+                'x64') }}
+          linux_snap: >-
+            ${{ format('{0}_{1}_{2}.snap',
+                needs.prebuild.outputs.package-name-lower,
+                needs.prebuild.outputs.version,
+                'amd64') }}
+          linux_flatpak: >-
+            ${{ format('{0}_{1}_{2}_flatpak.tar.gz',
+                needs.prebuild.outputs.package-name-lower,
+                needs.prebuild.outputs.version,
+                'x64') }}
 
   build-linux-arm:
+    needs: [prebuild]
     timeout-minutes: 20
     permissions:
-      contents: write # to upload artifacts
+      contents: read
       packages: read
     runs-on: ubuntu-24.04-arm
     environment: release
-    outputs:
-      artifact-links: ${{ steps.build.outputs.artifact-links }}
     steps:
       - uses: actions/checkout@v4
       - uses: holepunchto/actions/make-pear-app@v1
         id: build
         with:
-          channel: production
+          channel: ${{ env.CHANNEL }}
           upgrade_key: ${{ inputs['upgrade-key'] }}
+          linux_appimage: >-
+            ${{ format('{0}-{1}-{2}.AppImage',
+                needs.prebuild.outputs.package-name,
+                needs.prebuild.outputs.version,
+                'arm64') }}
+          linux_snap: >-
+            ${{ format('{0}_{1}_{2}.snap',
+                needs.prebuild.outputs.package-name-lower,
+                needs.prebuild.outputs.version,
+                'arm64') }}
+          linux_flatpak: >-
+            ${{ format('{0}_{1}_{2}_flatpak.tar.gz',
+                needs.prebuild.outputs.package-name-lower,
+                needs.prebuild.outputs.version,
+                'arm64') }}
 
   build-macos:
+    needs: [prebuild]
     timeout-minutes: 20
     permissions:
-      contents: write # to upload artifacts
+      contents: read
       packages: read
     runs-on: macos-latest
     environment: release
-    outputs:
-      artifact-links: ${{ steps.build.outputs.artifact-links }}
     steps:
       - uses: actions/checkout@v4
       - uses: holepunchto/actions/make-pear-app@v1
         id: build
         with:
-          channel: production
+          channel: ${{ env.CHANNEL }}
           upgrade_key: ${{ inputs['upgrade-key'] }}
+          macos_dmg: >-
+            ${{ format('{0}-{1}-{2}.dmg',
+                needs.prebuild.outputs.package-name,
+                needs.prebuild.outputs.version,
+                'arm64') }}
           macos_certificate_base64: ${{ secrets.CERTIFICATE_P12 }}
           macos_p12_password: ${{ secrets.CERTIFICATE_PASSWORD }}
           macos_codesign_identity: ${{ secrets.MAC_CODESIGN_IDENTITY }}
@@ -73,21 +132,25 @@ jobs:
           macos_apple_team_id: ${{ secrets.APPLE_TEAM_ID }}
 
   build-macos-x64:
+    needs: [prebuild]
     timeout-minutes: 20
     permissions:
-      contents: write # to upload artifacts
+      contents: read
       packages: read
     runs-on: macos-26-intel
     environment: release
-    outputs:
-      artifact-links: ${{ steps.build.outputs.artifact-links }}
     steps:
       - uses: actions/checkout@v4
       - uses: holepunchto/actions/make-pear-app@v1
         id: build
         with:
-          channel: production
+          channel: ${{ env.CHANNEL }}
           upgrade_key: ${{ inputs['upgrade-key'] }}
+          macos_dmg: >-
+            ${{ format('{0}-{1}-{2}.dmg',
+                needs.prebuild.outputs.package-name,
+                needs.prebuild.outputs.version,
+                'x64') }}
           macos_certificate_base64: ${{ secrets.CERTIFICATE_P12 }}
           macos_p12_password: ${{ secrets.CERTIFICATE_PASSWORD }}
           macos_codesign_identity: ${{ secrets.MAC_CODESIGN_IDENTITY }}
@@ -97,21 +160,23 @@ jobs:
           macos_apple_team_id: ${{ secrets.APPLE_TEAM_ID }}
 
   build-win32:
+    needs: [prebuild]
     timeout-minutes: 20
     permissions:
-      contents: write # to upload artifacts
+      contents: read
       packages: read
     runs-on: windows-latest
     environment: release
-    outputs:
-      artifact-links: ${{ steps.build.outputs.artifact-links }}
     steps:
       - uses: actions/checkout@v4
       - uses: holepunchto/actions/make-pear-app@v1
         id: build
         with:
-          channel: production
+          channel: ${{ env.CHANNEL }}
           upgrade_key: ${{ inputs['upgrade-key'] }}
+          windows_msix: >-
+            ${{ format('{0}.msix',
+                needs.prebuild.outputs.package-name) }}
           windows_signing_method: windows_cert_pfx
           windows_cert_pfx_base64: ${{ secrets.WINDOWS_CERT_PFX_BASE64 }}
           windows_cert_password: ${{ secrets.WINDOWS_CERT_PASSWORD }}
