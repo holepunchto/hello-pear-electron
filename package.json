@@ -42,5 +42,8 @@
     "pear-electron-forge-maker-snap": "^0.0.10",
     "prettier": "^3.8.1",
     "prettier-config-holepunch": "^2.0.0"
+  },
+  "allowScripts": {
+    "electron@40.10.1": true
   }
 }
