@@ -1,10 +1,6 @@
 {
   "multisig": {
-    "publicKeys": [
-      "k7mqsd1h1keto4ch3qh1n89kyne4nfzq6ox1wzndygoi5mbu9qby",
-      "km96j1pdcbzfkekkhowb9sm1wy147mjeha6rxq15zwhhuc13kosy",
-      "ac5yss98bmbx5t6s9myhp8o934zf7d1wdnx36twmaeir31fkn64o"
-    ],
+    "publicKeys": ["<PUBKEY_HERE>", "<PUBKEY_HERE>", "<PUBKEY_HERE>"],
     "namespace": "holepunchto/hello-pear-electron",
     "quorum": 2
   }
