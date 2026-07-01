@@ -44,6 +44,7 @@
     "prettier-config-holepunch": "^2.0.0"
   },
   "allowScripts": {
-    "electron@40.10.1": true
+    "electron@40.10.1": true,
+    "electron-winstaller": false
   }
 }
