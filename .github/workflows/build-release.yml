@@ -59,7 +59,8 @@ jobs:
     environment: release
     steps:
       - uses: actions/checkout@v4
-      - uses: AndreiRegiani/actions/make-pear-app@macos-app-file
+      - uses: holepunchto/actions/make-pear-app@v1
+        id: build
         with:
           channel: ${{ env.CHANNEL }}
           upgrade_key: ${{ inputs['upgrade-key'] }}
@@ -89,7 +90,7 @@ jobs:
     environment: release
     steps:
       - uses: actions/checkout@v4
-      - uses: AndreiRegiani/actions/make-pear-app@macos-app-file
+      - uses: holepunchto/actions/make-pear-app@v1
         id: build
         with:
           channel: ${{ env.CHANNEL }}
@@ -120,7 +121,7 @@ jobs:
     environment: release
     steps:
       - uses: actions/checkout@v4
-      - uses: AndreiRegiani/actions/make-pear-app@macos-app-file
+      - uses: holepunchto/actions/make-pear-app@v1
         id: build
         with:
           channel: ${{ env.CHANNEL }}
@@ -153,7 +154,7 @@ jobs:
     environment: release
     steps:
       - uses: actions/checkout@v4
-      - uses: AndreiRegiani/actions/make-pear-app@macos-app-file
+      - uses: holepunchto/actions/make-pear-app@v1
         id: build
         with:
           channel: ${{ env.CHANNEL }}
@@ -186,7 +187,7 @@ jobs:
     environment: release
     steps:
       - uses: actions/checkout@v4
-      - uses: AndreiRegiani/actions/make-pear-app@macos-app-file
+      - uses: holepunchto/actions/make-pear-app@v1
         id: build
         with:
           channel: ${{ env.CHANNEL }}
