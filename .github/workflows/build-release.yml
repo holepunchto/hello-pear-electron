@@ -132,7 +132,7 @@ jobs:
                 needs.prebuild.outputs.version,
                 'arm64') }}
           macos_app: >-
-            ${{ format('{0}-{1}-{2}.app.tgz',
+            ${{ format('{0}-{1}-{2}.app.zip',
                 needs.prebuild.outputs.package-name,
                 needs.prebuild.outputs.version,
                 'arm64') }}
@@ -165,7 +165,7 @@ jobs:
                 needs.prebuild.outputs.version,
                 'x64') }}
           macos_app: >-
-            ${{ format('{0}-{1}-{2}.app.tgz',
+            ${{ format('{0}-{1}-{2}.app.zip',
                 needs.prebuild.outputs.package-name,
                 needs.prebuild.outputs.version,
                 'x64') }}
@@ -232,7 +232,7 @@ jobs:
 
       - uses: actions/download-artifact@v4
         with:
-          pattern: '*.app.tgz'
+          pattern: '*.app.zip'
           path: out/artifacts
 
       - uses: actions/download-artifact@v4
@@ -260,10 +260,10 @@ jobs:
           extract_dir="$RUNNER_TEMP/stage-artifacts"
           mkdir -p "$extract_dir"
           while IFS= read -r -d '' archive; do
-            dest="$extract_dir/$(basename "$archive" .tgz)"
+            dest="$extract_dir/$(basename "$archive" .zip)"
             mkdir -p "$dest"
-            tar -xzf "$archive" -C "$dest"
-          done < <(find "$artifact_dir" -name '*.tgz' -type f -print0)
+            ditto -x -k "$archive" "$dest"
+          done < <(find "$artifact_dir" -name '*.zip' -type f -print0)
 
           if [[ -n "$UPGRADE_KEY" ]]; then
             jq --arg upgrade "$UPGRADE_KEY" '.upgrade = $upgrade' package.json > "$package_json"
