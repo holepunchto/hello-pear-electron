@@ -98,15 +98,40 @@ module.exports = {
       name: 'pear-electron-forge-maker-snap',
       platforms: ['linux'],
       config: {
-        snapcraftYamlPath: 'build/snapcraft.yaml',
-        summary: 'Integrating Pear into a hello world electron desktop app',
-        description:
-          'End-to-end boilerplate for embedding pear-runtime into Electron apps and deploying peer-to-peer application updates.',
-        contact: 'hello@holepunchto.to',
-        license: 'Apache-2.0',
-        issues: 'https://github.com/holepunchto/hello-pear-electron/issues',
-        website: 'https://github.com/holepunchto/hello-pear-electron',
-        icon: `${packagerConfig.icon}.png`
+        icon: `${packagerConfig.icon}.png`,
+        snapcraft: {
+          summary: 'Integrating Pear into a hello world electron desktop app',
+          description:
+            'End-to-end boilerplate for embedding pear-runtime into Electron apps and deploying peer-to-peer application updates.',
+          contact: 'hello@holepunchto.to',
+          license: 'Apache-2.0',
+          issues: 'https://github.com/holepunchto/hello-pear-electron/issues',
+          website: 'https://github.com/holepunchto/hello-pear-electron',
+          app: {
+            extensions: ['gnome'],
+            plugs: [
+              'desktop',
+              'desktop-legacy',
+              'home',
+              'x11',
+              'wayland',
+              'audio-playback',
+              'audio-record',
+              'camera',
+              'opengl',
+              'network',
+              'network-bind',
+              'browser-support',
+              'network-status'
+            ],
+            environment: {
+              TMPDIR: '$XDG_RUNTIME_DIR'
+            }
+          },
+          part: {
+            'stage-packages': ['libatomic1']
+          }
+        }
       }
     }
   ],
