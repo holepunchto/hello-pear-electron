@@ -39,7 +39,7 @@
     "lunte": "^1.6.0",
     "pear-electron-forge-maker-appimage": "^2.0.0",
     "pear-electron-forge-maker-flatpak": "^0.0.6",
-    "pear-electron-forge-maker-snap": "github:holepunchto/electron-forge-maker-snap#refactor-to-use-structured-config-overrides-and-remove-YAML-templating",
+    "pear-electron-forge-maker-snap": "github:holepunchto/electron-forge-maker-snap#use-execfilesync",
     "prettier": "^3.8.1",
     "prettier-config-holepunch": "^2.0.0"
   },
