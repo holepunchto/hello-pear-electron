@@ -40,6 +40,7 @@ End-to-end boilerplate for embedding [pear-runtime][pear-runtime] into [Electron
 - [CI Configuration](#ci-configuration)
 - [Store Submissions](#store-submissions)
   - [Flathub](#flathub)
+  - [Snap](#snap)
 - [Scripts](#scripts)
 - [Troubleshooting](#troubleshooting)
 
@@ -1103,6 +1104,85 @@ x-checker-data:
   url: https://static.keet.io/downloads/
   version-pattern: href="((?:\d+\.)+\d+)/"
   url-template: https://static.keet.io/downloads/$version/Keet-arm64-flatpak.tar.gz
+```
+
+### Snap <a name="snap"></a>
+
+Snap packages applications for Linux and distributes them through the Snap Store. This section covers preparing a Snap package, testing it locally and publishing releases to the Snap Store.
+
+Install the Snap tools:
+
+```sh
+$ snap install snapcraft --classic
+$ snap install lxd
+$ sudo usermod -a -G lxd $USER
+$ sudo lxd init --auto
+```
+
+In the project directory, [build](#make-linux) the app. This will create a `.snap` package in the `out/make` directory.
+
+Install the Snap:
+
+```sh
+$ snap install out/make/hellopear_1.0.0_arm64.snap --devmode
+```
+
+After making changes to the Snap configuration, rebuild the application and reinstall the generated Snap.
+
+Launch the application from your desktop environment or run it from the CLI:
+
+```sh
+$ hellopear
+```
+
+Uninstall using:
+
+```sh
+$ snap remove hellopear
+```
+
+If the builds take up too much memory, clean the build container:
+
+```sh
+$ cd out
+$ snapcraft clean
+```
+
+Refer to the [Electron Forge Snap Maker documentation](https://github.com/holepunchto/electron-forge-maker-snap) to configure the Snap.
+
+After confirming that the Snap works:
+
+- Create your developer account in <https://login.ubuntu.com/> and log in.
+- Log in from your terminal with `snapcraft login`.
+- Register your Snap using [the name](https://documentation.ubuntu.com/snapcraft/9.0/how-to/publishing/register-a-snap/#name-your-snap) with `snapcraft register <snap-name>` or `snapcraft register --private <snap-name>` for a private Snap.
+- Publish your Snap with `snapcraft upload --release=stable <my-snap>.snap`.
+- Check the release status with `snapcraft status <snap-name>`.
+
+Snapcraft will guide you with the next steps if release fails.
+
+Once the Snap has been released, it should be available on the Snap Store `https://snapcraft.io/<snap-name>`:
+
+```sh
+$ snap install <snap-name>
+$ <snap-name>
+```
+
+To automate Snap releases, first create this credentials file:
+
+```sh
+$ snapcraft export-login <credentials-filename>
+```
+
+Set the contents of the file as a secret in your automation pipeline and authenticate Snap with:
+
+```sh
+$ export SNAPCRAFT_STORE_CREDENTIALS=$(cat <credentials-filename>)
+```
+
+Upload a new Snap release to the desired channel (for example, `stable`):
+
+```sh
+$ snapcraft upload <snap-name>.snap --release stable
 ```
 
 ## Scripts <a name="scripts"></a>
