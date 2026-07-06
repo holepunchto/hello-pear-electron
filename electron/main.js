@@ -71,12 +71,12 @@ function getWorker(specifier) {
   const extension = isLinux ? '.AppImage' : isMac ? '.app' : '.msix'
 
   const worker = PearRuntime.run(require.resolve('..' + specifier), [
-    dir,
-    appPath,
     updates,
     version,
     upgrade,
-    productName + extension
+    productName + extension,
+    dir,
+    appPath
   ])
   const pipe = new FramedStream(worker)
 
