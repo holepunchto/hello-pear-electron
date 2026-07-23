@@ -186,7 +186,11 @@ jobs:
     steps:
       - uses: RaisinTen/actions/pear-base@add-pear-base
       - name: Pear version
-        run: pear -v
+        run: |
+          Get-Command pear
+          where.exe pear
+          pear -v
+          echo "Exit code: $LASTEXITCODE"
         shell: pwsh
       - uses: actions/checkout@v4
       - uses: holepunchto/actions/make-pear-app@v1
