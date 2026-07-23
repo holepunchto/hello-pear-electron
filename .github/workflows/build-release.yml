@@ -51,6 +51,10 @@ jobs:
     runs-on: ubuntu-latest
     environment: release
     steps:
+      - uses: RaisinTen/actions/pear-base@add-pear-base
+      - name: Pear version
+        run: pear -v
+        shell: bash
       - uses: actions/checkout@v4
       - uses: holepunchto/actions/make-pear-app@v1
         with:
@@ -81,6 +85,10 @@ jobs:
     runs-on: ubuntu-24.04-arm
     environment: release
     steps:
+      - uses: RaisinTen/actions/pear-base@add-pear-base
+      - name: Pear version
+        run: pear -v
+        shell: bash
       - uses: actions/checkout@v4
       - uses: holepunchto/actions/make-pear-app@v1
         id: build
@@ -112,6 +120,10 @@ jobs:
     runs-on: macos-latest
     environment: release
     steps:
+      - uses: RaisinTen/actions/pear-base@add-pear-base
+      - name: Pear version
+        run: pear -v
+        shell: bash
       - uses: actions/checkout@v4
       - uses: holepunchto/actions/make-pear-app@v1
         id: build
@@ -140,6 +152,10 @@ jobs:
     runs-on: macos-26-intel
     environment: release
     steps:
+      - uses: RaisinTen/actions/pear-base@add-pear-base
+      - name: Pear version
+        run: pear -v
+        shell: bash
       - uses: actions/checkout@v4
       - uses: holepunchto/actions/make-pear-app@v1
         id: build
@@ -168,6 +184,10 @@ jobs:
     runs-on: windows-latest
     environment: release
     steps:
+      - uses: RaisinTen/actions/pear-base@add-pear-base
+      - name: Pear version
+        run: pear -v
+        shell: pwsh
       - uses: actions/checkout@v4
       - uses: holepunchto/actions/make-pear-app@v1
         id: build
