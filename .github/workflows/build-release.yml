@@ -187,10 +187,32 @@ jobs:
       - uses: RaisinTen/actions/pear-base@add-pear-base
       - name: Pear version
         run: |
+          Write-Host "=== Get-Command ==="
           Get-Command pear
+
+          Write-Host "=== where.exe ==="
           where.exe pear
+
+          Write-Host "=== pear -v ==="
           pear -v
-          echo "Exit code: $LASTEXITCODE"
+          Write-Host "Exit code after -v: $LASTEXITCODE"
+
+          Write-Host "=== pear --version ==="
+          pear --version
+          Write-Host "Exit code after --version: $LASTEXITCODE"
+
+          Write-Host "=== Capture stdout/stderr ==="
+          pear -v *> pear-output.txt
+          Write-Host "Exit code after capture: $LASTEXITCODE"
+
+          Write-Host "=== Output file ==="
+          if (Test-Path pear-output.txt) {
+            Get-Content pear-output.txt
+          } else {
+            Write-Host "pear-output.txt was not created"
+          }
+
+          Write-Host "=== Done ==="
         shell: pwsh
       - uses: actions/checkout@v4
       - uses: holepunchto/actions/make-pear-app@v1
