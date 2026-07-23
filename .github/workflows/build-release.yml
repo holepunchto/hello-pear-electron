@@ -52,8 +52,8 @@ jobs:
     environment: release
     steps:
       - uses: RaisinTen/actions/pear-base@add-pear-base
-      - name: Pear data dht
-        run: pear data dht
+      - name: Pear help
+        run: pear help
         shell: bash
       - uses: actions/checkout@v4
       - uses: holepunchto/actions/make-pear-app@v1
@@ -86,8 +86,8 @@ jobs:
     environment: release
     steps:
       - uses: RaisinTen/actions/pear-base@add-pear-base
-      - name: Pear data dht
-        run: pear data dht
+      - name: Pear help
+        run: pear help
         shell: bash
       - uses: actions/checkout@v4
       - uses: holepunchto/actions/make-pear-app@v1
@@ -121,8 +121,8 @@ jobs:
     environment: release
     steps:
       - uses: RaisinTen/actions/pear-base@add-pear-base
-      - name: Pear data dht
-        run: pear data dht
+      - name: Pear help
+        run: pear help
         shell: bash
       - uses: actions/checkout@v4
       - uses: holepunchto/actions/make-pear-app@v1
@@ -153,8 +153,8 @@ jobs:
     environment: release
     steps:
       - uses: RaisinTen/actions/pear-base@add-pear-base
-      - name: Pear data dht
-        run: pear data dht
+      - name: Pear help
+        run: pear help
         shell: bash
       - uses: actions/checkout@v4
       - uses: holepunchto/actions/make-pear-app@v1
@@ -185,7 +185,7 @@ jobs:
     environment: release
     steps:
       - uses: RaisinTen/actions/pear-base@add-pear-base
-      - name: Pear data dht
+      - name: Pear help
         run: |
           Write-Host "=== Get-Command ==="
           Get-Command pear
@@ -193,8 +193,8 @@ jobs:
           Write-Host "=== where.exe ==="
           where.exe pear
 
-          Write-Host "=== pear data dht ==="
-          pear data dht
+          Write-Host "=== pear help ==="
+          pear help
           Write-Host "Exit code after -v: $LASTEXITCODE"
 
           Write-Host "=== pear --version ==="
@@ -202,7 +202,7 @@ jobs:
           Write-Host "Exit code after --version: $LASTEXITCODE"
 
           Write-Host "=== Capture stdout/stderr ==="
-          pear data dht *> pear-output.txt
+          pear help *> pear-output.txt
           Write-Host "Exit code after capture: $LASTEXITCODE"
 
           Write-Host "=== Output file ==="
