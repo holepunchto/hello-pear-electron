@@ -195,11 +195,11 @@ jobs:
 
           Write-Host "=== pear help ==="
           pear help
-          Write-Host "Exit code after -v: $LASTEXITCODE"
+          Write-Host "Exit code after help: $LASTEXITCODE"
 
-          Write-Host "=== pear --version ==="
-          pear --version
-          Write-Host "Exit code after --version: $LASTEXITCODE"
+          Write-Host "=== pear.cmd help ==="
+          pear.cmd help
+          Write-Host "Exit code after help: $LASTEXITCODE"
 
           Write-Host "=== Capture stdout/stderr ==="
           pear help *> pear-output.txt
