@@ -184,9 +184,16 @@ jobs:
     runs-on: windows-latest
     environment: release
     steps:
-      - uses: RaisinTen/actions/pear-base@add-pear-base
+      # - uses: RaisinTen/actions/pear-base@add-pear-base
+      - uses: RaisinTen/actions/setup-node@add-pear-base
+        with:
+          node-version: 20
+          registry-url: 'https://npm.pkg.github.com'
       - name: Pear help
         run: |
+          Write-Host "=== Install Pear ==="
+          npm i -g pear
+
           Write-Host "=== Get-Command ==="
           Get-Command pear
 
