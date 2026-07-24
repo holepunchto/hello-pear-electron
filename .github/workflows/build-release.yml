@@ -205,9 +205,6 @@ jobs:
           Compare-Object ($before -split ';') ($after -split ';') |
             Where-Object SideIndicator -eq '=>' |
             Select-Object -ExpandProperty InputObject
-
-          Write-Host "=== Writing Path ==="
-          "$env:LOCALAPPDATA\Programs\pear" >> $env:GITHUB_PATH
         shell: pwsh
       - name: Pear help
         run: |
