@@ -197,10 +197,6 @@ jobs:
           pear help
           Write-Host "Exit code after help: $LASTEXITCODE"
 
-          Write-Host "=== pear.cmd help ==="
-          pear.cmd help
-          Write-Host "Exit code after help: $LASTEXITCODE"
-
           Write-Host "=== Capture stdout/stderr ==="
           pear help *> pear-output.txt
           Write-Host "Exit code after capture: $LASTEXITCODE"
