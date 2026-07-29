@@ -55,14 +55,10 @@ jobs:
         with:
           source: true
           ref: main
-      - name: Pear help
+      - name: Pear
         run: |
-          echo "=== PATH ==="
-          echo $PATH
-          echo "=== which pear ==="
-          which pear
-          echo "=== pear help ==="
-          pear help
+          pear -v
+          pear touch
         shell: bash
       - uses: actions/checkout@v4
       - uses: holepunchto/actions/make-pear-app@v1
@@ -98,14 +94,10 @@ jobs:
         with:
           source: true
           ref: main
-      - name: Pear help
+      - name: Pear
         run: |
-          echo "=== PATH ==="
-          echo $PATH
-          echo "=== which pear ==="
-          which pear
-          echo "=== pear help ==="
-          pear help
+          pear -v
+          pear touch
         shell: bash
       - uses: actions/checkout@v4
       - uses: holepunchto/actions/make-pear-app@v1
@@ -142,14 +134,10 @@ jobs:
         with:
           source: true
           ref: main
-      - name: Pear help
+      - name: Pear
         run: |
-          echo "=== PATH ==="
-          echo $PATH
-          echo "=== which pear ==="
-          which pear
-          echo "=== pear help ==="
-          pear help
+          pear -v
+          pear touch
         shell: bash
       - uses: actions/checkout@v4
       - uses: holepunchto/actions/make-pear-app@v1
@@ -183,14 +171,10 @@ jobs:
         with:
           source: true
           ref: main
-      - name: Pear help
+      - name: Pear
         run: |
-          echo "=== PATH ==="
-          echo $PATH
-          echo "=== which pear ==="
-          which pear
-          echo "=== pear help ==="
-          pear help
+          pear -v
+          pear touch
         shell: bash
       - uses: actions/checkout@v4
       - uses: holepunchto/actions/make-pear-app@v1
@@ -224,51 +208,10 @@ jobs:
         with:
           source: true
           ref: main
-      # - uses: RaisinTen/actions/setup-node@add-pear-base
-      #   with:
-      #     node-version: 20
-      #     registry-url: 'https://npm.pkg.github.com'
-      # - name: Setup Pear
-      #   run: |
-      #     $before = [Environment]::GetEnvironmentVariable("PATH", "User")
-
-      #     Write-Host "=== Install Pear ==="
-      #     npm i -g pear
-
-      #     Write-Host "=== Run Pear ==="
-      #     pear
-
-      #     $after = [Environment]::GetEnvironmentVariable("PATH", "User")
-
-      #     Write-Host "=== User PATH diff ==="
-      #     Compare-Object ($before -split ';') ($after -split ';') |
-      #       Where-Object SideIndicator -eq '=>' |
-      #       Select-Object -ExpandProperty InputObject
-      #   shell: pwsh
-      - name: Pear help
+      - name: Pear
         run: |
-          Write-Host "=== Get-Command ==="
-          Get-Command pear
-
-          Write-Host "=== where.exe ==="
-          where.exe pear
-
-          Write-Host "=== pear help ==="
-          pear help
-          Write-Host "Exit code after help: $LASTEXITCODE"
-
-          Write-Host "=== Capture stdout/stderr ==="
-          pear help *> pear-output.txt
-          Write-Host "Exit code after capture: $LASTEXITCODE"
-
-          Write-Host "=== Output file ==="
-          if (Test-Path pear-output.txt) {
-            Get-Content pear-output.txt
-          } else {
-            Write-Host "pear-output.txt was not created"
-          }
-
-          Write-Host "=== Done ==="
+          pear -v
+          pear touch
         shell: pwsh
       - uses: actions/checkout@v4
       - uses: holepunchto/actions/make-pear-app@v1
