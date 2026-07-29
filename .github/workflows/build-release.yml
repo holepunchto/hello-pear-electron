@@ -57,6 +57,8 @@ jobs:
           ref: main
       - name: Pear help
         run: |
+          echo "=== PATH ==="
+          echo $PATH
           echo "=== which pear ==="
           which pear
           echo "=== pear help ==="
@@ -98,6 +100,8 @@ jobs:
           ref: main
       - name: Pear help
         run: |
+          echo "=== PATH ==="
+          echo $PATH
           echo "=== which pear ==="
           which pear
           echo "=== pear help ==="
@@ -140,6 +144,8 @@ jobs:
           ref: main
       - name: Pear help
         run: |
+          echo "=== PATH ==="
+          echo $PATH
           echo "=== which pear ==="
           which pear
           echo "=== pear help ==="
@@ -179,6 +185,8 @@ jobs:
           ref: main
       - name: Pear help
         run: |
+          echo "=== PATH ==="
+          echo $PATH
           echo "=== which pear ==="
           which pear
           echo "=== pear help ==="
