@@ -52,9 +52,6 @@ jobs:
     environment: release
     steps:
       - uses: RaisinTen/actions/pear-base@add-pear-base
-        with:
-          source: true
-          ref: main
       - name: Pear
         run: |
           pear -v
@@ -91,9 +88,6 @@ jobs:
     environment: release
     steps:
       - uses: RaisinTen/actions/pear-base@add-pear-base
-        with:
-          source: true
-          ref: main
       - name: Pear
         run: |
           pear -v
@@ -131,9 +125,6 @@ jobs:
     environment: release
     steps:
       - uses: RaisinTen/actions/pear-base@add-pear-base
-        with:
-          source: true
-          ref: main
       - name: Pear
         run: |
           pear -v
@@ -168,9 +159,6 @@ jobs:
     environment: release
     steps:
       - uses: RaisinTen/actions/pear-base@add-pear-base
-        with:
-          source: true
-          ref: main
       - name: Pear
         run: |
           pear -v
@@ -205,9 +193,6 @@ jobs:
     environment: release
     steps:
       - uses: RaisinTen/actions/pear-base@add-pear-base
-        with:
-          source: true
-          ref: main
       - name: Pear
         run: |
           pear -v
