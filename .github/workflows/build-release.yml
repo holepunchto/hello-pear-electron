@@ -52,6 +52,9 @@ jobs:
     environment: release
     steps:
       - uses: RaisinTen/actions/pear-base@add-pear-base
+        with:
+          source: true
+          ref: main
       - name: Pear help
         run: pear help
         shell: bash
@@ -86,6 +89,9 @@ jobs:
     environment: release
     steps:
       - uses: RaisinTen/actions/pear-base@add-pear-base
+        with:
+          source: true
+          ref: main
       - name: Pear help
         run: pear help
         shell: bash
@@ -121,6 +127,9 @@ jobs:
     environment: release
     steps:
       - uses: RaisinTen/actions/pear-base@add-pear-base
+        with:
+          source: true
+          ref: main
       - name: Pear help
         run: pear help
         shell: bash
@@ -153,6 +162,9 @@ jobs:
     environment: release
     steps:
       - uses: RaisinTen/actions/pear-base@add-pear-base
+        with:
+          source: true
+          ref: main
       - name: Pear help
         run: pear help
         shell: bash
@@ -184,28 +196,31 @@ jobs:
     runs-on: windows-latest
     environment: release
     steps:
-      # - uses: RaisinTen/actions/pear-base@add-pear-base
-      - uses: RaisinTen/actions/setup-node@add-pear-base
+      - uses: RaisinTen/actions/pear-base@add-pear-base
         with:
-          node-version: 20
-          registry-url: 'https://npm.pkg.github.com'
-      - name: Setup Pear
-        run: |
-          $before = [Environment]::GetEnvironmentVariable("PATH", "User")
+          source: true
+          ref: main
+      # - uses: RaisinTen/actions/setup-node@add-pear-base
+      #   with:
+      #     node-version: 20
+      #     registry-url: 'https://npm.pkg.github.com'
+      # - name: Setup Pear
+      #   run: |
+      #     $before = [Environment]::GetEnvironmentVariable("PATH", "User")
 
-          Write-Host "=== Install Pear ==="
-          npm i -g pear
+      #     Write-Host "=== Install Pear ==="
+      #     npm i -g pear
 
-          Write-Host "=== Run Pear ==="
-          pear
+      #     Write-Host "=== Run Pear ==="
+      #     pear
 
-          $after = [Environment]::GetEnvironmentVariable("PATH", "User")
+      #     $after = [Environment]::GetEnvironmentVariable("PATH", "User")
 
-          Write-Host "=== User PATH diff ==="
-          Compare-Object ($before -split ';') ($after -split ';') |
-            Where-Object SideIndicator -eq '=>' |
-            Select-Object -ExpandProperty InputObject
-        shell: pwsh
+      #     Write-Host "=== User PATH diff ==="
+      #     Compare-Object ($before -split ';') ($after -split ';') |
+      #       Where-Object SideIndicator -eq '=>' |
+      #       Select-Object -ExpandProperty InputObject
+      #   shell: pwsh
       - name: Pear help
         run: |
           Write-Host "=== Get-Command ==="
