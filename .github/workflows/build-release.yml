@@ -56,7 +56,11 @@ jobs:
           source: true
           ref: main
       - name: Pear help
-        run: pear help
+        run: |
+          echo "=== which pear ==="
+          which pear
+          echo "=== pear help ==="
+          pear help
         shell: bash
       - uses: actions/checkout@v4
       - uses: holepunchto/actions/make-pear-app@v1
@@ -93,7 +97,11 @@ jobs:
           source: true
           ref: main
       - name: Pear help
-        run: pear help
+        run: |
+          echo "=== which pear ==="
+          which pear
+          echo "=== pear help ==="
+          pear help
         shell: bash
       - uses: actions/checkout@v4
       - uses: holepunchto/actions/make-pear-app@v1
@@ -131,7 +139,11 @@ jobs:
           source: true
           ref: main
       - name: Pear help
-        run: pear help
+        run: |
+          echo "=== which pear ==="
+          which pear
+          echo "=== pear help ==="
+          pear help
         shell: bash
       - uses: actions/checkout@v4
       - uses: holepunchto/actions/make-pear-app@v1
@@ -166,7 +178,11 @@ jobs:
           source: true
           ref: main
       - name: Pear help
-        run: pear help
+        run: |
+          echo "=== which pear ==="
+          which pear
+          echo "=== pear help ==="
+          pear help
         shell: bash
       - uses: actions/checkout@v4
       - uses: holepunchto/actions/make-pear-app@v1
