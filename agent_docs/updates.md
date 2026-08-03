@@ -29,7 +29,7 @@ Seeding / replication:
 - `store.replicate` is registered **only when updates are enabled**: app data in
   the worker's corestore won't replicate under the dev default `--no-updates`.
   When adding app P2P storage, hoist `swarm.on('connection', (c) =>
-  store.replicate(c))` out of the updates-gated block and `swarm.join` your app
+store.replicate(c))` out of the updates-gated block and `swarm.join` your app
   topic separately — only the updater-drive join stays gated behind `updates`.
 
 Surface the template doesn't use (see the `pear-runtime` / `pear-runtime-updater`
