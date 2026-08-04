@@ -26,7 +26,7 @@ npm run make                         # → installers in out/make/
 
 `start`/`package`/`make` all fail at the forge gate until `package.json#upgrade`
 holds a real key (`pear touch`) or `UPGRADE_KEY` is set — the committed value is a
-placeholder. `UPGRADE_KEY` only helps the gate and *packaged* builds (the hook
+placeholder. `UPGRADE_KEY` only helps the gate and _packaged_ builds (the hook
 rewrites the packaged `package.json`); in dev the running app reads the committed
 file, so with the placeholder on disk `npm start` opens the window but the worker
 dies on the invalid link at boot (`--no-updates` doesn't prevent this — the
@@ -55,7 +55,7 @@ any rule here are the human's call: when a task seems to require one, stop and
 surface the conflict instead of working around it. Exceptions are expected to be
 rare.
 
-- ✅ **Always:** if your change makes a *descriptive* statement in AGENTS.md or
+- ✅ **Always:** if your change makes a _descriptive_ statement in AGENTS.md or
   `agent_docs/` false, update the doc and flag it in your summary; if it conflicts
   with a contract or boundary, stop and ask instead — never rewrite a rule to
   legalize your own change
