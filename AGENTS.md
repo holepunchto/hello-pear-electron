@@ -19,7 +19,7 @@ npm start                            # dev, updates OFF
 npm start -- --updates               # dev + update download (apply can't work in dev)
 npm start -- --storage <dir>         # second instance / custom storage
 npm run lint                         # prettier --check . && lunte  (= CI)
-npm run format
+npm run format                       # prettier --write . && lunte --fix
 npm run package                      # → out/HelloPear-<platform>-<arch>/
 npm run make                         # → installers in out/make/
 ```
