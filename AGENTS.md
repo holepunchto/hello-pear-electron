@@ -40,7 +40,7 @@ npm run make                         # → installers in out/make/
 - `productName` ↔ `AppxManifest.xml` Identity ↔ CI artifact names ↔ storage dirs
 - `AppxManifest.xml` Publisher CN ↔ Windows signing cert (stable across builds)
 - `pear.json#multisig`: **any edit = different production key**
-- `package.json#version` ↔ flatpak manifest URLs + sha512 ↔ metainfo `<release>`
+- `package.json#version` ↔ generated package metadata (AppImage/Snap/MSIX/Flatpak) ↔ release metadata (metainfo.xml <release>, Flatpak URLs + sha512)
 
 ## Boundaries
 
