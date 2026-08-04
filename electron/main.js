@@ -65,7 +65,7 @@ function getWorker(specifier) {
         ? isSnap
           ? path.join(process.env.SNAP_USER_COMMON, appName)
           : path.join(linuxConfigHome, appName)
-        : path.join(os.homedir(), 'AppData', 'Roaming', appName)
+        : path.join(os.homedir(), 'AppData', 'Local', appName)
   }
 
   const extension = isLinux ? '.AppImage' : isMac ? '.app' : '.msix'
