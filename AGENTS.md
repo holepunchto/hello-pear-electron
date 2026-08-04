@@ -24,8 +24,14 @@ npm run package                      # → out/HelloPear-<platform>-<arch>/
 npm run make                         # → installers in out/make/
 ```
 
-`start`/`package`/`make` all fail until `package.json#upgrade` holds a real key
-(`pear touch`) or `UPGRADE_KEY` is set — the committed value is a placeholder.
+`start`/`package`/`make` all fail at the forge gate until `package.json#upgrade`
+holds a real key (`pear touch`) or `UPGRADE_KEY` is set — the committed value is a
+placeholder. `UPGRADE_KEY` only helps the gate and *packaged* builds (the hook
+rewrites the packaged `package.json`); in dev the running app reads the committed
+file, so with the placeholder on disk `npm start` opens the window but the worker
+dies on the invalid link at boot (`--no-updates` doesn't prevent this — the
+updater parses the link in its constructor). A working dev run needs a
+well-formed key committed.
 
 ## Contracts: editing one side breaks the other, often silently
 

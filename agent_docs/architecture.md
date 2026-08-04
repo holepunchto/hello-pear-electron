@@ -35,8 +35,8 @@ The code is small — read it for the wiring; below are only the non-obvious fac
   a crashed worker.
 - Per-platform storage dir is chosen in `getWorker()` (dev:
   `<tmpdir>/pear/HelloPear`). Inside: `pear-runtime/corestore`,
-  `pear-runtime/next/<length>.<fork>/` (wiped every launch), `app-storage/`
-  (suggested `pear.storage` for app data).
+  `pear-runtime/next/<length>.<fork>/` (wiped on every updates-enabled launch),
+  `app-storage/` (suggested `pear.storage` for app data).
 - **A stall is usually the network, not the code, and the two look identical.** An
   update that never arrives, or a peer that never connects, most often means this
   machine is unreachable: `pear seed <link> --json` prints `firewalled` and
