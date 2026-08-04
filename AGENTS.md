@@ -19,7 +19,7 @@ npm start                            # dev, updates OFF
 npm start -- --updates               # dev + update download (apply can't work in dev)
 npm start -- --storage <dir>         # second instance / custom storage
 npm run lint                         # prettier --check . && lunte  (= CI)
-npm run format
+npm run format                       # prettier --write . && lunte --fix
 npm run package                      # → out/HelloPear-<platform>-<arch>/
 npm run make                         # → installers in out/make/
 ```
@@ -46,7 +46,7 @@ well-formed key committed.
 - `productName` ↔ `AppxManifest.xml` Identity ↔ CI artifact names ↔ storage dirs
 - `AppxManifest.xml` Publisher CN ↔ Windows signing cert (stable across builds)
 - `pear.json#multisig`: **any edit = different production key**
-- `package.json#version` ↔ flatpak manifest URLs + sha512 ↔ metainfo `<release>`
+- `package.json#version` ↔ generated package metadata (AppImage/Snap/MSIX/Flatpak) ↔ release metadata (metainfo.xml <release>, Flatpak URLs + sha512)
 
 ## Boundaries
 
