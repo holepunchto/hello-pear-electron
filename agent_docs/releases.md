@@ -1,5 +1,10 @@
 # CI & releases (`.github/`, pear pipeline)
 
+> Read before touching `.github/`, or when preparing a release or debugging why
+> a staged release never reaches installs. Only non-obvious, code-verified
+> facts — the code is the reference for everything else. Index:
+> [AGENTS.md](../AGENTS.md).
+
 - `integrate.yml`: lint only — no build, no tests. `build-release.yml`: manual
   dispatch, five per-platform jobs gated on the GitHub `release` environment
   (signing secrets live there); covers only "make distributables" — `pear build`

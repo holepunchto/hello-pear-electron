@@ -1,5 +1,9 @@
 # Architecture notes (`electron/`, `renderer/`, `workers/`)
 
+> Read before editing `electron/`, `renderer/`, or `workers/`, or when debugging
+> worker spawn, IPC, or startup crashes. Only non-obvious, code-verified facts —
+> the code is the reference for everything else. Index: [AGENTS.md](../AGENTS.md).
+
 Renderer (sandboxed) ↔ `window.bridge` (Electron IPC) ↔ main (broker only) ↔ fd-3
 FramedStream pipe ↔ Bare worker (`hello-pear-worker`: swarm + corestore + updater).
 The code is small — read it for the wiring; below are only the non-obvious facts.

@@ -1,5 +1,9 @@
 # Packaging gotchas (`forge.config.js`, `build/`, `flatpak/`)
 
+> Read before touching `forge.config.js`, `build/`, or `flatpak/`, or when
+> rebranding or changing signing. Only non-obvious, code-verified facts — the
+> code is the reference for everything else. Index: [AGENTS.md](../AGENTS.md).
+
 - **asar must stay off**: workers are spawned by an external Bare binary from real
   file paths; asar breaks every spawn.
 - The `readPackageJson` hook validates the upgrade key and runs for `start` too

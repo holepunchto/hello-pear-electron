@@ -1,5 +1,10 @@
 # OTA update behavior
 
+> Read before touching the update flow or update UI, adding P2P data to the
+> worker, or when debugging "update never arrives" / "apply hangs". Only
+> non-obvious, code-verified facts — the code is the reference for everything
+> else. Index: [AGENTS.md](../AGENTS.md).
+
 Flow: stage a new build (as described in README) → the worker's swarm replicates the drive → the
 updater mirrors the bundle → pipe strings flip the renderer UI → apply → relaunch.
 

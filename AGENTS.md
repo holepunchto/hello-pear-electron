@@ -44,21 +44,40 @@ npm run make                         # → installers in out/make/
 
 ## Boundaries
 
-- ✅ **Always:** if your change contradicts anything in AGENTS.md or `agent_docs/`,
-  fix the doc in the same change (correct it — don't add new sections unless you have to)
-- ✅ **Always:** check worker changes in a packaged build (`npm run package`) before
-  staging — Bare resolves modules differently there than in dev, so `npm start`
-  passing proves nothing about the worker booting for a user
+You are a tool assisting the maintainer, not a substitute for them. Exceptions to
+any rule here are the human's call: when a task seems to require one, stop and
+surface the conflict instead of working around it. Exceptions are expected to be
+rare.
+
+- ✅ **Always:** if your change makes a *descriptive* statement in AGENTS.md or
+  `agent_docs/` false, update the doc and flag it in your summary; if it conflicts
+  with a contract or boundary, stop and ask instead — never rewrite a rule to
+  legalize your own change
+- ✅ **Always:** check worker changes in a packaged build (`npm run package`) —
+  Bare resolves modules differently there than in dev, so `npm start` passing
+  proves nothing about the worker booting for a user. Work is done when lint
+  passes and, for worker changes, the packaged app boots.
 - ⚠️ **Ask first:** `pear.json`, `AppxManifest.xml` identity/publisher, new deps,
   electron bumps
+- 🚫 **Never:** deployment and publishing (`pear stage`,
+  `pear provision`, `pear multisig`, `pear seed`, pushing `v*` tags — that
+  triggers npm publish), unless the user explicitly asked for exactly that in
+  this session
 - 🚫 **Never:** enable asar (breaks worker spawning); add CLI flags/launch surfaces
   without declaring them to paparam in `electron/main.js` (unknown argv crashes the
-  packaged app); push `v*` tags unless releasing (triggers npm publish); commit
-  secrets
+  packaged app); commit secrets
 
-## Docs — read before touching that area
+## Topic docs — match your task, read the doc BEFORE editing that area
 
-- [`agent_docs/architecture.md`](agent_docs/architecture.md) — IPC wiring + worker contract (`electron/`, `renderer/`, `workers/`)
-- [`agent_docs/updates.md`](agent_docs/updates.md) — OTA timing/apply/limits + updater API forks can use
-- [`agent_docs/packaging.md`](agent_docs/packaging.md) — forge/signing/store gotchas (`forge.config.js`, `build/`, `flatpak/`)
-- [`agent_docs/releases.md`](agent_docs/releases.md) — CI + pear deployment (`.github/`, releases)
+Each `agent_docs/` file holds only code-verified facts you cannot deduce from this
+repo's sources (cross-package contracts, failure semantics, dependency behavior);
+each opens with its own scope statement. Routing:
+
+- Editing `electron/`, `renderer/`, `workers/`, or debugging worker spawn/IPC/startup
+  → [`agent_docs/architecture.md`](agent_docs/architecture.md)
+- Touching the update flow or update UI, adding P2P data, or debugging missing
+  updates → [`agent_docs/updates.md`](agent_docs/updates.md)
+- Touching `forge.config.js`, `build/`, `flatpak/`, rebranding, or signing
+  → [`agent_docs/packaging.md`](agent_docs/packaging.md)
+- Touching `.github/`, or cutting/troubleshooting a release
+  → [`agent_docs/releases.md`](agent_docs/releases.md)
