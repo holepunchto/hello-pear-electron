@@ -1,7 +1,7 @@
 # OTA update behavior
 
 > Read before touching the update flow or update UI, adding P2P data to the
-> worker, or when debugging "update never arrives" / "apply hangs". Only
+> worker, or when debugging how OTA updates land. Only
 > non-obvious, code-verified facts — the code is the reference for everything
 > else. Index: [AGENTS.md](../AGENTS.md).
 
