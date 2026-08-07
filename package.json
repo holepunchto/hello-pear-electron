@@ -14,7 +14,9 @@
     "format": "prettier --write . && lunte --fix",
     "start": "electron-forge start -- --no-updates",
     "package": "electron-forge package",
-    "make": "electron-forge make"
+    "make": "electron-forge make",
+    "install:all": "npm i --ignore-scripts=true && npm run install:electron",
+    "install:electron": "node node_modules/electron/install.js"
   },
   "dependencies": {
     "corestore": "^7.9.1",
