@@ -56,7 +56,7 @@ jobs:
         with:
           allow-git: root
           clean-install: true
-          version: 24
+          version: 20
           registry-url: 'https://npm.pkg.github.com'
           node-auth-token: ${{ github.token }}
       - uses: RaisinTen/actions/run-npm-script@use-node-base-in-make-pear-app
@@ -96,7 +96,7 @@ jobs:
         with:
           allow-git: root
           clean-install: true
-          version: 24
+          version: 20
           registry-url: 'https://npm.pkg.github.com'
           node-auth-token: ${{ github.token }}
       - uses: RaisinTen/actions/run-npm-script@use-node-base-in-make-pear-app
@@ -137,7 +137,7 @@ jobs:
         with:
           allow-git: root
           clean-install: true
-          version: 24
+          version: 20
           registry-url: 'https://npm.pkg.github.com'
           node-auth-token: ${{ github.token }}
       - uses: RaisinTen/actions/run-npm-script@use-node-base-in-make-pear-app
@@ -175,7 +175,7 @@ jobs:
         with:
           allow-git: root
           clean-install: true
-          version: 24
+          version: 20
           registry-url: 'https://npm.pkg.github.com'
           node-auth-token: ${{ github.token }}
       - uses: RaisinTen/actions/run-npm-script@use-node-base-in-make-pear-app
@@ -213,7 +213,7 @@ jobs:
         with:
           allow-git: root
           clean-install: true
-          version: 24
+          version: 20
           registry-url: 'https://npm.pkg.github.com'
           node-auth-token: ${{ github.token }}
       - uses: RaisinTen/actions/run-npm-script@use-node-base-in-make-pear-app
