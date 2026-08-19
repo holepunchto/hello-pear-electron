@@ -52,17 +52,17 @@ jobs:
     environment: release
     steps:
       - uses: actions/checkout@v4
-      - uses: RaisinTen/actions/node-base-extended@use-node-base-in-make-pear-app
+      - uses: holepunchto/actions/node-base-extended@v1
         with:
           allow-git: root
           clean-install: true
           version: 20
           registry-url: 'https://npm.pkg.github.com'
           node-auth-token: ${{ github.token }}
-      - uses: RaisinTen/actions/run-npm-script@use-node-base-in-make-pear-app
+      - uses: holepunchto/actions/run-npm-script@v1
         with:
           script: postinstall:all
-      - uses: RaisinTen/actions/make-pear-app@use-node-base-in-make-pear-app
+      - uses: holepunchto/actions/make-pear-app@v1
         with:
           channel: ${{ env.CHANNEL }}
           upgrade_key: ${{ inputs['upgrade-key'] }}
@@ -92,17 +92,17 @@ jobs:
     environment: release
     steps:
       - uses: actions/checkout@v4
-      - uses: RaisinTen/actions/node-base-extended@use-node-base-in-make-pear-app
+      - uses: holepunchto/actions/node-base-extended@v1
         with:
           allow-git: root
           clean-install: true
           version: 20
           registry-url: 'https://npm.pkg.github.com'
           node-auth-token: ${{ github.token }}
-      - uses: RaisinTen/actions/run-npm-script@use-node-base-in-make-pear-app
+      - uses: holepunchto/actions/run-npm-script@v1
         with:
           script: postinstall:all
-      - uses: RaisinTen/actions/make-pear-app@use-node-base-in-make-pear-app
+      - uses: holepunchto/actions/make-pear-app@v1
         id: build
         with:
           channel: ${{ env.CHANNEL }}
@@ -133,17 +133,17 @@ jobs:
     environment: release
     steps:
       - uses: actions/checkout@v4
-      - uses: RaisinTen/actions/node-base-extended@use-node-base-in-make-pear-app
+      - uses: holepunchto/actions/node-base-extended@v1
         with:
           allow-git: root
           clean-install: true
           version: 20
           registry-url: 'https://npm.pkg.github.com'
           node-auth-token: ${{ github.token }}
-      - uses: RaisinTen/actions/run-npm-script@use-node-base-in-make-pear-app
+      - uses: holepunchto/actions/run-npm-script@v1
         with:
           script: postinstall:mac
-      - uses: RaisinTen/actions/make-pear-app@use-node-base-in-make-pear-app
+      - uses: holepunchto/actions/make-pear-app@v1
         id: build
         with:
           channel: ${{ env.CHANNEL }}
@@ -171,17 +171,17 @@ jobs:
     environment: release
     steps:
       - uses: actions/checkout@v4
-      - uses: RaisinTen/actions/node-base-extended@use-node-base-in-make-pear-app
+      - uses: holepunchto/actions/node-base-extended@v1
         with:
           allow-git: root
           clean-install: true
           version: 20
           registry-url: 'https://npm.pkg.github.com'
           node-auth-token: ${{ github.token }}
-      - uses: RaisinTen/actions/run-npm-script@use-node-base-in-make-pear-app
+      - uses: holepunchto/actions/run-npm-script@v1
         with:
           script: postinstall:mac
-      - uses: RaisinTen/actions/make-pear-app@use-node-base-in-make-pear-app
+      - uses: holepunchto/actions/make-pear-app@v1
         id: build
         with:
           channel: ${{ env.CHANNEL }}
@@ -209,17 +209,17 @@ jobs:
     environment: release
     steps:
       - uses: actions/checkout@v4
-      - uses: RaisinTen/actions/node-base-extended@use-node-base-in-make-pear-app
+      - uses: holepunchto/actions/node-base-extended@v1
         with:
           allow-git: root
           clean-install: true
           version: 20
           registry-url: 'https://npm.pkg.github.com'
           node-auth-token: ${{ github.token }}
-      - uses: RaisinTen/actions/run-npm-script@use-node-base-in-make-pear-app
+      - uses: holepunchto/actions/run-npm-script@v1
         with:
           script: postinstall:all
-      - uses: RaisinTen/actions/make-pear-app@use-node-base-in-make-pear-app
+      - uses: holepunchto/actions/make-pear-app@v1
         id: build
         with:
           channel: ${{ env.CHANNEL }}
