@@ -61,7 +61,7 @@ jobs:
           node-auth-token: ${{ github.token }}
       - uses: RaisinTen/actions/run-npm-script@use-node-base-in-make-pear-app
         with:
-          script: install:electron
+          script: postinstall:all
       - uses: RaisinTen/actions/make-pear-app@use-node-base-in-make-pear-app
         with:
           channel: ${{ env.CHANNEL }}
@@ -101,7 +101,7 @@ jobs:
           node-auth-token: ${{ github.token }}
       - uses: RaisinTen/actions/run-npm-script@use-node-base-in-make-pear-app
         with:
-          script: install:electron
+          script: postinstall:all
       - uses: RaisinTen/actions/make-pear-app@use-node-base-in-make-pear-app
         id: build
         with:
@@ -142,7 +142,7 @@ jobs:
           node-auth-token: ${{ github.token }}
       - uses: RaisinTen/actions/run-npm-script@use-node-base-in-make-pear-app
         with:
-          script: install:electron
+          script: postinstall:mac
       - uses: RaisinTen/actions/make-pear-app@use-node-base-in-make-pear-app
         id: build
         with:
@@ -180,7 +180,7 @@ jobs:
           node-auth-token: ${{ github.token }}
       - uses: RaisinTen/actions/run-npm-script@use-node-base-in-make-pear-app
         with:
-          script: install:electron
+          script: postinstall:mac
       - uses: RaisinTen/actions/make-pear-app@use-node-base-in-make-pear-app
         id: build
         with:
@@ -218,7 +218,7 @@ jobs:
           node-auth-token: ${{ github.token }}
       - uses: RaisinTen/actions/run-npm-script@use-node-base-in-make-pear-app
         with:
-          script: install:electron
+          script: postinstall:all
       - uses: RaisinTen/actions/make-pear-app@use-node-base-in-make-pear-app
         id: build
         with:

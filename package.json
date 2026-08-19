@@ -15,8 +15,13 @@
     "start": "electron-forge start -- --no-updates",
     "package": "electron-forge package",
     "make": "electron-forge make",
-    "install:all": "npm i --ignore-scripts=true && npm run install:electron",
-    "install:electron": "node node_modules/electron/install.js"
+    "install:all": "npm i --ignore-scripts=true && npm run postinstall:all",
+    "install:mac": "npm i --ignore-scripts=true && npm run postinstall:mac",
+    "postinstall:all": "npm run install:electron",
+    "postinstall:mac": "npm run postinstall:all && npm run install:macos-alias && npm run install:fs-xattr",
+    "install:electron": "node node_modules/electron/install.js",
+    "install:macos-alias": "cd node_modules/macos-alias && node-gyp rebuild",
+    "install:fs-xattr": "cd node_modules/fs-xattr && node-gyp rebuild"
   },
   "dependencies": {
     "framed-stream": "^1.0.1",
