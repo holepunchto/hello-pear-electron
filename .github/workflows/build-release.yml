@@ -213,6 +213,8 @@ jobs:
         with:
           allow-git: root
           clean-install: true
+          # TODO: Use LTS. Not done yet because during packaging, the process exits before
+          # the extract-zip package finishes the Electron ZIP extraction on Windows.
           version: 20
           registry-url: 'https://npm.pkg.github.com'
           node-auth-token: ${{ github.token }}
