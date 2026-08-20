@@ -52,6 +52,16 @@ jobs:
     environment: release
     steps:
       - uses: actions/checkout@v4
+      - uses: holepunchto/actions/node-base-extended@v1
+        with:
+          allow-git: root
+          clean-install: true
+          version: 20
+          registry-url: 'https://npm.pkg.github.com'
+          node-auth-token: ${{ github.token }}
+      - uses: holepunchto/actions/run-npm-script@v1
+        with:
+          script: postinstall:all
       - uses: holepunchto/actions/make-pear-app@v1
         with:
           channel: ${{ env.CHANNEL }}
@@ -82,6 +92,16 @@ jobs:
     environment: release
     steps:
       - uses: actions/checkout@v4
+      - uses: holepunchto/actions/node-base-extended@v1
+        with:
+          allow-git: root
+          clean-install: true
+          version: 20
+          registry-url: 'https://npm.pkg.github.com'
+          node-auth-token: ${{ github.token }}
+      - uses: holepunchto/actions/run-npm-script@v1
+        with:
+          script: postinstall:all
       - uses: holepunchto/actions/make-pear-app@v1
         id: build
         with:
@@ -113,6 +133,16 @@ jobs:
     environment: release
     steps:
       - uses: actions/checkout@v4
+      - uses: holepunchto/actions/node-base-extended@v1
+        with:
+          allow-git: root
+          clean-install: true
+          version: 20
+          registry-url: 'https://npm.pkg.github.com'
+          node-auth-token: ${{ github.token }}
+      - uses: holepunchto/actions/run-npm-script@v1
+        with:
+          script: postinstall:mac
       - uses: holepunchto/actions/make-pear-app@v1
         id: build
         with:
@@ -141,6 +171,16 @@ jobs:
     environment: release
     steps:
       - uses: actions/checkout@v4
+      - uses: holepunchto/actions/node-base-extended@v1
+        with:
+          allow-git: root
+          clean-install: true
+          version: 20
+          registry-url: 'https://npm.pkg.github.com'
+          node-auth-token: ${{ github.token }}
+      - uses: holepunchto/actions/run-npm-script@v1
+        with:
+          script: postinstall:mac
       - uses: holepunchto/actions/make-pear-app@v1
         id: build
         with:
@@ -169,6 +209,18 @@ jobs:
     environment: release
     steps:
       - uses: actions/checkout@v4
+      - uses: holepunchto/actions/node-base-extended@v1
+        with:
+          allow-git: root
+          clean-install: true
+          # TODO: Use LTS. Not done yet because during packaging, the process exits before
+          # the extract-zip package finishes the Electron ZIP extraction on Windows.
+          version: 20
+          registry-url: 'https://npm.pkg.github.com'
+          node-auth-token: ${{ github.token }}
+      - uses: holepunchto/actions/run-npm-script@v1
+        with:
+          script: postinstall:all
       - uses: holepunchto/actions/make-pear-app@v1
         id: build
         with:

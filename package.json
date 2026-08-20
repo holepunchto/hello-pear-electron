@@ -15,8 +15,13 @@
     "start": "electron-forge start -- --no-updates",
     "package": "electron-forge package",
     "make": "electron-forge make",
-    "install:all": "npm i --ignore-scripts=true && npm run install:electron",
-    "install:electron": "node node_modules/electron/install.js"
+    "install:all": "npm i --ignore-scripts=true && npm run postinstall:all",
+    "install:mac": "npm i --ignore-scripts=true && npm run postinstall:mac",
+    "postinstall:all": "npm run install:electron",
+    "postinstall:mac": "npm run postinstall:all && npm run install:macos-alias && npm run install:fs-xattr",
+    "install:electron": "node node_modules/electron/install.js",
+    "install:macos-alias": "cd node_modules/macos-alias && node-gyp rebuild",
+    "install:fs-xattr": "cd node_modules/fs-xattr && node-gyp rebuild"
   },
   "dependencies": {
     "framed-stream": "^1.0.1",
@@ -32,6 +37,7 @@
     "@electron-forge/maker-msix": "^7.11.1",
     "@electron-forge/maker-rpm": "^7.11.1",
     "@electron-forge/maker-zip": "^7.11.1",
+    "@electron/node-gyp": "git+ssh://git@github.com/electron/node-gyp.git#06b29aafb7708acef8b3669835c8a7857ebc92d2",
     "app-builder-lib": "^26.8.1",
     "electron": "^40.2.1",
     "electron-forge-plugin-prune-prebuilds": "^1.0.0",

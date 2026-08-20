@@ -74,8 +74,16 @@ End-to-end boilerplate for embedding [pear-runtime][pear-runtime] into [Electron
 
 ### Install <a name="install"></a>
 
+On Windows and Linux:
+
 ```sh
 npm run install:all
+```
+
+On macOS:
+
+```sh
+npm run install:mac
 ```
 
 ### Start <a name="start"></a>
