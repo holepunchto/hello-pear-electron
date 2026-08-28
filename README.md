@@ -38,6 +38,7 @@ End-to-end boilerplate for embedding [pear-runtime][pear-runtime] into [Electron
     - [Release Line Builds](#release-line-builds)
     - [Custom Builds](#custom-builds)
 - [CI Configuration](#ci-configuration)
+  - [CI Multisig](#ci-multisig)
 - [Store Submissions](#store-submissions)
   - [Flathub](#flathub)
   - [Snap](#snap)
@@ -1024,6 +1025,110 @@ Create a GitHub environment (Settings -> Environments) named `release`. Run the 
 - Windows certificate 'subject' must match the `Publisher` in [AppxManifest.xml](build/AppxManifest.xml).
 - Linux builds are not signed, no configuration needed.
 
+### CI Multisig <a name="ci-multisig"></a>
+
+The `Build Release` workflow can stage build artifacts and create a multisig signing request in the same run.
+
+1. Create a GitHub environment named `release`.
+
+2. Configure one secret to the `release` environment:
+
+| Secret             | Notes                                                        |
+| ------------------ | ------------------------------------------------------------ |
+| `PEAR_PRIMARY_KEY` | Hex-encoded primary key for the CI-owned staged source drive |
+
+Generate `PEAR_PRIMARY_KEY` once and save it as a `release` environment secret:
+
+```sh
+node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
+```
+
+Keep this value a secret and use the same value for future staged builds. `PEAR_PRIMARY_KEY` is the persistent write key for the CI-owned staged source drive. Changing it creates a different staged source drive and breaks continuity with the existing `ci/snapshot.json`, so rotate it only when intentionally starting a new staged source drive or recovering from a corrupted/conflicted one.
+
+Configure three plain variables (not secrets) to the `release` environment:
+
+| Variable             | Notes                                                      |
+| -------------------- | ---------------------------------------------------------- |
+| `MULTISIG_QUORUM`    | Required signature count, e.g. `2`                         |
+| `MULTISIG_PUBKEYS`   | Space-separated signer public keys                         |
+| `MULTISIG_NAMESPACE` | Multisig namespace, e.g. `holepunchto/hello-pear-electron` |
+
+Note: public keys order matters, changing the order changes the output.
+
+3. In `Settings -> Actions -> General -> Workflow permissions`, select `Read and write permissions` and enable `Allow GitHub Actions to create and approve pull requests`.
+   The stage job uses `GITHUB_TOKEN` to commit `ci/snapshot.json` to `main`. If direct push to `main` fails, it opens a snapshot update PR instead.
+   Without this, the stage job can push the snapshot branch but fails when creating the PR with `GitHub Actions is not permitted to create or approve pull requests`.
+
+4. Set the same multisig values in `pear.json` and compute the multisig link:
+
+```sh
+pear multisig link --config ./pear.json
+```
+
+Use the printed `pear://...` link as the `Build Release` `upgrade-key`, or leave `upgrade-key` empty if the same link is already set in `package.json`.
+
+5. For an OTA release, bump the version before running CI and push the changed files:
+
+```sh
+npm version minor --no-git-tag-version
+```
+
+6. Run `Build Release` with:
+   - `upgrade-key`: the `pear://...` link from `pear multisig link --config ./pear.json` and `run-stage-multisig`: `true`
+   - CI builds the OS distributables.
+   - `make-pear-app` uploads the release artifacts.
+   - CI downloads artifacts like macOS `.app`, Linux AppImages, and Windows MSIX into `out/artifacts`.
+   - CI builds `out/stage` with `pear-build`.
+   - `holepunchto/actions/pear-ci` fetches `ci/snapshot.json` from `main`.
+   - `pear-ci` stages `out/stage` into the production staging drive and waits until connected remote peers have synced the staged source drive.
+   - `holepunchto/actions/pear-ci` writes the updated `ci/snapshot.json` back to `main`, or creates a PR if direct push fails.
+   - CI creates a multisig request with `pear-ci-multisig request`.
+   - CI prints the source verlink, multisig request, and signing command in the `Multisig Request` summary section.
+
+7. Keep the staged source drive well seeded.
+   The staged source drive contains this CI build. Note: this is a different link not the multisig release target used as the `upgrade-key`.
+
+   In the stage job logs find the staged source key printed by `pear-ci`. Seed that drive from two independent Pear instances or machines and keep both running through the final commit:
+
+   ```sh
+   pear seed pear://<key>
+   ```
+
+   `pear-ci-multisig request` checks that both the staged drive DB and blob cores are fully available from two peers. If CI fails with `SOURCE_CORE_INSUFFICIENT_PEERS (1/2 peers)`, add another seeder and rerun the workflow.
+
+8. Be sure the automated `ci/snapshot.json` PR is merged before the next staged build if the action could not push directly to `main`.
+   The snapshot lets future CI runs reopen the staged drive state before appending the next version.
+
+9. After CI finishes, open the `Build Release` run summary. Each signer copies the request from the `Multisig Request` section and runs this from the project root.
+   `<signer-name>` is the local signing key name, e.g. `signer-a`.
+
+   ```sh
+   pear multisig sign <request> <signer-name>
+   ```
+
+   After collecting enough responses for the quorum, copy the source verlink from the `Multisig Request` section and verify and commit with the matching `pear.json` config:
+
+   ```sh
+   pear multisig verify --config ./pear.json <source-verlink> <request> <response-1> <response-2>
+   pear multisig commit --config ./pear.json <source-verlink> <request> <response-1> <response-2>
+   ```
+
+   If commit asks for the multisig target to be seeded, seed the printed multisig link from two independent Pear instances and keep them running until commit completes:
+
+   ```sh
+   pear seed pear://<multisig-link-key>
+   ```
+
+   After commit, verify the release target can be read:
+
+   ```sh
+   pear dump --list <multisig-link>
+   ```
+
+   The output should include `/package.json` and the staged files under `/by-arch/...`.
+
+Note: CI workflow only creates the multisig request, it does not run the final `multisig commit` which is done manually by a signer.
+
 ## Store Submissions <a name="store-submissions"></a>
 
 Applications built from this template can also be distributed through platform-specific application stores.
@@ -1264,6 +1369,10 @@ Runs: `electron-forge make`
 ---
 
 ## Troubleshooting <a name="troubleshooting"></a>
+
+### CI stage fails with Hypercore conflict or `SESSION_CLOSED` <a name="ci-stage-conflict-session-closed"></a>
+
+If `pear-ci` logs `[hypercore] conflict detected` or `SESSION_CLOSED: Cannot append to a closed session` during staging, the CI staged source drive is conflicted or was reused incorrectly. Recovery is to start a new staged source drive: generate a fresh `PEAR_PRIMARY_KEY`, replace the `release` environment secret, keep `ci/snapshot.json` as `[]`, and rerun the workflow. Do not rotate `PEAR_PRIMARY_KEY` for normal releases; it is the persistent write key for appending future staged builds to the same CI source drive.
 
 ### App did not update <a name="app-did-not-update"></a>
 
