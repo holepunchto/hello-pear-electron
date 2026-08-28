@@ -140,6 +140,8 @@ To disable updates as an application default, ensure that the package.json is sp
 
 #### Runtime Update Flow <a name="runtime-update-flow"></a>
 
+A running application checks for updates on startup and when its application drive receives new data. After the first 60 seconds of startup, detected updates are scheduled with a randomized delay of up to 1 hour by default to spread update traffic across peers. This can be configured with the updater's `delay` option.
+
 A running application will receive `updating` and `updated` events, which are sent to the electron renderer
 process via `bridge.onPearEvent()`. After receiving the `updated` event, the `bridge.applyUpdate()` method is called. This swaps the current application path with a path to the updated application build and then removes the old application from disk. So once the application is restarted, the application path contains the new build therefore the updated application is executed on restart.
 
