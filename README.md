@@ -216,6 +216,34 @@ The full release flow — stage, provision, and multisig — plus the Foundation
 - [Release pipeline](https://docs.pears.com/explanation/deployment-releasing-apps-p2p) — why stage, provision, and multisig exist and how they chain together
 - [Build desktop distributables](https://docs.pears.com/how-to/operate-an-app/build-and-package/build-desktop-distributables) — macOS, Windows, and Linux signing and notarization
 
+The Foundational Steps bootstrap the deployment and then feed into the repeating release cycle:
+
+```mermaid
+graph TD
+    subgraph Link Setup
+        T(0. Touch & Seed) --> U(1. Set upgrade link)
+    end
+
+    U -.-> V
+
+    V(2. Version) --> Make(3. Make Distributables)
+    Make --> Build(4. Build Deployment Directory)
+    Build --> Stage(5. Stage)
+    Stage -->|iterate| V
+    Stage -->|stable| Prov(6. Provision)
+    Prov -->|assessed| Req(7d. Prepare Request)
+    Req --> Sign(7e. Sign)
+    Sign --> Verify(7f. Verify)
+    Verify --> Commit(7g. Commit)
+    Commit --> Live[Production Live]
+    Live -->|next release| V
+
+    K(7a. Create Signing Keys) --> C(7b. Create Multisig Config)
+    Prov -->|setup| C
+    C --> L(7c. Set upgrade to Multisig Link)
+    L --> Req
+```
+
 ## CI Configuration <a name="ci-configuration"></a>
 
 Create a GitHub environment (Settings -> Environments) named `release`. Run the `Build Release` workflow to build in CI. This workflow requires these secrets for signed builds:
