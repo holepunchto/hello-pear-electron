@@ -355,6 +355,8 @@ x-checker-data:
   url-template: https://static.keet.io/downloads/$version/Keet-arm64-flatpak.tar.gz
 ```
 
+Flathub's central external data checker GitHub Action runs every 4 hours via a cron job. You can avoid this delay by opting out of that workflow and adding a "Check for updates" button to the GitHub Actions tab. To do this, use the [example workflow](https://github.com/flathub/io.keet.Keet/blob/master/.github/workflows/update.yml), replacing the Flatpak YAML filename with yours and add the [flathub.json](https://github.com/flathub/io.keet.Keet/blob/master/flathub.json) file to your repository.
+
 ### Snap <a name="snap"></a>
 
 Snap packages applications for Linux and distributes them through the Snap Store. This section covers preparing a Snap package, testing it locally and publishing releases to the Snap Store.
