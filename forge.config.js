@@ -61,6 +61,7 @@ module.exports = {
       platforms: ['win32'],
       config: {
         appManifest: path.join(__dirname, 'build', 'AppxManifest.xml'),
+        packageAssets: path.join(__dirname, 'build', 'msix-assets'),
         windowsKitVersion: getWindowsKitVersion(),
         ...(process.env.WINDOWS_SIGN_HOOK
           ? {
@@ -80,7 +81,8 @@ module.exports = {
           { file: 'build/icon/icon-32x32.png', size: 32 },
           { file: 'build/icon/icon-64x64.png', size: 64 },
           { file: 'build/icon/icon-128x128.png', size: 128 },
-          { file: 'build/icon/icon-256x256.png', size: 256 }
+          { file: 'build/icon/icon-256x256.png', size: 256 },
+          { file: 'build/icon/icon-512x512.png', size: 512 }
         ]
       }
     },
