@@ -153,8 +153,8 @@ jobs:
                 needs.prebuild.outputs.package-name,
                 needs.prebuild.outputs.version,
                 'arm64') }}
-          macos_certificate_base64: ${{ secrets.CERTIFICATE_P12 }}
-          macos_p12_password: ${{ secrets.CERTIFICATE_PASSWORD }}
+          macos_development_certificate_base64: ${{ secrets.CERTIFICATE_P12 }}
+          macos_development_password: ${{ secrets.CERTIFICATE_PASSWORD }}
           macos_codesign_identity: ${{ secrets.MAC_CODESIGN_IDENTITY }}
           macos_notarization_method: apple_id_password
           macos_apple_id: ${{ secrets.APPLE_ID }}
@@ -191,13 +191,52 @@ jobs:
                 needs.prebuild.outputs.package-name,
                 needs.prebuild.outputs.version,
                 'x64') }}
-          macos_certificate_base64: ${{ secrets.CERTIFICATE_P12 }}
-          macos_p12_password: ${{ secrets.CERTIFICATE_PASSWORD }}
+          macos_development_certificate_base64: ${{ secrets.CERTIFICATE_P12 }}
+          macos_development_password: ${{ secrets.CERTIFICATE_PASSWORD }}
           macos_codesign_identity: ${{ secrets.MAC_CODESIGN_IDENTITY }}
           macos_notarization_method: apple_id_password
           macos_apple_id: ${{ secrets.APPLE_ID }}
           macos_apple_password: ${{ secrets.APPLE_PASSWORD }}
           macos_apple_team_id: ${{ secrets.APPLE_TEAM_ID }}
+
+  build-macos-mas:
+    needs: [prebuild]
+    timeout-minutes: 20
+    permissions:
+      contents: read
+      packages: read
+    runs-on: macos-latest
+    environment: release
+    steps:
+      - uses: actions/checkout@v4
+      - uses: holepunchto/actions/node-base-extended@v1
+        with:
+          allow-git: root
+          clean-install: true
+          version: 20
+          registry-url: 'https://npm.pkg.github.com'
+          node-auth-token: ${{ github.token }}
+      - uses: holepunchto/actions/run-npm-script@v1
+        with:
+          script: postinstall:mac
+      - uses: holepunchto/actions/make-pear-app@v1
+        id: build
+        with:
+          script: make:mas
+          channel: ${{ env.CHANNEL }}
+          upgrade_key: ${{ inputs['upgrade-key'] }}
+          macos_mas_pkg: >-
+            ${{ format('{0}-{1}-{2}.pkg',
+                needs.prebuild.outputs.package-name,
+                needs.prebuild.outputs.version,
+                'arm64') }}
+          macos_distribution_certificate_base64: ${{ secrets.APPLE_DISTRIBUTION_CERTIFICATE_P12 }}
+          macos_distribution_password: ${{ secrets.APPLE_DISTRIBUTION_CERTIFICATE_PASSWORD }}
+          macos_installer_distribution_certificate_base64: ${{ secrets.MAC_INSTALLER_DISTRIBUTION_CERTIFICATE_P12 }}
+          macos_installer_distribution_password: ${{ secrets.MAC_INSTALLER_DISTRIBUTION_CERTIFICATE_PASSWORD }}
+          macos_distribution_provisioning_profile_base64: ${{ secrets.MACOS_DISTRIBUTION_PROVISION_PROFILE_BASE64 }}
+          macos_distribution_identity: 'Apple Distribution'
+          macos_installer_distribution_identity: '3rd Party Mac Developer Installer'
 
   build-win32:
     needs: [prebuild]

@@ -47,6 +47,28 @@ function sendToAll(name, data) {
   }
 }
 
+function shouldUpdate() {
+  if (!updates) return false
+
+  if (isWindows) {
+    const isMsix = process.windowsStore ?? false
+    if (isMsix) {
+      return app.isPackaged
+    }
+    return false
+  }
+
+  if (isMac) {
+    if (process.mas) {
+      return false
+    }
+    return app.isPackaged
+  }
+
+  // TODO: Linux Snap and Flatpak should not update.
+  return app.isPackaged
+}
+
 function getWorker(specifier) {
   if (workers.has(specifier)) return workers.get(specifier)
   const appPath = getAppPath()
@@ -71,7 +93,7 @@ function getWorker(specifier) {
   const extension = isLinux ? '.AppImage' : isMac ? '.app' : '.msix'
 
   const worker = PearRuntime.run(require.resolve('..' + specifier), [
-    updates,
+    shouldUpdate(),
     version,
     upgrade,
     productName + extension,
