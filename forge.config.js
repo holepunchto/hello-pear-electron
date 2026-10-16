@@ -28,10 +28,30 @@ function getWindowsKitVersion() {
 let packagerConfig = {
   icon: 'build/icon',
   protocols: [{ name: appName, schemes: [pkg.name] }],
-  derefSymlinks: true
+  derefSymlinks: true,
+  extendInfo: {
+    ElectronTeamID: '1A2B3C4D5E'
+  }
 }
 
-if (process.env.MAC_CODESIGN_IDENTITY) {
+if (process.argv.includes('--platform=mas')) {
+  packagerConfig = {
+    ...packagerConfig,
+    osxSign: {
+      identity: process.env.MAS_DISTRIBUTION_IDENTITY,
+      provisioningProfile: process.env.MAS_PROVISIONING_PROFILE,
+      optionsForFile: (filePath) => {
+        let entitlements
+        if (filePath.includes('.app/')) {
+          entitlements = path.join(__dirname, 'build', 'entitlements.mas.inherit.plist')
+        } else {
+          entitlements = path.join(__dirname, 'build', 'entitlements.mas.plist')
+        }
+        return { entitlements, hardenedRuntime: false }
+      }
+    }
+  }
+} else if (process.env.MAC_CODESIGN_IDENTITY) {
   packagerConfig = {
     ...packagerConfig,
     osxSign: {
@@ -55,6 +75,13 @@ module.exports = {
       name: '@electron-forge/maker-dmg',
       platforms: ['darwin'],
       config: {}
+    },
+    {
+      name: '@electron-forge/maker-pkg',
+      platforms: ['mas'],
+      config: {
+        identity: process.env.MAS_INSTALLER_DISTRIBUTION_IDENTITY
+      }
     },
     {
       name: '@electron-forge/maker-msix',
