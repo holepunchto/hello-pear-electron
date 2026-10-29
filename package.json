@@ -47,7 +47,7 @@
     "@electron-forge/maker-zip": "^7.11.1",
     "@electron/node-gyp": "git+ssh://git@github.com/electron/node-gyp.git#06b29aafb7708acef8b3669835c8a7857ebc92d2",
     "app-builder-lib": "^26.8.1",
-    "electron": "^40.2.1",
+    "electron": "^42.0.1",
     "electron-forge-plugin-prune-prebuilds": "^1.0.2",
     "electron-forge-plugin-universal-prebuilds": "^1.0.0",
     "hello-pear-worker": "^1.2.0",
