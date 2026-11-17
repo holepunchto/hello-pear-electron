@@ -54,7 +54,6 @@ jobs:
       - uses: actions/checkout@v4
       - uses: holepunchto/actions/node-base-extended@v1
         with:
-          allow-git: root
           clean-install: true
           version: 20
           registry-url: 'https://npm.pkg.github.com'
@@ -94,7 +93,6 @@ jobs:
       - uses: actions/checkout@v4
       - uses: holepunchto/actions/node-base-extended@v1
         with:
-          allow-git: root
           clean-install: true
           version: 20
           registry-url: 'https://npm.pkg.github.com'
@@ -135,7 +133,6 @@ jobs:
       - uses: actions/checkout@v4
       - uses: holepunchto/actions/node-base-extended@v1
         with:
-          allow-git: root
           clean-install: true
           version: 20
           registry-url: 'https://npm.pkg.github.com'
@@ -173,7 +170,6 @@ jobs:
       - uses: actions/checkout@v4
       - uses: holepunchto/actions/node-base-extended@v1
         with:
-          allow-git: root
           clean-install: true
           version: 20
           registry-url: 'https://npm.pkg.github.com'
@@ -211,7 +207,6 @@ jobs:
       - uses: actions/checkout@v4
       - uses: holepunchto/actions/node-base-extended@v1
         with:
-          allow-git: root
           clean-install: true
           version: 20
           registry-url: 'https://npm.pkg.github.com'
@@ -250,7 +245,6 @@ jobs:
       - uses: actions/checkout@v4
       - uses: holepunchto/actions/node-base-extended@v1
         with:
-          allow-git: root
           clean-install: true
           # TODO: Use LTS. Not done yet because during packaging, the process exits before
           # the extract-zip package finishes the Electron ZIP extraction on Windows.
@@ -266,8 +260,10 @@ jobs:
           channel: ${{ env.CHANNEL }}
           upgrade_key: ${{ inputs['upgrade-key'] }}
           windows_msix: >-
-            ${{ format('{0}.msix',
-                needs.prebuild.outputs.package-name) }}
+            ${{ format('{0}-{1}-{2}.msix',
+                needs.prebuild.outputs.package-name,
+                'win32-x64',
+                needs.prebuild.outputs.version) }}
           windows_signing_method: windows_cert_pfx
           windows_cert_pfx_base64: ${{ secrets.WINDOWS_CERT_PFX_BASE64 }}
           windows_cert_password: ${{ secrets.WINDOWS_CERT_PASSWORD }}
