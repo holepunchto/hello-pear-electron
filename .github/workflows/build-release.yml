@@ -266,8 +266,10 @@ jobs:
           channel: ${{ env.CHANNEL }}
           upgrade_key: ${{ inputs['upgrade-key'] }}
           windows_msix: >-
-            ${{ format('{0}.msix',
-                needs.prebuild.outputs.package-name) }}
+            ${{ format('{0}-{1}-{2}.msix',
+                needs.prebuild.outputs.package-name,
+                'win32-x64',
+                needs.prebuild.outputs.version) }}
           windows_signing_method: windows_cert_pfx
           windows_cert_pfx_base64: ${{ secrets.WINDOWS_CERT_PFX_BASE64 }}
           windows_cert_password: ${{ secrets.WINDOWS_CERT_PASSWORD }}
