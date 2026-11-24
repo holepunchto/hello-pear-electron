@@ -37,7 +37,8 @@ well-formed key committed.
 
 - Six-arg spawn argv order: `getWorker()` in `electron/main.js` ↔ the worker's positional reads
 - Specifier `'/workers/main.js'`: renderer ↔ IPC channel names
-- Pipe strings `updating`/`updated`/`pear:applyUpdate`/`pear:updateApplied`; FramedStream on both ends
+- Pipe strings `updating`/`updated`/`pear:applyUpdate`/`pear:updateApplied`/`pear:updateFailed <message>`;
+  FramedStream on both ends
 - Node builtins used under `workers/` ↔ `package.json#imports`: Bare has no `events`,
   so in-project worker code needs a `{"bare": "bare-events", "default": "events"}`
   entry (hypercore and hyperswarm ship the same map). Dev silently resolves a hoisted

@@ -29,8 +29,10 @@ The code is small — read it for the wiring; below are only the non-obvious fac
 - Pipe protocol = plain UTF-8 strings in FramedStream frames, matched by exact
   equality. Unknown →worker strings get `console.log`ged; unknown worker→ strings
   are forwarded to the renderer.
-- `pear:applyUpdate` is hardwired to `'/workers/main.js'`, lazily respawns a dead
-  worker, and its promise has no reject/timeout — any failure = renderer hangs.
+- `pear:applyUpdate` is hardwired to `'/workers/main.js'` and lazily respawns a dead
+  worker. Its promise resolves on `pear:updateApplied`, rejects on
+  `pear:updateFailed <message>` (prefix match) or if the pipe closes first, and has
+  no timeout — a worker that never replies still hangs the renderer.
 - `sendToAll` broadcasts every worker channel to **all** windows; nothing restarts
   a crashed worker.
 - Per-platform storage dir is chosen in `getWorker()` (dev:
