@@ -161,16 +161,28 @@ ipcMain.handle('pear:applyUpdate', () => {
   const pipe = getWorker(mainWorkerSpecifier)
 
   return new Promise((resolve, reject) => {
+    function cleanup() {
+      pipe.removeListener('data', onData)
+      pipe.removeListener('close', onClose)
+    }
     function onData(data) {
       const message = data.toString()
 
       if (message === 'pear:updateApplied') {
-        pipe.removeListener('data', onData)
+        cleanup()
         resolve()
+      } else if (message.startsWith('pear:updateFailed')) {
+        cleanup()
+        reject(new Error(message.slice('pear:updateFailed '.length) || 'update failed'))
       }
+    }
+    function onClose() {
+      cleanup()
+      reject(new Error('worker closed before the update was applied'))
     }
 
     pipe.on('data', onData)
+    pipe.on('close', onClose)
     pipe.write('pear:applyUpdate')
   })
 })
